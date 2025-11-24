@@ -9,6 +9,9 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
     public float lineLength = 15f; // Длина прямых линий
     public int lineCount = 8; // Количество прямых линий
 
+    [Header("Промежуточные узлы")]
+    public int intermediateNodes = 0; // Количество промежуточных узлов между основными точками
+
     [Header("Настройки отображения")]
     public Color gridColor = Color.blue; // Цвет сетки
     public float previewHeight = 0.1f; // Высота отображения префаба над поверхностью
@@ -79,11 +82,20 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
         float maxDistance = circleCount * gridStep;
         roundedDistance = Mathf.Clamp(roundedDistance, 0, maxDistance);
 
+        // Определяем номер круга для вычисленного расстояния
+        int targetCircle = Mathf.RoundToInt(roundedDistance / gridStep);
+        targetCircle = Mathf.Clamp(targetCircle, 1, circleCount);
+
         // Вычисляем угол направления
         float angle = Mathf.Atan2(direction.z, direction.x);
 
-        // Округляем угол до ближайшего шага углов
-        float angleStep = 360f / lineCount;
+        // Определяем количество точек на целевом круге с учетом уменьшения
+        int reductionMultiplier = GetReductionMultiplierForCircle(targetCircle);
+        int pointsOnTargetCircle = lineCount / reductionMultiplier;
+        if (pointsOnTargetCircle < 4) pointsOnTargetCircle = 4;
+
+        // Округляем угол до ближайшего шага углов для целевого круга
+        float angleStep = 360f / pointsOnTargetCircle;
         float roundedAngle = Mathf.Round(angle * Mathf.Rad2Deg / angleStep) * angleStep;
 
         // Преобразуем обратно в радианы
@@ -96,7 +108,9 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
             Mathf.Sin(roundedAngle) * roundedDistance
         );
 
-        Debug.Log($"Сетка: входная позиция {worldPosition}, выходная позиция {gridPosition}, расстояние {distance} -> {roundedDistance}");
+        Debug.Log("Сетка: входная позиция " + worldPosition + ", выходная позиция " + gridPosition +
+                 ", расстояние " + distance + " -> " + roundedDistance +
+                 ", круг " + targetCircle + ", точек на круге: " + pointsOnTargetCircle);
 
         return gridPosition;
     }
@@ -110,7 +124,7 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
         // Создаем декали точек в узлах сетки
         CreateDecalPoints();
 
-        Debug.Log($"Режим предпросмотра круговой сетки включен. Центр: {gridCenter}");
+        Debug.Log("Режим предпросмотра круговой сетки включен. Центр: " + gridCenter);
     }
 
     // Выключение режима предпросмотра
@@ -138,9 +152,24 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
         {
             float radius = circle * gridStep;
 
-            for (int line = 0; line < lineCount; line++)
+            // Определяем количество промежуточных узлов для текущего круга
+            int currentIntermediateNodes = GetIntermediateNodesForCircle(circle);
+
+            // Определяем множитель уменьшения точек для текущего круга
+            int reductionMultiplier = GetReductionMultiplierForCircle(circle);
+
+            // Вычисляем общее количество точек на текущем круге
+            int basePoints = lineCount / reductionMultiplier;
+            int totalPointsOnCircle = basePoints * (currentIntermediateNodes + 1);
+
+            // Если количество точек меньше минимального, устанавливаем минимум
+            if (totalPointsOnCircle < 4) totalPointsOnCircle = 4;
+
+            float angleStep = 360f / totalPointsOnCircle;
+
+            for (int pointIndex = 0; pointIndex < totalPointsOnCircle; pointIndex++)
             {
-                float angle = line * (360f / lineCount) * Mathf.Deg2Rad;
+                float angle = pointIndex * angleStep * Mathf.Deg2Rad;
 
                 // Вычисляем позицию точки
                 Vector3 pointPosition = gridCenter + new Vector3(
@@ -158,7 +187,62 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
             }
         }
 
-        Debug.Log($"Создано {decalPoints.Count} декалей точек");
+        Debug.Log("Создано " + decalPoints.Count + " декалей точек (включая промежуточные)");
+    }
+
+    // Получение количества промежуточных узлов для конкретного круга
+    int GetIntermediateNodesForCircle(int circleNumber)
+    {
+        if (intermediateNodes >= 0)
+        {
+            // Положительные значения: добавляем промежуточные узлы
+            return Mathf.Max(0, (circleNumber - 1) * intermediateNodes);
+        }
+        else
+        {
+            // Отрицательные значения: уменьшаем количество точек
+            // Для отрицательных значений промежуточные узлы не добавляем
+            return 0;
+        }
+    }
+
+    // Получение множителя уменьшения точек для круга
+    int GetReductionMultiplierForCircle(int circleNumber)
+    {
+        if (intermediateNodes >= 0)
+        {
+            // Положительные значения - не уменьшаем точки
+            return 1;
+        }
+        else
+        {
+            // Отрицательные значения: уменьшаем количество точек
+            int reductionLevel = Mathf.Abs(intermediateNodes);
+
+            // Определяем на сколько кругов распространяется уменьшение
+            int reductionCircles = Mathf.Min(reductionLevel, circleCount);
+
+            // Для кругов, которые не попадают под уменьшение, возвращаем 1
+            if (circleNumber > reductionCircles)
+                return 1;
+
+            // Вычисляем множитель уменьшения для текущего круга
+            // Чем ближе круг к центру, тем сильнее уменьшение
+            int circleIndexFromCenter = reductionCircles - circleNumber + 1;
+            int reductionMultiplier = (int)Mathf.Pow(2, circleIndexFromCenter - 1);
+
+            return reductionMultiplier;
+        }
+    }
+
+    // Получение количества точек на указанном круге
+    public int GetPointsCountOnCircle(int circleNumber)
+    {
+        int reductionMultiplier = GetReductionMultiplierForCircle(circleNumber);
+        int pointsCount = lineCount / reductionMultiplier;
+
+        // Обеспечиваем минимальное количество точек
+        return Mathf.Max(4, pointsCount);
     }
 
     // Очистка всех декалей точек
@@ -199,6 +283,82 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
         return isActive && currentPreview != null;
     }
 
+    // Получение всех позиций узлов сетки (включая промежуточные)
+    public List<Vector3> GetAllGridPositions()
+    {
+        List<Vector3> positions = new List<Vector3>();
+
+        for (int circle = 1; circle <= circleCount; circle++)
+        {
+            float radius = circle * gridStep;
+
+            // Определяем количество промежуточных узлов для текущего круга
+            int currentIntermediateNodes = GetIntermediateNodesForCircle(circle);
+
+            // Определяем множитель уменьшения точек для текущего круга
+            int reductionMultiplier = GetReductionMultiplierForCircle(circle);
+
+            // Вычисляем общее количество точек на текущем круге
+            int basePoints = lineCount / reductionMultiplier;
+            int totalPointsOnCircle = basePoints * (currentIntermediateNodes + 1);
+
+            // Если количество точек меньше минимального, устанавливаем минимум
+            if (totalPointsOnCircle < 4) totalPointsOnCircle = 4;
+
+            float angleStep = 360f / totalPointsOnCircle;
+
+            for (int pointIndex = 0; pointIndex < totalPointsOnCircle; pointIndex++)
+            {
+                float angle = pointIndex * angleStep * Mathf.Deg2Rad;
+
+                Vector3 position = gridCenter + new Vector3(
+                    Mathf.Cos(angle) * radius,
+                    0,
+                    Mathf.Sin(angle) * radius
+                );
+
+                positions.Add(position);
+            }
+        }
+
+        return positions;
+    }
+
+    // Получение позиций только основных узлов (без промежуточных)
+    public List<Vector3> GetMainGridPositions()
+    {
+        List<Vector3> positions = new List<Vector3>();
+
+        for (int circle = 1; circle <= circleCount; circle++)
+        {
+            float radius = circle * gridStep;
+
+            // Определяем множитель уменьшения точек для текущего круга
+            int reductionMultiplier = GetReductionMultiplierForCircle(circle);
+
+            // Вычисляем количество точек на круге с учетом уменьшения
+            int pointsOnCircle = lineCount / reductionMultiplier;
+            if (pointsOnCircle < 4) pointsOnCircle = 4;
+
+            float angleStep = 360f / pointsOnCircle;
+
+            for (int pointIndex = 0; pointIndex < pointsOnCircle; pointIndex++)
+            {
+                float angle = pointIndex * angleStep * Mathf.Deg2Rad;
+
+                Vector3 position = gridCenter + new Vector3(
+                    Mathf.Cos(angle) * radius,
+                    0,
+                    Mathf.Sin(angle) * radius
+                );
+
+                positions.Add(position);
+            }
+        }
+
+        return positions;
+    }
+
     // Визуализация сетки в редакторе
     void OnDrawGizmos()
     {
@@ -228,19 +388,10 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
 
         // Рисуем точки пересечения (для визуализации в редакторе)
         Gizmos.color = Color.red;
-        for (int circle = 1; circle <= circleCount; circle++)
+        List<Vector3> allPositions = GetAllGridPositions();
+        foreach (Vector3 point in allPositions)
         {
-            float radius = circle * gridStep;
-            for (int line = 0; line < lineCount; line++)
-            {
-                float angle = line * angleStep * Mathf.Deg2Rad;
-                Vector3 point = gridCenter + new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    0,
-                    Mathf.Sin(angle) * radius
-                );
-                Gizmos.DrawSphere(point, 0.1f);
-            }
+            Gizmos.DrawSphere(point, 0.1f);
         }
     }
 
@@ -269,32 +420,6 @@ public class DF_MiniFigureGridDecalFor : MonoBehaviour
     public Vector3 GetGridCenter()
     {
         return gridCenter;
-    }
-
-    // Получение списка всех позиций узлов сетки
-    public List<Vector3> GetAllGridPositions()
-    {
-        List<Vector3> positions = new List<Vector3>();
-
-        for (int circle = 1; circle <= circleCount; circle++)
-        {
-            float radius = circle * gridStep;
-
-            for (int line = 0; line < lineCount; line++)
-            {
-                float angle = line * (360f / lineCount) * Mathf.Deg2Rad;
-
-                Vector3 position = gridCenter + new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    0,
-                    Mathf.Sin(angle) * radius
-                );
-
-                positions.Add(position);
-            }
-        }
-
-        return positions;
     }
 
     // Очистка при уничтожении объекта
