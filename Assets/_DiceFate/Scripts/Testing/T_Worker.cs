@@ -10,7 +10,7 @@ public class T_Worker : MonoBehaviour, ISelectable, IMoveable
 
     private NavMeshAgent agent;
 
-
+    public bool IsSelected => throw new System.NotImplementedException();
 
     private void Awake()
     {
@@ -38,6 +38,11 @@ public class T_Worker : MonoBehaviour, ISelectable, IMoveable
     {
        // agent.destination = position;
       agent.SetDestination(position);
+    }
+
+    public void StopMove()
+    {
+        throw new System.NotImplementedException();
     }
 }
  
