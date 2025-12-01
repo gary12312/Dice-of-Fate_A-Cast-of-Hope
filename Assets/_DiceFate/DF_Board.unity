@@ -1741,7 +1741,6 @@ GameObject:
   - component: {fileID: 500060710}
   - component: {fileID: 500060709}
   - component: {fileID: 500060712}
-  - component: {fileID: 500060715}
   - component: {fileID: 500060716}
   - component: {fileID: 500060717}
   m_Layer: 0
@@ -1901,24 +1900,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9861698, y: 2, z: 1.008859}
   m_Center: {x: 0.0013737975, y: 1, z: 0.00043869013}
---- !u!114 &500060715
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 500060705}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9bd7ccb125c26104591de5f50108406e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.TestUnit
-  <IsSelected>k__BackingField: 0
-  <CurrentHealth>k__BackingField: 0
-  <MaxHealth>k__BackingField: 0
-  decal: {fileID: 1069881005}
-  UnitSO: {fileID: 11400000, guid: ff007b2b85c89b44cabd7b3484d72b72, type: 2}
-  Outline: {fileID: 500060717}
 --- !u!114 &500060716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3771,6 +3752,7 @@ MonoBehaviour:
   floorLayers:
     serializedVersion: 2
     m_Bits: 0
+  updateInterval: 0.1
   cameraMoveSpeedX: 2.1
   cameraMoveSpeedY: 4
   cameraRotationSpeed: 10

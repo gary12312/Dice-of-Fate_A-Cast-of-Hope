@@ -11,14 +11,26 @@ public class T_PlayerInput : MonoBehaviour
     [SerializeField] private LayerMask floorLayers; // Слои для пола/поверхности перемещения
 
     private ISelectable selectableUnit; // Текущий выбранный юнит
+    private IHover hoverable;       // Текущее наведение
+
+    // Управление частотой обновления
+    [SerializeField] private float updateInterval = 0.05f;
+    private float accumulatedTime;
+
+
+
 
     // Update вызывается каждый кадр
     void Update()
     {
-        HandelLeftClick();   // Обработка левого клика (выбор)
-        HandelRightClick();  // Обработка правого клика (перемещение)
-        HandelRightClick2(); // Дополнительная обработка правого клика (отладка)
+        HandelLeftClick();      // Обработка левого клика (выбор)
+        HandelRightClick();     // Обработка правого клика (перемещение)
+        HandelRightClick2();    // Дополнительная обработка правого клика (отладка)
+        UpdateForHoverable(); // Уменьшение частоты Обновление FPS - для Outline
     }
+
+
+
 
 
     // Обрабатывает правый клик для перемещения выбранного юнита
@@ -79,4 +91,40 @@ public class T_PlayerInput : MonoBehaviour
             }
         }
     }
+
+    //-------------- Обработка наведения мыши --------------
+
+    // Уменьшаем частоту обновления
+    private void UpdateForHoverable()
+    {
+        accumulatedTime += Time.deltaTime;
+
+        if (accumulatedTime >= updateInterval)
+        {
+            IsMouseOnObjectOrNot();
+            accumulatedTime = 0;
+        }
+    }
+
+    private void IsMouseOnObjectOrNot()
+    {
+        hoverable.OnExitHover(); // Вызываем метод OnExitHover - чтобы снять обводку 
+
+        Ray cameraRay = camera.ScreenPointToRay(Input.mousePosition);
+
+        // Если луч попал в объект и у него есть компонент IHover
+        if (Physics.Raycast(cameraRay, out RaycastHit hit, 100) && hit.collider.TryGetComponent(out IHover hover))
+        {
+            hover.OnEnterHover();  // Вызываем метод через интерфейс IHover 
+        }      
+    }
+
+
+    
+
+
+
+
+
+
 }

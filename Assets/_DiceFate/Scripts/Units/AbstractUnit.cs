@@ -24,9 +24,9 @@ namespace DiceFate.Units
             InitializationСheck();
             InitializationStart();
         }
-       
+
         //Проверки на null
-       private void  InitializationСheck()
+        private void InitializationСheck()
         {
             if (decal == null) { Debug.LogError($"Установить decal для {this} "); }
             if (UnitSO == null) { Debug.LogError($"Установить UnitSO для {this} "); }
@@ -35,13 +35,13 @@ namespace DiceFate.Units
 
         // Настройка при запуске 
         private void InitializationStart()
-        {       
+        {
             decal.SetActive(false);                   // 1. отключть Decal        
             Outline?.DisableOutline();                // 2. отключить Обводку       
-          //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
+                                                      //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
             MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
             CurrentHealth = MaxHealth;
-    
+
 
         }
 
@@ -52,8 +52,10 @@ namespace DiceFate.Units
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this)); // Вызвать событие, изаписать себя как выбранный юнит слушает DF_PlayerInput
 
             decal.SetActive(true);
-           
+
             OutlineOnSelected();
+
+            IsSelected = true;
         }
 
         public void Deselect()
@@ -62,7 +64,9 @@ namespace DiceFate.Units
 
             decal.SetActive(false);
 
-            OutlineOffSelected();  
+            OutlineOffSelected();
+
+            IsSelected = false;
         }
 
         //-------------- IDamageable реализация --------------
@@ -112,15 +116,11 @@ namespace DiceFate.Units
         //-------------- Управление обводкой юнита --------------
         public void OnEnterHover()
         {
-            //if ( )
-            //{
-                
-            //}
-            Outline?.EnableOutline();
+            if (IsSelected == false) { Outline?.EnableOutline(); }
         }
         public void OnExitHover()
         {
-            Outline?.DisableOutline();
+            if (IsSelected == false) { Outline?.DisableOutline(); }
         }
         public void OutlineOnSelected()
         {
@@ -129,8 +129,8 @@ namespace DiceFate.Units
         }
         public void OutlineOffSelected()
         {
-           Outline?.DefaultColorOutline();
-           Outline?.DisableOutline();
+            Outline?.ResetColorOutline();
+            Outline?.DisableOutline();
         }
     }
 }

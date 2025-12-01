@@ -1,11 +1,12 @@
-using UnityEngine;
-using UnityEngine.InputSystem;
-using Unity.Cinemachine;
+using DiceFate.EventBus;
+using DiceFate.Events;
 //using System.Collections.Generic;
 //using System.Windows.Input;
 using DiceFate.Units;
-using DiceFate.EventBus;
-using DiceFate.Events;
+using System.Collections.Generic;
+using Unity.Cinemachine;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 
@@ -22,11 +23,19 @@ namespace DiceFate.Player
         [SerializeField] private LayerMask floorLayers;
         //[SerializeField] private DF_CameraConfig cameraConfig;
 
+
+
         private CinemachineFollow cinemachineFollow;
         private Vector3 startingFollowOffset;
         private Vector2 mouseDelta; // Изменение положения мыши
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
+        private IHover hoverableUnit;       // Текущее наведение юнит
+
+        // Управление частотой обновления
+        [SerializeField] private float updateInterval = 0.05f;
+        private float accumulatedTime;
+
 
         // Дополнительные параметры для управления камерой
         [Header("Настройки движения камеры")]
@@ -60,8 +69,8 @@ namespace DiceFate.Player
             startingFollowOffset = cinemachineFollow.FollowOffset;
 
 
-             Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;           
-             Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+            Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
             //Bus<UnitSpawnEvent>.OnEvent += HandeleUnitSpawn;
             //Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
         }
@@ -83,11 +92,13 @@ namespace DiceFate.Player
 
         private void Update()
         {
-            LeftClick();
+            LeftClick();           // Обработка левого клика (выбор)
             MiddleClickAndHold();
-            RightClickAndHold();
-
+            RightClickAndHold();   // Обработка правого клика (перемещение)
+            UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline         
         }
+
+
 
 
         //---------------------------------- Клики мышы  -------------------------------------------------------------
@@ -115,10 +126,6 @@ namespace DiceFate.Player
                 }
             }
         }
-
-
-
-
 
         private void MiddleClickAndHold()
         {
@@ -172,17 +179,72 @@ namespace DiceFate.Player
 
         //---------------------------------- Выбор и выделение   ----------------------------------
         private void HandelUnitSelected(UnitSelectedEvent evt)
-        {  
+        {
             selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
         }
 
         private void HandeleUnitDeselect(UnitDeselectedEvent evt)
-        {       
-                selectedUnit = null;  // Сбросить текущий выделенный юнит          
+        {
+            selectedUnit = null;  // Сбросить текущий выделенный юнит          
         }
 
 
+        //---------------------------------- Обработка наведения мыши   ----------------------------
 
+        // Уменьшаем частоту обновления
+        private void UpdateForHoverable()
+        {
+            accumulatedTime += Time.deltaTime;
+
+            if (accumulatedTime >= updateInterval)
+            {
+                IsMouseOnObjectOrNot();
+                accumulatedTime = 0;
+            }
+        }
+
+        // Проверяем, находится ли мышь над объектом с IHover
+        private void IsMouseOnObjectOrNot()
+        {
+            //if (hoverableUnit != null)
+            //{
+            //    hoverableUnit.OnEnterHover();
+            //    hoverableUnit = null;
+            //}
+
+
+
+            Ray cameraRay = camera.ScreenPointToRay(Input.mousePosition);
+
+
+
+
+            // Если луч попал в объект и у него есть компонент IHover
+            if (Physics.Raycast(cameraRay, out RaycastHit hit, 100) && hit.collider.TryGetComponent(out IHover hover))
+            {
+                //if (hoverableUnit != null)
+                //{
+                //    hoverableUnit.OnEnterHover() ;
+                //    hoverableUnit = null;
+                //}
+
+                if (hoverableUnit != null && hoverableUnit == hover) // проверить !!!!!
+                {
+                   return; // Если уже есть наведение, ничего не делаем
+                }
+
+
+                hover.OnEnterHover();  // Включаем обводку через интерфейс IHover 
+                hoverableUnit = hover; // Сохраняем текущий наведение юнит
+            }
+            // Если луч не попал в объект с IHover, снимаем обводку
+            else if (hoverableUnit != null)
+            {
+                hoverableUnit.OnExitHover(); // Снимаем обводку через интерфейс IHover 
+                hoverableUnit = null;        // Сбрасываем текущее наведение юнит
+            }
+
+        }
 
 
 
