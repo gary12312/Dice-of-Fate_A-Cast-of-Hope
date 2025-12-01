@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: New Unit
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.UnitSO
   <Health>k__BackingField: 50
+  <Armor>k__BackingField: 10
+  <colorSelected>k__BackingField: {r: 1, g: 1, b: 1, a: 1}

@@ -829,27 +829,13 @@ GameObject:
   - component: {fileID: 211796145}
   - component: {fileID: 211796144}
   - component: {fileID: 211796143}
-  - component: {fileID: 211796141}
   m_Layer: 0
-  m_Name: MiniFigure (1)
+  m_Name: Mini_Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &211796141
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 211796140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83307b49295c26f419a2259bce8b9ecd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DF_UnitManadger
-  decal: {fileID: 1160325679}
 --- !u!65 &211796143
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1756,6 +1742,8 @@ GameObject:
   - component: {fileID: 500060709}
   - component: {fileID: 500060712}
   - component: {fileID: 500060715}
+  - component: {fileID: 500060716}
+  - component: {fileID: 500060717}
   m_Layer: 0
   m_Name: MiniFigure
   m_TagString: Untagged
@@ -1920,7 +1908,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 500060705}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9bd7ccb125c26104591de5f50108406e, type: 3}
   m_Name: 
@@ -1930,6 +1918,44 @@ MonoBehaviour:
   <MaxHealth>k__BackingField: 0
   decal: {fileID: 1069881005}
   UnitSO: {fileID: 11400000, guid: ff007b2b85c89b44cabd7b3484d72b72, type: 2}
+  Outline: {fileID: 500060717}
+--- !u!114 &500060716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500060705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b85effe8f2082143896c6c0f9e6da3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitPlayer
+  <IsSelected>k__BackingField: 0
+  <CurrentHealth>k__BackingField: 0
+  <MaxHealth>k__BackingField: 0
+  decal: {fileID: 1069881005}
+  UnitSO: {fileID: 11400000, guid: ff007b2b85c89b44cabd7b3484d72b72, type: 2}
+  Outline: {fileID: 500060717}
+--- !u!114 &500060717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500060705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c9a8bdaa43ef4e4695f2dcca98c4f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObjectOutline
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 2
+  isOutline: 1
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &502971900
 GameObject:
   m_ObjectHideFlags: 0
@@ -4669,31 +4695,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a506d6b8f4dd4514e91c4f6ccc8c7e67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DF_Outline
-  colorHover:
-    r: 1
-    g: 0.92156863
-    b: 0.015686275
-    a: 1
-  colorSelect:
-    r: 0
-    g: 1
-    b: 0
-    a: 1
-  isOutline: 0
-  outlineMode: 0
-  outlineColor:
-    r: 1
-    g: 1
-    b: 1
-    a: 1
-  outlineWidth: 7.08
-  precomputeOutline: 0
-  bakeKeys: []
-  bakeValues: []
-  renderers: []
-  outlineMaskMaterial: {fileID: 0}
-  outlineFillMaterial: {fileID: 0}
-  needsUpdate: 1
 --- !u!114 &1454590402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4708,7 +4709,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectOutline
   outlineMode: 0
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineWidth: 2
+  outlineWidth: 4
   isOutline: 1
   precomputeOutline: 0
   bakeKeys: []

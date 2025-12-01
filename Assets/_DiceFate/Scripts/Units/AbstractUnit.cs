@@ -1,10 +1,11 @@
 using DiceFate.EventBus;
 using DiceFate.Events;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace DiceFate.Units
 {
-    public class AbstractUnit : MonoBehaviour, ISelectable, IDamageable, IMoveable
+    public class AbstractUnit : MonoBehaviour, ISelectable, IDamageable, IMoveable, IHover
     {
 
         [field: SerializeField] public bool IsSelected { get; private set; }   // ISelectable
@@ -13,17 +14,37 @@ namespace DiceFate.Units
 
         [SerializeField] private GameObject decal;
         [SerializeField] private UnitSO UnitSO;
+        [SerializeField] private ObjectOutline Outline; //обводка
 
         public Transform Transform => transform; // IDamageable
 
 
         protected virtual void Start()
         {
-            MaxHealth = UnitSO.Health;
-            CurrentHealth = MaxHealth;
-
-            decal.SetActive(false);
+            InitializationСheck();
+            InitializationStart();
         }
+       
+        //Проверки на null
+       private void  InitializationСheck()
+        {
+            if (decal == null) { Debug.LogError($"Установить decal для {this} "); }
+            if (UnitSO == null) { Debug.LogError($"Установить UnitSO для {this} "); }
+            if (Outline == null) { Debug.LogError($"Установить Outline для {this} "); }
+        }
+
+        // Настройка при запуске 
+        private void InitializationStart()
+        {       
+            decal.SetActive(false);                   // 1. отключть Decal        
+            Outline?.DisableOutline();                // 2. отключить Обводку       
+          //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
+            MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
+            CurrentHealth = MaxHealth;
+    
+
+        }
+
 
         //-------------- ISelectable реализация --------------
         public void Select()
@@ -31,7 +52,8 @@ namespace DiceFate.Units
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this)); // Вызвать событие, изаписать себя как выбранный юнит слушает DF_PlayerInput
 
             decal.SetActive(true);
-
+           
+            OutlineOnSelected();
         }
 
         public void Deselect()
@@ -40,6 +62,7 @@ namespace DiceFate.Units
 
             decal.SetActive(false);
 
+            OutlineOffSelected();  
         }
 
         //-------------- IDamageable реализация --------------
@@ -85,6 +108,29 @@ namespace DiceFate.Units
         }
 
 
-    }
 
+        //-------------- Управление обводкой юнита --------------
+        public void OnEnterHover()
+        {
+            //if ( )
+            //{
+                
+            //}
+            Outline?.EnableOutline();
+        }
+        public void OnExitHover()
+        {
+            Outline?.DisableOutline();
+        }
+        public void OutlineOnSelected()
+        {
+            Outline?.EnableOutline();
+            Outline?.ChangeColorOutline(UnitSO.colorSelected);
+        }
+        public void OutlineOffSelected()
+        {
+           Outline?.DefaultColorOutline();
+           Outline?.DisableOutline();
+        }
+    }
 }
