@@ -1743,6 +1743,7 @@ GameObject:
   - component: {fileID: 500060712}
   - component: {fileID: 500060716}
   - component: {fileID: 500060717}
+  - component: {fileID: 500060718}
   m_Layer: 0
   m_Name: MiniFigure
   m_TagString: Untagged
@@ -1916,7 +1917,7 @@ MonoBehaviour:
   <CurrentHealth>k__BackingField: 0
   <MaxHealth>k__BackingField: 0
   decal: {fileID: 1069881005}
-  UnitSO: {fileID: 11400000, guid: ff007b2b85c89b44cabd7b3484d72b72, type: 2}
+  UnitSO: {fileID: 11400000, guid: 9d9a81c3338cbc048819a1ae3eb4d2ff, type: 2}
   Outline: {fileID: 500060717}
 --- !u!114 &500060717
 MonoBehaviour:
@@ -1932,11 +1933,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectOutline
   outlineMode: 0
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineWidth: 2
+  outlineWidth: 4
   isOutline: 1
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
+--- !u!114 &500060718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 500060705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5fd381e73ea1a408d412a4867b6c8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.GridMovableForUnit
+  gridStep: 2
+  circleCount: 4
+  lineLength: 15
+  lineCount: 8
+  intermediateNodes: 0
+  gridColor: {r: 0, g: 0, b: 1, a: 1}
+  previewHeight: 0.1
+  previewPrefab: {fileID: 0}
+  decalPoint: {fileID: 0}
 --- !u!1 &502971900
 GameObject:
   m_ObjectHideFlags: 0
