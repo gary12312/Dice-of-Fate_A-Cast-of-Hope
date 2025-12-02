@@ -64,7 +64,7 @@ namespace DiceFate.Units
             else
             {
                 // Если луч не попадает на землю - скрываем префаб
-                HidePreview();
+               // HidePreview(); // отключил т.к префаб мерцал
             }
         }
 

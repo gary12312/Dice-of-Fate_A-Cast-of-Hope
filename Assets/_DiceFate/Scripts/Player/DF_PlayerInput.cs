@@ -1,12 +1,9 @@
-using DiceFate.EventBus;
-using DiceFate.Events;
-//using System.Collections.Generic;
-//using System.Windows.Input;
-using DiceFate.Units;
-using System.Collections.Generic;
-using Unity.Cinemachine;
 using UnityEngine;
+using Unity.Cinemachine;
 using UnityEngine.InputSystem;
+using DiceFate.Units;
+using DiceFate.Events;
+using DiceFate.EventBus;
 
 
 
@@ -19,18 +16,14 @@ namespace DiceFate.Player
         [SerializeField] private new Camera camera;
         [SerializeField] private Rigidbody cameraTarget;
         [SerializeField] private CinemachineCamera cinemachineCamera;
-        //[SerializeField] private LayerMask selectibleUnitLayers;
         [SerializeField] private LayerMask floorLayers;
-        //[SerializeField] private DF_CameraConfig cameraConfig;
-
-
 
         private CinemachineFollow cinemachineFollow;
         private Vector3 startingFollowOffset;
-        private Vector2 mouseDelta; // Изменение положения мыши
+        private Vector2 mouseDelta;       // Изменение положения мыши
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
-        private IHover hoverableUnit;       // Текущее наведение юнит
+        private IHover hoverableUnit;     // Текущее наведение юнит
 
         // Управление частотой обновления
         [SerializeField] private float updateInterval = 0.05f;
@@ -92,8 +85,8 @@ namespace DiceFate.Player
 
         private void Update()
         {
-            LeftClick();           // Обработка левого клика (выбор)
-            MiddleClickAndHold();
+            LeftClickToSelected();           // Обработка левого клика (выбор)
+            MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
             UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline         
         }
@@ -102,31 +95,6 @@ namespace DiceFate.Player
 
 
         //---------------------------------- Клики мышы  -------------------------------------------------------------
-        private void LeftClick()
-        {
-            if (camera == null) { return; }
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-
-                if (selectedUnit != null)
-                {
-                    selectedUnit.Deselect();
-                    // selectedUnit = null; перенесено в HandelUnitDeselected
-                }
-
-                if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, LayerMask.GetMask("Default"))
-                && hit.collider.TryGetComponent(out ISelectable selectable))
-                {
-                    selectable.Select();
-
-                    //  selectedUnit = selectable;  перенесено в HandelUnitSelected и записано ка  selectedUnit = evt.Unit;
-                }
-            }
-        }
-
         private void MiddleClickAndHold()
         {
             if (Mouse.current.middleButton.isPressed) { RotationCamera(); }
@@ -135,6 +103,48 @@ namespace DiceFate.Player
         private void RightClickAndHold()
         {
             if (Mouse.current.rightButton.isPressed) { MoveCamera(); }
+        }
+
+
+
+        // Обработка левого клика Для ВЫБОРА юнита
+        private void LeftClickToSelected()
+        {
+            if (camera == null) { return; }
+
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+
+                if (selectedUnit != null) { selectedUnit.Deselect(); }
+
+                if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, LayerMask.GetMask("Default"))
+                && hit.collider.TryGetComponent(out ISelectable selectable))
+                {
+                    selectable.Select();
+                }
+            }
+        }
+
+        // Обработка левого клика усли юнит выбран
+        private void LeftClickIfUnitSelected()
+        {
+            if (camera == null) { return; }
+
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+
+                if (selectedUnit != null) { selectedUnit.Deselect(); }
+
+                if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, LayerMask.GetMask("Default"))
+                && hit.collider.TryGetComponent(out ISelectable selectable))
+                {
+                    selectable.Select();
+                }
+            }
         }
 
 
@@ -206,33 +216,16 @@ namespace DiceFate.Player
         // Проверяем, находится ли мышь над объектом с IHover
         private void IsMouseOnObjectOrNot()
         {
-            //if (hoverableUnit != null)
-            //{
-            //    hoverableUnit.OnEnterHover();
-            //    hoverableUnit = null;
-            //}
-
-
-
             Ray cameraRay = camera.ScreenPointToRay(Input.mousePosition);
-
-
-
 
             // Если луч попал в объект и у него есть компонент IHover
             if (Physics.Raycast(cameraRay, out RaycastHit hit, 100) && hit.collider.TryGetComponent(out IHover hover))
             {
-                //if (hoverableUnit != null)
-                //{
-                //    hoverableUnit.OnEnterHover() ;
-                //    hoverableUnit = null;
-                //}
 
-                if (hoverableUnit != null && hoverableUnit == hover) // проверить !!!!!
+                if (hoverableUnit != null && hoverableUnit == hover)
                 {
-                   return; // Если уже есть наведение, ничего не делаем
+                    return; // Если уже есть наведение, ничего не делаем
                 }
-
 
                 hover.OnEnterHover();  // Включаем обводку через интерфейс IHover 
                 hoverableUnit = hover; // Сохраняем текущий наведение юнит

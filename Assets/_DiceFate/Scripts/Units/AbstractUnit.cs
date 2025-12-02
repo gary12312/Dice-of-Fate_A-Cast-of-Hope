@@ -5,7 +5,7 @@ using UnityEngine.PlayerLoop;
 
 namespace DiceFate.Units
 {
-    public class AbstractUnit : MonoBehaviour, ISelectable, IDamageable, IMoveable, IHover
+    public class AbstractUnit : MonoBehaviour, ISelectable, IDamageable, IHover
     {
 
         [field: SerializeField] public bool IsSelected { get; private set; }   // ISelectable
@@ -87,22 +87,18 @@ namespace DiceFate.Units
             Destroy(gameObject);
         }
 
-        // -------------- IMoveable реализация --------------
-        public void MoveTo(Vector3 position)
-        {
-            throw new System.NotImplementedException();
-            // graphAgent.SetVariableValue("TargetLocation", position);
+        //// -------------- IMoveable реализация --------------
+        //public void MoveTo(Vector3 position)
+        //{
+        //    throw new System.NotImplementedException();
+        //    // graphAgent.SetVariableValue("TargetLocation", position);
 
-        }
+        //}
 
-        public void StopMove()
-        {
-            throw new System.NotImplementedException();
-        }
-
-
-
-
+        //public void StopMove()
+        //{
+        //    throw new System.NotImplementedException();
+        //}
 
         public void Heal(int amount)  // разобраться
         {

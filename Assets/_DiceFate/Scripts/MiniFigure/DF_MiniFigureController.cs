@@ -24,10 +24,11 @@ public class DF_MiniFigureController : MonoBehaviour
     public float rotationThreshold = 0.1f; // Минимальная дистанция для начала поворота
     public bool keepFinalRotation = true; // Сохранять финальный поворот после движения
 
-    private NavMeshAgent agent;
-    private Vector3 originalPosition; // Исходная позиция фигуры
     private DF_MiniFigureIsSelectable selectionController; // Контроллер выделения
     private DF_MiniFigureGridDecalFor gridSystem; // Система сетки
+
+    private NavMeshAgent agent;
+    private Vector3 originalPosition; // Исходная позиция фигуры
     private bool isMoving = false; // Выполняется ли перемещение в данный момент
     private Quaternion targetRotation; // Целевой поворот
 
