@@ -24,6 +24,7 @@ namespace DiceFate.Player
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
         private IHover hoverableUnit;     // Текущее наведение юнит
+        private IMoveable moveable;       // Текущий перемещаемый юнит
 
         // Управление частотой обновления
         [SerializeField] private float updateInterval = 0.05f;
@@ -85,10 +86,22 @@ namespace DiceFate.Player
 
         private void Update()
         {
-            LeftClickToSelected();           // Обработка левого клика (выбор)
+            //LeftClickToSelected();           // Обработка левого клика (выбор)
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
-            UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline         
+            UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
+
+            if (selectedUnit == null)
+            {
+                LeftClickToSelected();
+            }
+            else
+            {
+                LeftClickToMove();
+            }
+
+
+
         }
 
 
@@ -107,45 +120,75 @@ namespace DiceFate.Player
 
 
 
-        // Обработка левого клика Для ВЫБОРА юнита
+        // Обработка левого клика Для ВЫБОРА юнита // TargetDecal
         private void LeftClickToSelected()
         {
             if (camera == null) { return; }
 
             Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
+            RaycastHit hit;
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
 
-                if (selectedUnit != null) { selectedUnit.Deselect(); }
+                //  if (selectedUnit != null) { selectedUnit.Deselect(); }
 
-                if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, LayerMask.GetMask("Default"))
+                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
                 && hit.collider.TryGetComponent(out ISelectable selectable))
                 {
                     selectable.Select();
                 }
             }
+
         }
 
-        // Обработка левого клика усли юнит выбран
-        private void LeftClickIfUnitSelected()
+        private void LeftClickToMove()
         {
-            if (camera == null) { return; }
+            if (camera == null || selectedUnit == null)
+            { return; }
 
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+            RaycastHit hit;
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-
-                if (selectedUnit != null) { selectedUnit.Deselect(); }
-
-                if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, LayerMask.GetMask("Default"))
-                && hit.collider.TryGetComponent(out ISelectable selectable))
+                // Тест: бросаем луч на все слои
+                if (Physics.Raycast(cameraRay, out hit, float.MaxValue))
                 {
-                    selectable.Select();
+                   // Прямой доступ через GameObject
+                    MonoBehaviour selectedMono = selectedUnit as MonoBehaviour;
+                    if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
+                    {
+                        
+                        moveable.MoveTo(hit.point);
+                    }           
                 }
             }
         }
+        //private void LeftClickToMove()
+        //{
+        //    if (camera == null) { return; }
+
+        //    Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
+        //    RaycastHit hit;
+
+        //    if (Mouse.current.leftButton.wasPressedThisFrame)
+        //    {
+
+        //        //  if (selectedUnit != null) { selectedUnit.Deselect(); }
+
+        //        if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
+        //        && hit.collider.TryGetComponent(out IMoveable moveable))
+        //        {
+        //            moveable.MoveTo(hit.point);
+        //        }
+        //    }
+
+        //}
+
+
+
+
 
 
 

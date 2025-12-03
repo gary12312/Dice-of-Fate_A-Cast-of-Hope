@@ -6,7 +6,7 @@ using DiceFate.EventBus;
 
 namespace DiceFate.Units
 {
-    public class ControllerMovableUnitOnGrid : MonoBehaviour
+    public class ControllerMovableUnitOnGrid : MonoBehaviour, IMoveable
     {
         [Header("Настройки перемещения")]
         public float moveDistance = 20f; // Максимальная дистанция перемещения
@@ -134,6 +134,33 @@ namespace DiceFate.Units
                         
             if (gridSystem != null) gridSystem.DisablePreview(); // Выключаем систему предпросмотра сетки
         }
+
+
+        //-------------- IMoveable реализация --------------
+
+        public void MoveTo(Vector3 position)
+        {
+            // Используем позицию из системы круговой сетки
+            Vector3 targetPosition = gridSystem.GetCircularGridPosition(position);
+
+            // Проверяем, что позиция валидная (не нулевая)
+            if (targetPosition != Vector3.zero)
+            {
+                MoveToPosition(targetPosition);
+            }
+            else
+            {
+                Debug.Log("Не удалось определить позицию на сетке");
+            }
+        }
+
+        public void StopMove()
+        {
+            throw new System.NotImplementedException();
+        }
+
+
+
 
 
 
@@ -487,7 +514,7 @@ namespace DiceFate.Units
             Debug.Log("Параметры прыжка обновлены: высота=" + height + ", длительность=" + duration);
         }
 
-
+    
     }
 
 }

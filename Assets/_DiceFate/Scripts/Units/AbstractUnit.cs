@@ -12,7 +12,7 @@ namespace DiceFate.Units
         [field: SerializeField] public int CurrentHealth { get; private set; } // IDamageable
         [field: SerializeField] public int MaxHealth { get; private set; }     // IDamageable
 
-        [SerializeField] private GameObject decal;
+        [SerializeField] private GameObject object1;
         [SerializeField] private UnitSO UnitSO;
         [SerializeField] private ObjectOutline Outline; //обводка
 
@@ -28,7 +28,7 @@ namespace DiceFate.Units
         //Проверки на null
         private void InitializationСheck()
         {
-            if (decal == null) { Debug.LogError($"Установить decal для {this} "); }
+            if (object1 == null) { Debug.LogError($"Установить decal для {this} "); }
             if (UnitSO == null) { Debug.LogError($"Установить UnitSO для {this} "); }
             if (Outline == null) { Debug.LogError($"Установить Outline для {this} "); }
         }
@@ -36,7 +36,7 @@ namespace DiceFate.Units
         // Настройка при запуске 
         private void InitializationStart()
         {
-            decal.SetActive(false);                   // 1. отключть Decal        
+            object1.SetActive(false);                   // 1. отключть Decal        
             Outline?.DisableOutline();                // 2. отключить Обводку       
                                                       //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
             MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
@@ -51,7 +51,7 @@ namespace DiceFate.Units
         {
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this)); // Вызвать событие, изаписать себя как выбранный юнит слушает DF_PlayerInput
 
-            decal.SetActive(true);
+            object1.SetActive(true);
 
             OutlineOnSelected();
 
@@ -62,7 +62,7 @@ namespace DiceFate.Units
         {
             Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this)); // Вызвать событие, изаписать себя как отмененный юнит слушает DF_PlayerInput
 
-            decal.SetActive(false);
+            object1.SetActive(false);
 
             OutlineOffSelected();
 
