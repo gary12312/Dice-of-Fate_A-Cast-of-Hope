@@ -12,6 +12,9 @@ namespace DiceFate.Units
         public float moveDistance = 20f; // Максимальная дистанция перемещения
         public float liftHeight = 0.5f; // Высота подъема при движении
 
+        [Header("Настройки автоматического выбора режима")]
+        public float distanceToJump = 3f; // Дистанция, при превышении которой включается прыжок
+
         [Header("Настройки прыжка")]
         public bool isJump = false; // Если true - фигура прыгает вместо плавного перемещения
         public float jumpHeight = 2f; // Максимальная высота прыжка
@@ -57,19 +60,6 @@ namespace DiceFate.Units
             // Получаем компонент NavMeshAgent
             agent = GetComponent<NavMeshAgent>();
 
-            // Получаем компонент выделения
-            selectionController = GetComponent<DF_MiniFigureIsSelectable>();
-            if (selectionController == null)
-            {
-                Debug.LogError("DF_MiniFigureIsSelectable не найден на объекте!");
-                return;
-            }
-
-            // Подписываемся на события выделения
-
-            //Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
-            //Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
-
             // Сохраняем исходную позицию для ограничений перемещения
             originalPosition = transform.position;
 
@@ -78,60 +68,29 @@ namespace DiceFate.Units
 
             // Инициализируем целевой поворот
             targetRotation = transform.rotation;
+
+            // Отладочный вывод настроек
+            Debug.Log($"Настройки перемещения: distanceToJump = {distanceToJump}, isJump = {isJump}");
         }
 
         void Update()
         {
-            //if (selectedUnit != null)
-            //{ SelectFigure(); }
-            //else
-            //{ DeselectFigure(); }
-
-            //// Если фигура выделена и был клик по земле - перемещаем
-            //if (selectionController.IsSelected() && Input.GetMouseButtonDown(0) && !isMoving)
-            //{
-            //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            //    RaycastHit hit;
-
-            //    if (Physics.Raycast(ray, out hit) && hit.collider.CompareTag("Ground"))
-            //    {
-            //        // Используем позицию из системы круговой сетки
-            //        Vector3 targetPosition = gridSystem.GetCircularGridPosition(hit.point);
-
-            //        // Проверяем, что позиция валидная (не нулевая)
-            //        if (targetPosition != Vector3.zero)
-            //        {
-            //            MoveToPosition(targetPosition);
-            //        }
-            //        else
-            //        {
-            //            Debug.Log("Не удалось определить позицию на сетке");
-            //        }
-            //    }
-            //}
-
-            //// Плавный поворот к целевой ориентации
-            //if (enableRotation && transform.rotation != targetRotation)
-            //{
-            //    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            //}
+            // Плавный поворот к целевой ориентации
+            if (enableRotation && transform.rotation != targetRotation)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
         }
 
 
         //---------------------------------- запуск событий    ----------------------------------
         private void HandelUnitSelected(UnitSelectedEvent evt)
         {
-            // selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
-            //  EnaibleGrid();
-                        
             if (gridSystem != null) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
         }
 
         private void HandeleUnitDeselect(UnitDeselectedEvent evt)
         {
-            // selectedUnit = null;  // Сбросить текущий выделенный юнит          
-            // DisableGrid();
-                        
             if (gridSystem != null) gridSystem.DisablePreview(); // Выключаем систему предпросмотра сетки
         }
 
@@ -160,9 +119,7 @@ namespace DiceFate.Units
         }
 
 
-
-
-
+        //-------------- Основная логика --------------
 
         // Метод выделения Сетки
         public void EnaibleGrid()
@@ -176,12 +133,7 @@ namespace DiceFate.Units
         {
             // Выключаем систему предпросмотра сетки
             if (gridSystem != null) gridSystem.DisablePreview();
-
         }
-
-
-
-
 
         // Проверка возможности перемещения в указанную позицию
         bool CanMoveToPosition(Vector3 targetPosition)
@@ -206,6 +158,19 @@ namespace DiceFate.Units
             return true;
         }
 
+        // Определение режима перемещения на основе дистанции
+        private bool ShouldJumpForDistance(float distance)
+        {
+            // Если расстояние больше distanceToJump - используем прыжок
+            // Если меньше или равно - обычное перемещение
+            bool shouldJump = distance > distanceToJump;
+
+            // Если isJump принудительно включен, всегда прыжок
+            if (isJump) return true;
+
+            return shouldJump;
+        }
+
         // Перемещение фигуры в указанную позицию
         public void MoveToPosition(Vector3 targetPosition)
         {
@@ -216,19 +181,27 @@ namespace DiceFate.Units
                 return;
             }
 
-            Debug.Log("Начинаем перемещение в позицию: " + targetPosition);
+            // Вычисляем дистанцию перемещения
+            float distance = Vector3.Distance(transform.position, targetPosition);
+
+            // Определяем режим перемещения на основе дистанции
+            bool useJumpMode = ShouldJumpForDistance(distance);
+
+            Debug.Log($"Начинаем перемещение на дистанцию: {distance:F2}, " +
+                     $"порог прыжка: {distanceToJump}, " +
+                     $"режим: {(useJumpMode ? "ПРЫЖОК" : "ХОДЬБА")}");
 
             // Вычисляем направление для поворота (только горизонтальное)
             Vector3 direction = GetHorizontalDirection(targetPosition);
             if (direction.magnitude > rotationThreshold && enableRotation)
             {
-                Debug .Log("Вычисляем поворот к направлению: " + direction);
+                Debug.Log("Вычисляем поворот к направлению: " + direction);
                 // Вычисляем поворот только вокруг оси Y
                 targetRotation = GetYRotationOnly(direction);
             }
 
             // Запускаем соответствующую корутину в зависимости от режима
-            if (isJump)
+            if (useJumpMode)
             {
                 StartCoroutine(JumpToPosition(targetPosition));
             }
@@ -236,10 +209,6 @@ namespace DiceFate.Units
             {
                 StartCoroutine(MoveWithLift(targetPosition));
             }
-
-            // Снимаем выделение после начала перемещения
-            //selectionController.DeselectFigure();
-           
         }
 
         // Получение горизонтального направления (игнорирует высоту)
@@ -263,11 +232,11 @@ namespace DiceFate.Units
             return Quaternion.Euler(0f, targetYAngle, 0f);
         }
 
-        // Корутин для плавного перемещения с подъемом (оригинальный метод)
+        // Корутин для плавного перемещения с подъемом (ходьба)
         IEnumerator MoveWithLift(Vector3 targetPosition)
         {
             isMoving = true;
-            Debug.Log("Запуск корутина плавного перемещения");
+            Debug.Log("Запуск корутина плавного перемещения (ходьба)");
 
             // Блокируем автоматическое перемещение NavMeshAgent
             agent.isStopped = true;
@@ -378,13 +347,12 @@ namespace DiceFate.Units
 
             // Поворачиваем в сторону движения перед прыжком (только по Y)
             if (enableRotation)
-            {             
+            {
                 Vector3 jumpDirection = GetHorizontalDirection(targetPosition);
                 if (jumpDirection.magnitude > rotationThreshold)
                 {
                     targetRotation = GetYRotationOnly(jumpDirection);
-                    // Ждем немного чтобы поворот начался перед прыжком
-                    Debug.Log("Поворот и прыжок"); // ------------------------------------------- Проверить почему нет поворота
+                    // Ждем немного чтобы поворот начался перед прыжком                   
                     yield return new WaitForSeconds(0.1f);
                 }
             }
@@ -517,7 +485,24 @@ namespace DiceFate.Units
             Debug.Log("Параметры прыжка обновлены: высота=" + height + ", длительность=" + duration);
         }
 
-    
-    }
+        // Метод для настройки порога прыжка
+        public void SetJumpThreshold(float threshold)
+        {
+            distanceToJump = threshold;
+            Debug.Log("Порог прыжка установлен: " + threshold);
+        }
 
+        // Метод для получения текущего порога прыжка
+        public float GetJumpThreshold()
+        {
+            return distanceToJump;
+        }
+
+        // Метод для получения текущего режима перемещения
+        public string GetCurrentMoveMode()
+        {
+            return isJump ? "Принудительный прыжок" :
+                   $"Авто (ходьба до {distanceToJump}, прыжок после)";
+        }
+    }
 }

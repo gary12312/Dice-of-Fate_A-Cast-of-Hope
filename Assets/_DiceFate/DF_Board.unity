@@ -1737,9 +1737,6 @@ GameObject:
   m_Component:
   - component: {fileID: 500060706}
   - component: {fileID: 500060708}
-  - component: {fileID: 500060711}
-  - component: {fileID: 500060710}
-  - component: {fileID: 500060709}
   - component: {fileID: 500060712}
   - component: {fileID: 500060716}
   - component: {fileID: 500060719}
@@ -1793,95 +1790,6 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &500060709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 500060705}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c063cecd58b64a4ba83fe5567074139, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DF_MiniFigureIsSelectable
-  decal: {fileID: 0}
-  gridSystem: {fileID: 500060710}
---- !u!114 &500060710
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 500060705}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bfb13f93cab80549aaabfa5a1603083, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DF_MiniFigureGridDecalFor
-  gridStep: 1
-  circleCount: 12
-  lineLength: 13
-  lineCount: 28
-  intermediateNodes: -3
-  gridColor: {r: 0, g: 0, b: 1, a: 1}
-  previewHeight: 0.5
-  previewPrefab: {fileID: 2500054204220271980, guid: 3adbf053908fff747a616e0f199f4b79, type: 3}
-  decalPoint: {fileID: 2455774047340294629, guid: b012ffd6371d97d44bfe9ab5422c5eb2, type: 3}
---- !u!114 &500060711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 500060705}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65a31a04d40c9af43bfbeb1e3edaad2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DF_MiniFigureController
-  moveDistance: 20
-  liftHeight: 0.5
-  isJump: 1
-  jumpHeight: 2
-  jumpDuration: 1
-  jumpCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 3.378881
-      outSlope: 3.378881
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.1277778
-    - serializedVersion: 3
-      time: 0.5
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: -4.190476
-      outSlope: -4.190476
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.13333333
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  enableRotation: 1
-  rotationSpeed: 5
-  rotationThreshold: 0.1
-  keepFinalRotation: 1
 --- !u!65 &500060712
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1975,7 +1883,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.ControllerMovableUnitOnGrid
   moveDistance: 20
   liftHeight: 0.5
-  isJump: 1
+  distanceToJump: 3
+  isJump: 0
   jumpHeight: 2
   jumpDuration: 1
   jumpCurve:
@@ -1984,12 +1893,12 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: 4.9870114
+      outSlope: 4.9870114
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.061111134
     - serializedVersion: 3
       time: 0.5
       value: 1
@@ -2002,11 +1911,11 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: -4.6071496
+      outSlope: -4.6071496
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.088888764
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
