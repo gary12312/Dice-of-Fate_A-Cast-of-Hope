@@ -222,6 +222,7 @@ namespace DiceFate.Units
             Vector3 direction = GetHorizontalDirection(targetPosition);
             if (direction.magnitude > rotationThreshold && enableRotation)
             {
+                Debug .Log("Вычисляем поворот к направлению: " + direction);
                 // Вычисляем поворот только вокруг оси Y
                 targetRotation = GetYRotationOnly(direction);
             }
@@ -237,7 +238,8 @@ namespace DiceFate.Units
             }
 
             // Снимаем выделение после начала перемещения
-            selectionController.DeselectFigure();
+            //selectionController.DeselectFigure();
+           
         }
 
         // Получение горизонтального направления (игнорирует высоту)
@@ -376,12 +378,13 @@ namespace DiceFate.Units
 
             // Поворачиваем в сторону движения перед прыжком (только по Y)
             if (enableRotation)
-            {
+            {             
                 Vector3 jumpDirection = GetHorizontalDirection(targetPosition);
                 if (jumpDirection.magnitude > rotationThreshold)
                 {
                     targetRotation = GetYRotationOnly(jumpDirection);
                     // Ждем немного чтобы поворот начался перед прыжком
+                    Debug.Log("Поворот и прыжок"); // ------------------------------------------- Проверить почему нет поворота
                     yield return new WaitForSeconds(0.1f);
                 }
             }

@@ -155,40 +155,17 @@ namespace DiceFate.Player
                 // Тест: бросаем луч на все слои
                 if (Physics.Raycast(cameraRay, out hit, float.MaxValue))
                 {
-                   // Прямой доступ через GameObject
+                    // Прямой доступ через GameObject
                     MonoBehaviour selectedMono = selectedUnit as MonoBehaviour;
                     if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
                     {
-                        
                         moveable.MoveTo(hit.point);
-                    }           
+                        selectedUnit.Deselect();
+                    }
+
                 }
             }
         }
-        //private void LeftClickToMove()
-        //{
-        //    if (camera == null) { return; }
-
-        //    Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
-        //    RaycastHit hit;
-
-        //    if (Mouse.current.leftButton.wasPressedThisFrame)
-        //    {
-
-        //        //  if (selectedUnit != null) { selectedUnit.Deselect(); }
-
-        //        if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
-        //        && hit.collider.TryGetComponent(out IMoveable moveable))
-        //        {
-        //            moveable.MoveTo(hit.point);
-        //        }
-        //    }
-
-        //}
-
-
-
-
 
 
 
