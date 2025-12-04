@@ -6,8 +6,6 @@ using DiceFate.Events;
 using DiceFate.EventBus;
 
 
-
-
 namespace DiceFate.Player
 {
     public class DF_PlayerInput : MonoBehaviour
@@ -86,7 +84,6 @@ namespace DiceFate.Player
 
         private void Update()
         {
-            //LeftClickToSelected();           // Обработка левого клика (выбор)
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
             UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
@@ -99,9 +96,6 @@ namespace DiceFate.Player
             {
                 LeftClickToMove();
             }
-
-
-
         }
 
 
@@ -219,7 +213,7 @@ namespace DiceFate.Player
         }
 
 
-        //---------------------------------- Обработка наведения мыши   ----------------------------
+        //---------------------------------- Обработка наведения мыши  ----------------------------
 
         // Уменьшаем частоту обновления
         private void UpdateForHoverable()
@@ -262,83 +256,7 @@ namespace DiceFate.Player
 
 
 
-
-
         // ---------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //private void HendelMouseUp()
-        //{
-        //    if (activeAction == null && !Keyboard.current.shiftKey.isPressed) // Если шифт не нажат то сбрасывать выделение
-        //    {
-        //        DeselectAllUnits();
-        //    }
-
-
-        //    HandleLeftClick();
-        //    foreach (AbstractUnit unit in addedUnits)
-        //    {
-        //        unit.Select();
-        //    }
-
-
-        //    selectionBox.gameObject.SetActive(false);
-        //    isDragging = false;
-        //}
-
-        //private void HandelMouseDrag()
-        //{
-        //    if (activeAction != null || wasMouseDownOnUI) return;
-
-
-        //    Debug.Log("Удержание");
-        //    Bounds selectionBoxBounds = ResizeSelectoinBox();
-
-        //    foreach (AbstractUnit unit in aliveUnits)
-        //    {
-        //        Vector2 unitPosition = camera.WorldToScreenPoint(unit.transform.position);
-        //        if (selectionBoxBounds.Contains(unitPosition))
-        //        {
-        //            addedUnits.Add(unit);
-        //        }
-        //    }
-        //}
-
-        //private void HandelMouseDown()
-        //{
-        //    selectionBox.sizeDelta = Vector2.zero;
-        //    selectionBox.gameObject.SetActive(true);
-        //    addedUnits.Clear();
-        //    isDragging = true;
-        //    wasMouseDownOnUI = EventSystem.current.IsPointerOverGameObject();
-        //}
-
-        //private void DeselectAllUnits()
-        //{
-        //    ISelectable[] currentlySelectedUnits = selectedUnits.ToArray();
-
-        //    foreach (ISelectable selectable in currentlySelectedUnits)
-        //    {
-        //        selectable.Deselect();
-
-        //    }
-        //}
-
 
 
 
