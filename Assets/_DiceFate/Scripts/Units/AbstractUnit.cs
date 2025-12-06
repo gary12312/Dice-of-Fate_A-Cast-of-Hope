@@ -51,11 +51,7 @@ namespace DiceFate.Units
         {
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this)); // Вызвать событие, изаписать себя как выбранный юнит слушает DF_PlayerInput
 
-            object1.SetActive(true);
-
-            OutlineOnSelected();
-
-            IsSelected = true;
+            ReadyToMove();
         }
 
         public void Deselect()
@@ -128,5 +124,18 @@ namespace DiceFate.Units
             Outline?.ResetColorOutline();
             Outline?.DisableOutline();
         }
+
+        //-------------- Фазы --------------
+        private void ReadyToMove()
+        {
+            object1.SetActive(true);
+
+            OutlineOnSelected();
+
+            IsSelected = true;
+        }
+
+
+
     }
 }

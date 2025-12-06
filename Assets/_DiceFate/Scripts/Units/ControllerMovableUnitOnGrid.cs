@@ -46,8 +46,8 @@ namespace DiceFate.Units
 
         private void Awake()
         {
-            Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+            //Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
+            //Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
         }
         private void OnDestroy()
         {

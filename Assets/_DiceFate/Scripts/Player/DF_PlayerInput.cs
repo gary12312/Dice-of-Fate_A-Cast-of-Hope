@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using DiceFate.Units;
 using DiceFate.Events;
 using DiceFate.EventBus;
+using UnityEngine.EventSystems;
+using DiceFate.Maine;
 
 
 namespace DiceFate.Player
@@ -19,6 +21,7 @@ namespace DiceFate.Player
         private CinemachineFollow cinemachineFollow;
         private Vector3 startingFollowOffset;
         private Vector2 mouseDelta;       // Изменение положения мыши
+        private bool isWasMouseDownUI;   //  был ли клик по UI
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
         private IHover hoverableUnit;     // Текущее наведение юнит
@@ -98,7 +101,12 @@ namespace DiceFate.Player
             }
         }
 
+        //---------------------------------- Наведение мышы  ---------------------------------------------------------
 
+        private void HandelMpuseDown()
+        {
+            isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject();
+        }
 
 
         //---------------------------------- Клики мышы  -------------------------------------------------------------
@@ -139,6 +147,12 @@ namespace DiceFate.Player
         private void LeftClickToMove()
         {
             if (camera == null || selectedUnit == null)
+            { return; }
+
+            if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
+            { return; }
+
+            if (PhaseNumber.currentPhase != 4)
             { return; }
 
             Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
