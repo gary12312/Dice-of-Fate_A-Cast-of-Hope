@@ -1,11 +1,12 @@
-using UnityEngine;
-using Unity.Cinemachine;
-using UnityEngine.InputSystem;
-using DiceFate.Units;
-using DiceFate.Events;
 using DiceFate.EventBus;
-using UnityEngine.EventSystems;
+using DiceFate.Events;
 using DiceFate.Maine;
+using DiceFate.Units;
+using System.Drawing;
+using Unity.Cinemachine;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 
 namespace DiceFate.Player
@@ -20,10 +21,13 @@ namespace DiceFate.Player
 
         private CinemachineFollow cinemachineFollow;
         private Vector3 startingFollowOffset;
+        private Vector3 pointMousePosition;
         private Vector2 mouseDelta;       // Изменение положения мыши
         private bool isWasMouseDownUI;   //  был ли клик по UI
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
+        //private List<ISelectableDice> selectableDice = new(10); //емкость для выделенных кубиков
+        //private ISelectableDice selectableDiceTest;  //емкость для выделенных кубиков
         private IHover hoverableUnit;     // Текущее наведение юнит
         private IMoveable moveable;       // Текущий перемещаемый юнит
 
@@ -90,15 +94,29 @@ namespace DiceFate.Player
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
             UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
+           
+            
 
             if (selectedUnit == null)
             {
                 LeftClickToSelected();
             }
-            else
+            else if (selectedUnit != null && PhaseNumber.currentPhase == 5)
             {
                 LeftClickToMove();
             }
+            else if (selectedUnit != null && PhaseNumber.currentPhase == 3)
+            {
+                LeftClickToShakeAndDropDice();
+            }
+
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                // для теста 
+                Bus<OnTestingEvent>.Raise(new OnTestingEvent(1));
+            }
+
+
         }
 
         //---------------------------------- Наведение мышы  ---------------------------------------------------------
@@ -175,6 +193,33 @@ namespace DiceFate.Player
             }
         }
 
+        private void LeftClickToShakeAndDropDice()
+        {
+            if (PhaseNumber.currentPhase != 3) { return; }
+                             
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                isDragging = true;
+               
+                
+            }
+            else if (isDragging && Mouse.current.leftButton.isPressed)
+            {
+                ShakeDiceIsMouseDown();                          
+            }
+            else if (isDragging && Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                DropDiceIsMouseUp();
+                isDragging = false; 
+            }
+        }
+
+
+
+      
+
+
 
 
 
@@ -227,6 +272,13 @@ namespace DiceFate.Player
         }
 
 
+
+      
+
+
+
+
+
         //---------------------------------- Обработка наведения мыши  ----------------------------
 
         // Уменьшаем частоту обновления
@@ -266,6 +318,53 @@ namespace DiceFate.Player
             }
 
         }
+
+        //---------------------------------- Тряска и бросание кубиков  ----------------------------------
+
+
+        public void DropDiceIsMouseUp()
+        {
+            //selectableDiceTest.DropSelectDice();
+            Bus<OnDropEvent>.Raise(new OnDropEvent(1));
+        }
+
+
+        public Vector3? GetPointOnPlaneFromMouse()
+        {
+            if (camera == null) return null;
+            
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+     
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, floorLayers))
+            {                
+                if (hit.collider.CompareTag("Ground") || hit.collider.gameObject.name.Contains("Plane"))
+                {
+                    pointMousePosition = hit.point; 
+                }
+            }
+            return null; // Луч не попал в Plane
+        }
+
+        public void ShakeDiceIsMouseDown()
+        {
+            GetPointOnPlaneFromMouse();
+            Bus<OnShakeEvent>.Raise(new OnShakeEvent(pointMousePosition));
+            
+        }
+
+
+
+
+        //private void DeselectAllUnits()
+        //{
+        //    ISelectableDice[] currentlySelectedUnits = selectableDice.ToArray();
+
+        //    foreach (ISelectable selectable in currentlySelectedUnits)
+        //    {
+        //        selectable.Deselect();
+        //    }
+        //}
+
 
 
 

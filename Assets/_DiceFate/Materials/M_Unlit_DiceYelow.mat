@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: M_Unlit_DiceShader
+  m_Name: M_Unlit_DiceYelow
   m_Shader: {fileID: 4800000, guid: 847c1f78fa37dde43aef3b212db3be9d, type: 3}
-  m_Parent: {fileID: 2100000, guid: eb66ffd86b9dd1d47b12bbf3af33bdb9, type: 2}
+  m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -22,9 +22,14 @@ Material:
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 99672cc382eca3f4ebe609191ef00ea2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats: []
-    m_Colors: []
+    m_Colors:
+    - _BaseColor: {r: 0.90588236, g: 0.6541989, b: 0.03529413, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
