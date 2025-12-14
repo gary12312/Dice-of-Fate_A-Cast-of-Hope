@@ -1,50 +1,55 @@
-using UnityEngine;
-using DiceFate.Events;
 using DiceFate.EventBus;
+using DiceFate.Events;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DiceFate.Dice
 {
     public class KegTremble : MonoBehaviour
     {
         [SerializeField] private float powerShake = 0.005f;
+        [SerializeField] public float moveSpeed = 30f; //управляется из Mane
         private Vector3 start_position;
-  
-        private void Awake() 
+
+        private DiceCubeValue diceCubeValue;
+
+        private void Awake()
         {
-            Bus<OnShakeEvent>.OnEvent += HandelKegShake;
+            Bus<OnMoveToMouseEvent>.OnEvent += HandelMoveToMouse;
             Bus<OnDropEvent>.OnEvent += HandelKegDrop;
         }
         private void OnDestroy()
         {
-            Bus<OnShakeEvent>.OnEvent -= HandelKegShake;
+            Bus<OnMoveToMouseEvent>.OnEvent -= HandelMoveToMouse;
             Bus<OnDropEvent>.OnEvent -= HandelKegDrop;
         }
-        
+
         void Start()
         {
             start_position = transform.position;
+
         }
 
-
-        private void HandelKegShake(OnShakeEvent point) => KegShakeAndMoveForMouse(point); 
-        private void HandelKegDrop(OnDropEvent evt) => KegDrop();
-
-
-        private void KegDrop()
+        private void HandelKegDrop(OnDropEvent evt)
         {
             transform.rotation = Quaternion.Euler(90, 0, 0);
+            StartCoroutine(DilayBeforDeletObject());
         }
 
-        void KegShakeAndMoveForMouse(OnShakeEvent point)
+        private void HandelMoveToMouse(OnMoveToMouseEvent point)
         {
-            float x = Random.Range(-powerShake, powerShake);
-            float y = Random.Range(-powerShake, powerShake);
-            float z = Random.Range(-powerShake, powerShake);
-            transform.position += new Vector3(x, y, z) * Time.deltaTime * 500;
+            Vector3 transformMousePoint = new Vector3(point.Point.x, transform.position.y, point.Point.z); ;
 
-            Debug.Log($"Координаты  {point.Point}");
-
+            transform.position = Vector3.Lerp(transform.position,
+                                              transformMousePoint,
+                                              moveSpeed * Time.deltaTime);
         }
 
+        IEnumerator DilayBeforDeletObject()
+        {
+            yield return new WaitForSeconds(1f);
+            Destroy(this.gameObject);
+        }
     }
 }

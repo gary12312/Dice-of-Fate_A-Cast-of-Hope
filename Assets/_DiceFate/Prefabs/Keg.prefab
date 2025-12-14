@@ -278,3 +278,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Dice.KegTremble
   powerShake: 0.001
+  moveSpeed: 30

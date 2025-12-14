@@ -36,6 +36,13 @@ namespace DiceFate.Player
         private float accumulatedTime;
 
 
+
+        // провкрить и удалить если не нужно
+        private Vector3 previousMousePosition;
+        private float totalDistanceMoved = 0f;
+        private bool isFirstShakeCall = true;
+
+
         // Дополнительные параметры для управления камерой
         [Header("Настройки движения камеры")]
         [SerializeField] private float cameraMoveSpeedX = 6f; // Скорость движения камеры
@@ -206,7 +213,8 @@ namespace DiceFate.Player
             }
             else if (isDragging && Mouse.current.leftButton.isPressed)
             {
-                ShakeDiceIsMouseDown();                          
+                ShakeDiceIsMouseDown();
+                MoveToMouseDiceAndKeg();
             }
             else if (isDragging && Mouse.current.leftButton.wasReleasedThisFrame)
             {
@@ -347,9 +355,41 @@ namespace DiceFate.Player
 
         public void ShakeDiceIsMouseDown()
         {
+            // 
+
             GetPointOnPlaneFromMouse();
-            Bus<OnShakeEvent>.Raise(new OnShakeEvent(pointMousePosition));
             
+            // Если это первый вызов, сохраняем начальную позицию
+            if (isFirstShakeCall)
+            {
+                previousMousePosition = pointMousePosition;
+                totalDistanceMoved = 0f;
+                isFirstShakeCall = false;
+            }
+
+            // Вычисляем дистанцию перемещения мыши с предыдущего кадра
+            float frameDistance = 0f;
+            if (pointMousePosition != Vector3.zero)
+            {
+                frameDistance = Vector3.Distance(previousMousePosition, pointMousePosition);
+               // totalDistanceMoved += frameDistance;
+
+                // Сохраняем текущую позицию для следующего кадра
+                previousMousePosition = pointMousePosition;
+            }
+            //--------------------Разобраться!!!!!!!!!!!!!!!!!!!!
+
+           // Debug.Log($"Тряска  {power}");
+            Bus<OnShakeEvent>.Raise(new OnShakeEvent(frameDistance));
+            // Для отладки можно вывести информацию
+           // Debug.Log($"Дистанция перемещения мыши: {frameDistance:F2}");
+        }
+
+        public void MoveToMouseDiceAndKeg()
+        {
+            GetPointOnPlaneFromMouse();
+            Bus<OnMoveToMouseEvent>.Raise(new OnMoveToMouseEvent(pointMousePosition));
+
         }
 
 

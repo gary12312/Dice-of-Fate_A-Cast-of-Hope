@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5986572539359817053}
   m_Layer: 0
   m_Name: Cube_Dice_Attac
-  m_TagString: Untagged
+  m_TagString: Cube
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -121,7 +121,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1138631854012729928}
   serializedVersion: 5
-  m_Mass: 0.5
+  m_Mass: 0.8
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -156,14 +156,14 @@ MonoBehaviour:
   sleepThreshold: 0.1
   checkDelay: 1
   powerShake: 2
-  resultText: {fileID: 0}
-  waitingText: "\u0411\u0440\u043E\u0441\u043E\u043A..."
-  resultPrefix: "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442: "
+  moveSpeed: 30
+  moveSpeed2: 5
+  diceType: 1
   faceDirections:
   - {x: 0, y: 1, z: 0}
   - {x: 0, y: -1, z: 0}
-  - {x: 1, y: 0, z: 0}
   - {x: -1, y: 0, z: 0}
+  - {x: 1, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
   - {x: 0, y: 0, z: -1}
   faceValues: 010000000600000004000000030000000200000005000000

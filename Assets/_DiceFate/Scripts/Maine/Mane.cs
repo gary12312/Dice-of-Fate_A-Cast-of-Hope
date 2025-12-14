@@ -1,11 +1,14 @@
-using DiceFate.EventBus;
-using DiceFate.Events;
-using DiceFate.Units;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using DiceFate.Dice;
+using DiceFate.UI;
+using DiceFate.Units;
+using DiceFate.Events;
+using DiceFate.EventBus;
+using System.Collections;
 
 namespace DiceFate.Maine
 {
@@ -31,10 +34,16 @@ namespace DiceFate.Maine
         [SerializeField] private GameObject prefabDiceAttack;
         [SerializeField] private GameObject prefabDiceShield;
         [SerializeField] private GameObject prefabDiceCounterattack;
+        [SerializeField] private float moveSpeedToMouse = 30f;
 
         [SerializeField] private float prefabScale = 0.2f;
-        [SerializeField] private float spacingBetweenDice = 0.5f; // Расстояние между кубиками одного типа
-        [SerializeField] private DropTargetField dropTargetField; // Ссылка на поле с кубиками
+        [SerializeField] private float spacingBetweenDice = 0.5f;     // Расстояние между кубиками одного типа
+        [SerializeField] private KegCylinderSystem kegCylinderSystem; // Ссылка виртуальный цылиндр
+        [SerializeField] private UiDropTargetField uiDropTargetField;     // Ссылка на поле с кубиками
+
+        [Header("Фаза 3 настройки")]
+        [SerializeField] private UI_Mane uiMane;
+
 
         [Header("Доп. настройки")]
         [SerializeField] private Button buttonReturne;
@@ -44,9 +53,9 @@ namespace DiceFate.Maine
         private ISelectable selectedEnemy;
 
         // Словарь для хранения префабов по типам кубиков
-        private Dictionary<DragAndDropDice.DiceType, GameObject> dicePrefabs;
+        private Dictionary<UiDragAndDropDice.DiceType, GameObject> uiDicePrefabs;
         // Словарь для хранения точек спавна по типам кубиков
-        private Dictionary<DragAndDropDice.DiceType, Transform> spawnPoints;
+        private Dictionary<UiDragAndDropDice.DiceType, Transform> uiSpawnPoints;
 
         private void Awake()
         {
@@ -56,7 +65,7 @@ namespace DiceFate.Maine
             Bus<EnemyDeselectedEvent>.OnEvent += HandelEnemyDeselected;
             Bus<OnDropEvent>.OnEvent += HandelDropDice;
             Bus<OnTestingEvent>.OnEvent += TestingEvent;
-            
+
 
             buttonReturne.onClick.AddListener(ClickButtoneToReturne); // подписывается на щелчок
             dice.onClick.AddListener(PhaseTwoSelectedUnit); // подписывается на щелчок
@@ -79,30 +88,32 @@ namespace DiceFate.Maine
 
         private void Start()
         {
-            if (dropTargetField == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на DropTargetField!");
+            ValidateScripts();
 
             // Инициализируем словари
             UIInitializeDicePrefabs();
             UIInitializeSpawnPoints();
 
             HideAllScenrElements();
-            HideAllUIElements();
+            HideAllUIElements();          
+
+            kegCylinderSystem.cylinderFollowSpeed = moveSpeedToMouse; 
+
         }
 
         // Инициализация словаря префабов
         private void UIInitializeDicePrefabs()
         {
-            dicePrefabs = new Dictionary<DragAndDropDice.DiceType, GameObject>
+            uiDicePrefabs = new Dictionary<UiDragAndDropDice.DiceType, GameObject>
             {
-                { DragAndDropDice.DiceType.Movement, prefabDiceMovement },
-                { DragAndDropDice.DiceType.Attack, prefabDiceAttack },
-                { DragAndDropDice.DiceType.Shield, prefabDiceShield },
-                { DragAndDropDice.DiceType.Counterattack, prefabDiceCounterattack }
+                { UiDragAndDropDice.DiceType.Movement, prefabDiceMovement },
+                { UiDragAndDropDice.DiceType.Attack, prefabDiceAttack },
+                { UiDragAndDropDice.DiceType.Shield, prefabDiceShield },
+                { UiDragAndDropDice.DiceType.Counterattack, prefabDiceCounterattack }
             };
 
             // Проверяем, что все префабы установлены
-            foreach (var kvp in dicePrefabs)
+            foreach (var kvp in uiDicePrefabs)
             {
                 if (kvp.Value == null)
                 {
@@ -114,22 +125,35 @@ namespace DiceFate.Maine
         // Инициализация словаря точек спавна
         private void UIInitializeSpawnPoints()
         {
-            spawnPoints = new Dictionary<DragAndDropDice.DiceType, Transform>
+            uiSpawnPoints = new Dictionary<UiDragAndDropDice.DiceType, Transform>
             {
-                { DragAndDropDice.DiceType.Movement, spawnPointMovement },
-                { DragAndDropDice.DiceType.Attack, spawnPointAttac },
-                { DragAndDropDice.DiceType.Shield, spawnPointShield },
-                { DragAndDropDice.DiceType.Counterattack, spawnPointCounterattack }
+                { UiDragAndDropDice.DiceType.Movement, spawnPointMovement },
+                { UiDragAndDropDice.DiceType.Attack, spawnPointAttac },
+                { UiDragAndDropDice.DiceType.Shield, spawnPointShield },
+                { UiDragAndDropDice.DiceType.Counterattack, spawnPointCounterattack }
             };
 
             // Проверяем, что все точки спавна установлены
-            foreach (var kvp in spawnPoints)
+            foreach (var kvp in uiSpawnPoints)
             {
                 if (kvp.Value == null)
                 {
                     Debug.LogError($"Не установлена точка спавна для кубика типа: {kvp.Key}");
                 }
             }
+        }
+
+        // проверка установки скриптов  
+        private void ValidateScripts()
+        {
+            if (uiDropTargetField == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на DropTargetField!");
+
+            if (kegCylinderSystem == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на KegCylinderSystem!");
+
+            if (uiMane == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на UI_Mane!");
         }
 
         private void SetSceneElementsVisible(bool isKegAndDice)
@@ -212,19 +236,21 @@ namespace DiceFate.Maine
         //-------------- 3 Фаза Бросить кости выбранные кости --------------
         public void PhaseThreeSelectedUnit()
         {
-            Phase(3);            
+            Phase(3);
             ShowPhaseThreeUIElements();
             ShowPhaseThreeSceneElements();
             CreatePrefabKeg();
             CreateDiceFromField();
+            kegCylinderSystem.AddDiceToList();
             Debug.Log($"Фаза = {PhaseNumber.currentPhase}");
+
         }
 
         // Создание кубиков из списка кубиков на поле
         private void CreateDiceFromField()
         {
             // Получаем все кубики с поля
-            List<DragAndDropDice> diceOnField = dropTargetField.GetDiceOnField();
+            List<UiDragAndDropDice> diceOnField = uiDropTargetField.GetDiceOnField();
 
             if (diceOnField == null || diceOnField.Count == 0)
             {
@@ -234,19 +260,19 @@ namespace DiceFate.Maine
             Debug.Log($"Создание {diceOnField.Count} кубика(ов) из поля...");
 
             // Создаем кубики по типам
-            Dictionary<DragAndDropDice.DiceType, int> typeCounters = new Dictionary<DragAndDropDice.DiceType, int>
+            Dictionary<UiDragAndDropDice.DiceType, int> typeCounters = new Dictionary<UiDragAndDropDice.DiceType, int>
             {
-                { DragAndDropDice.DiceType.Movement, 0 },
-                { DragAndDropDice.DiceType.Attack, 0 },
-                { DragAndDropDice.DiceType.Shield, 0 },
-                { DragAndDropDice.DiceType.Counterattack, 0 }
+                { UiDragAndDropDice.DiceType.Movement, 0 },
+                { UiDragAndDropDice.DiceType.Attack, 0 },
+                { UiDragAndDropDice.DiceType.Shield, 0 },
+                { UiDragAndDropDice.DiceType.Counterattack, 0 }
             };
 
             foreach (var dice in diceOnField)
             {
                 if (dice == null) continue;
 
-                DragAndDropDice.DiceType diceType = dice.GetDiceType();
+                UiDragAndDropDice.DiceType diceType = dice.GetDiceType();
 
                 // Увеличиваем счетчик для этого типа
                 typeCounters[diceType]++;
@@ -265,14 +291,14 @@ namespace DiceFate.Maine
             }
         }
         // Метод для создания кубиков определенного типа
-        private void CreateDiceByType(DragAndDropDice.DiceType diceType, int count)
+        private void CreateDiceByType(UiDragAndDropDice.DiceType diceType, int count)
         {
             if (count <= 0) return;
 
-            if (!dicePrefabs.TryGetValue(diceType, out GameObject prefab) || prefab == null)
+            if (!uiDicePrefabs.TryGetValue(diceType, out GameObject prefab) || prefab == null)
             { Debug.LogError($"Не найден префаб для типа кубика: {diceType}"); return; }
 
-            if (!spawnPoints.TryGetValue(diceType, out Transform spawnPoint) || spawnPoint == null)
+            if (!uiSpawnPoints.TryGetValue(diceType, out Transform spawnPoint) || spawnPoint == null)
             { Debug.LogError($"Не найдена точка спавна для типа кубика: {diceType}"); return; }
 
             // Получаем префаб и точку спавна для этого типа
@@ -283,7 +309,7 @@ namespace DiceFate.Maine
         }
 
         // Метод для создания одного кубика
-        private void CreateSingleDice(GameObject prefab, Transform baseSpawnPoint, DragAndDropDice.DiceType diceType, int index)
+        private void CreateSingleDice(GameObject prefab, Transform baseSpawnPoint, UiDragAndDropDice.DiceType diceType, int index)
         {
             // Создаем экземпляр префаба
             GameObject spawnedObject = Instantiate(prefab);
@@ -302,25 +328,31 @@ namespace DiceFate.Maine
             // Устанавливаем родителя
             spawnedObject.transform.SetParent(baseSpawnPoint);
 
+            // Устанавливаем скорость перемещения Кубика с боченком к мыши  (для исключения вылиатания кубика сквозь боченок)
+            DiceCubeValue diceCubeValue = prefab.GetComponent<DiceCubeValue>();
+            diceCubeValue.moveSpeed = moveSpeedToMouse;
+
             // Настраиваем компонент кубика (если есть)
-            var diceComponent = spawnedObject.GetComponent<DragAndDropDice>();
+            var diceComponent = spawnedObject.GetComponent<UiDragAndDropDice>();
             if (diceComponent != null)
             {
                 diceComponent.diceType = diceType;
             }
-
             Debug.Log($"Создан кубик типа {diceType} #{index + 1} в позиции {spawnPosition}");
         }
 
         private void CreatePrefabKeg()
-        {               
+        {
             GameObject spawnedObject = Instantiate(prefabKeg);
-                     
+
             spawnedObject.transform.position = spawnPointKeg.position;
-            spawnedObject.transform.rotation = spawnPointKeg.rotation;                    
+            spawnedObject.transform.rotation = spawnPointKeg.rotation;
             //spawnedObject.transform.localScale = new Vector3(prefabScale, prefabScale, prefabScale);
 
-            spawnedObject.transform.SetParent(spawnPointKeg);  // Устанавливаем родителя (опционально)
+            spawnedObject.transform.SetParent(spawnPointKeg);  // Устанавливаем родителя 
+
+            KegTremble kegScript = prefabKeg.GetComponent<KegTremble>();
+            kegScript.moveSpeed = moveSpeedToMouse;
         }
 
 
@@ -351,9 +383,32 @@ namespace DiceFate.Maine
         public void PhaseFourSelectedUnit()
         {
             Phase(4);
-     
+
+            //Получаем значение кубиков на столе            
+            StartCoroutine(PhaseFourCoroutine());
+
+
+
+
+
             Debug.Log($"Фаза = {PhaseNumber.currentPhase}");
         }
+
+        private IEnumerator PhaseFourCoroutine()
+        {
+            //Ждем, пока кубики остановятся
+            yield return new WaitForSeconds(4f);
+            uiMane.UiEnableResultDisplay();
+
+            yield return new WaitForSeconds(1f);
+            uiMane.UiSetResultToCard();
+
+            yield return new WaitForSeconds(1f);
+            uiMane.UiDisableResultDisplay();
+        }
+
+
+
 
 
         //-------------- 5 Фаза  --------------

@@ -7,19 +7,32 @@ using UnityEngine;
 
 namespace DiceFate.Dice
 {
-    public class DiceCubeValue : MonoBehaviour, ISelectableDice
+    public class DiceCubeValue : MonoBehaviour
     {
         [Header("Dice Settings")]
-        public Rigidbody diceRigidbody;
-        public float sleepThreshold = 0.1f;
-        public float checkDelay = 1f;
-        public float powerShake = 2f;
-            
+        [SerializeField] private Rigidbody diceRigidbody;
+        [SerializeField] private float sleepThreshold = 0.1f;
+        [SerializeField] private float checkDelay = 1f;
+        [SerializeField] private float powerShake = 2f;
+        [SerializeField] public float moveSpeed = 30f; //управляется из Mane
+        [SerializeField] public float moveSpeed2 = 500f; //управляется из Mane
+        private Vector3 start_position; // для движения совместно со станканом  к мыши
+        private Vector3 positionBeforeToMove; // сохранить позицию перед движением к мыши
+        private Vector3 vectorEntrePositionAndZero;
+        private Vector3 randomOffset;
+       // private bool IsShake = false;
 
-        [Header("UI Settings")]
-        public TextMeshProUGUI resultText;
-        public string waitingText = "Бросок...";
-        public string resultPrefix = "Результат: ";
+
+        // Публичный параметр типа кубика с использованием enum
+        [Header("Тип кубика")]
+        public DiceType diceType;
+        public enum DiceType
+        {
+            Movement,
+            Attack,
+            Shield,
+            Counterattack
+        }
 
         [Header("Dice Face Values")]
         public Vector3[] faceDirections = new Vector3[]
@@ -37,19 +50,20 @@ namespace DiceFate.Dice
         private bool isChecking = false;
         private int lastResult = 0;
 
-         [field: SerializeField] public bool IsShakeSelectDice { get; private set; }   // ISelectableDice
+        [field: SerializeField] public bool IsShakeSelectDice { get; private set; }   // ISelectableDice
 
         private void Awake()
         {
-            Bus<OnShakeEvent>.OnEvent += HandelDiceShake;
+            Bus<OnShakeEvent>.OnEvent += HandelDiceShakeAndMove;
             Bus<OnDropEvent>.OnEvent += HandelDiceDrop;
+            Bus<OnMoveToMouseEvent>.OnEvent += HandelMoveToMouse;
+
         }
-
-
         private void OnDestroy()
         {
-            Bus<OnShakeEvent>.OnEvent -= HandelDiceShake;
+            Bus<OnShakeEvent>.OnEvent -= HandelDiceShakeAndMove;
             Bus<OnDropEvent>.OnEvent -= HandelDiceDrop;
+            Bus<OnMoveToMouseEvent>.OnEvent -= HandelMoveToMouse;
         }
 
         void Start()
@@ -57,9 +71,17 @@ namespace DiceFate.Dice
             if (diceRigidbody == null)
                 diceRigidbody = GetComponent<Rigidbody>();
 
-            if (resultText != null)
-                resultText.text = "Готов к броску";
+            start_position = transform.position;
+
+            // Генерируем случайное смещение в пределах 0.5f
+            float randomX = Random.Range(-0.5f, 0.5f);
+            float randomZ = Random.Range(-0.5f, 0.5f);
+
+            // Смещение только по горизонтали (X и Z), высота (Y) остается как есть
+            randomOffset = new Vector3(randomX, 0f, randomZ);
         }
+
+
 
         void Update()
         {
@@ -82,9 +104,6 @@ namespace DiceFate.Dice
 
         IEnumerator CheckDiceValue()
         {
-            if (resultText != null)
-                resultText.text = waitingText;
-
             // Ждем пока кубик не остановится
             while (diceRigidbody.linearVelocity.magnitude > sleepThreshold ||
                    diceRigidbody.angularVelocity.magnitude > sleepThreshold)
@@ -98,9 +117,7 @@ namespace DiceFate.Dice
             // Определяем значение кубика
             int result = GetDiceValue();
 
-            // Обновляем UI
-            if (resultText != null)
-                resultText.text = resultPrefix + result;
+            vectorEntrePositionAndZero = transform.position - start_position;
 
             lastResult = result;
             isChecking = false;
@@ -136,10 +153,6 @@ namespace DiceFate.Dice
         }
 
 
-  
-
-
-
         // Метод для принудительной проверки значения (можно вызвать извне)
         public void ForceCheck()
         {
@@ -149,14 +162,6 @@ namespace DiceFate.Dice
             }
         }
 
-        // Метод для сброса текста
-        public void ResetText()
-        {
-            if (resultText != null)
-                resultText.text = "Готов к броску";
-
-            lastResult = 0;
-        }
 
         // Метод для получения последнего результата
         public int GetLastResult()
@@ -167,15 +172,12 @@ namespace DiceFate.Dice
         // Метод для ручного броска кубика (можно вызвать из других скриптов)
         public void ThrowDice(Vector3 force, Vector3 torque)
         {
-            ResetText();
             diceRigidbody.AddForce(force, ForceMode.Impulse);
             diceRigidbody.AddTorque(torque, ForceMode.Impulse);
         }
 
         public void ResetDice()
         {
-            if (resultText != null)
-                resultText.text = "Готов к броску";
 
             lastResult = 0;
             isChecking = false;
@@ -189,35 +191,14 @@ namespace DiceFate.Dice
                 rb.isKinematic = true;
             }
         }
-
-        //-------------------- ISelectableDice реализация --------------
-        public void SelectDice()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void DeselectDice()
-        {
-            throw new System.NotImplementedException();
-        }
-        public void ShakeSelectDice()
-        {
-           
-           // IsShakeSelectDice= true;
-        }
-
-        public void DropSelectDice()
-        {
-            
-           // IsShakeSelectDice = false;
-        }
+  
 
         // --------------------- Реализация событий ----------------------
 
-        private void HandelDiceShake(OnShakeEvent evt)
-        {            
-            ShakeDice();
-        }
+        private void HandelDiceShakeAndMove(OnShakeEvent power) { }
+
+        private void HandelMoveToMouse(OnMoveToMouseEvent point) { }
+
 
         private void HandelDiceDrop(OnDropEvent evt)
         {
@@ -228,16 +209,21 @@ namespace DiceFate.Dice
 
 
 
-        // --------------------- Бросок и тряска кубика ------------------
-
+        // --------------------- Бросок и тряска и перемещение кубика ------------------
         public void ShakeDice()
         {
             float x = Random.Range(-powerShake, powerShake);
-            float y = Random.Range(-powerShake, powerShake);
+            float y = Random.Range(-0, 0);
             float z = Random.Range(-powerShake, powerShake);
             transform.Rotate(x * Time.deltaTime * 500, y * Time.deltaTime * 500, z * Time.deltaTime * 500);
         }
 
+        public void MoveDiceToMouse(OnMoveToMouseEvent point)
+        {
+            Vector3 targetPoint = point.Point + randomOffset;
+            targetPoint.y = transform.position.y;
+            transform.position = Vector3.Lerp(transform.position, targetPoint, moveSpeed * Time.deltaTime);
+        }
 
 
         public void DropDice()
@@ -252,7 +238,7 @@ namespace DiceFate.Dice
         {
             if (faceDirections == null) return;
 
-            Gizmos.color = Color.red;
+            Gizmos.color = UnityEngine.Color.red;
             for (int i = 0; i < faceDirections.Length; i++)
             {
                 if (i < faceValues.Length)
@@ -268,6 +254,6 @@ namespace DiceFate.Dice
             }
         }
 
- 
+
     }
 }

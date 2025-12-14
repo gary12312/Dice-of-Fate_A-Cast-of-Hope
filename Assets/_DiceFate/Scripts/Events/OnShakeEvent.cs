@@ -6,11 +6,11 @@ namespace DiceFate.Events
 {
     public struct OnShakeEvent : IEvent
     {
-        public Vector3 Point { get; private set; }
+        public float Power { get; private set; }
 
-        public OnShakeEvent(Vector3 value)
+        public OnShakeEvent(float value)
         {
-            Point = value;
+            Power = value;
         }
     }
 }

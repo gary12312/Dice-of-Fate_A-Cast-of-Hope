@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class TestGiveDiceGiveDice : MonoBehaviour
 {
     [Header("Ссылка на поле")]
-    public DropTargetField dropTargetField; // Ссылка на поле с кубиками
+    public UiDropTargetField dropTargetField; // Ссылка на поле с кубиками
 
     [Header("Настройки")]
     [Tooltip("Интервал проверки поля в секундах")]
@@ -80,15 +80,15 @@ public class TestGiveDiceGiveDice : MonoBehaviour
         }
 
         // Получаем типы кубиков на поле
-        List<DragAndDropDice.DiceType> diceTypes = dropTargetField.GetDiceTypesOnField();
+        List<UiDragAndDropDice.DiceType> diceTypes = dropTargetField.GetDiceTypesOnField();
 
         if (diceTypes.Count > 0)
         {
             // Подсчитываем количество каждого типа
-            int movementCount = dropTargetField.GetDiceTypeCount(DragAndDropDice.DiceType.Movement);
-            int attackCount = dropTargetField.GetDiceTypeCount(DragAndDropDice.DiceType.Attack);
-            int shieldCount = dropTargetField.GetDiceTypeCount(DragAndDropDice.DiceType.Shield);
-            int counterattackCount = dropTargetField.GetDiceTypeCount(DragAndDropDice.DiceType.Counterattack);
+            int movementCount = dropTargetField.GetDiceTypeCount(UiDragAndDropDice.DiceType.Movement);
+            int attackCount = dropTargetField.GetDiceTypeCount(UiDragAndDropDice.DiceType.Attack);
+            int shieldCount = dropTargetField.GetDiceTypeCount(UiDragAndDropDice.DiceType.Shield);
+            int counterattackCount = dropTargetField.GetDiceTypeCount(UiDragAndDropDice.DiceType.Counterattack);
 
             // Формируем детальный отчет
             string details = $"Детальная информация о кубиках на поле:\n" +
@@ -129,7 +129,7 @@ public class TestGiveDiceGiveDice : MonoBehaviour
     }
 
     // Метод для проверки наличия конкретного типа кубика на поле (обновлен для DiceType)
-    public bool HasDiceTypeOnField(DragAndDropDice.DiceType diceType)
+    public bool HasDiceTypeOnField(UiDragAndDropDice.DiceType diceType)
     {
         if (dropTargetField != null)
         {
@@ -139,7 +139,7 @@ public class TestGiveDiceGiveDice : MonoBehaviour
     }
 
     // Метод для получения количества кубиков определенного типа на поле
-    public int GetDiceTypeCountOnField(DragAndDropDice.DiceType diceType)
+    public int GetDiceTypeCountOnField(UiDragAndDropDice.DiceType diceType)
     {
         if (dropTargetField != null)
         {
