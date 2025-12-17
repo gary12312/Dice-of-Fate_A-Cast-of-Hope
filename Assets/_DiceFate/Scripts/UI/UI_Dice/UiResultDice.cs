@@ -93,6 +93,9 @@ namespace DiceFate.UI_Dice
             value5.SetActive(false);
             value6.SetActive(false);
         }
+
+
+
     }
 }
 

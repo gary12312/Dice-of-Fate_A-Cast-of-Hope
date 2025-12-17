@@ -101,20 +101,20 @@ namespace DiceFate.Player
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
             UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
-           
-            
+
+           // LeftClickToMove();
 
             if (selectedUnit == null)
             {
                 LeftClickToSelected();
             }
-            else if (selectedUnit != null && PhaseNumber.currentPhase == 5)
-            {
-                LeftClickToMove();
-            }
-            else if (selectedUnit != null && PhaseNumber.currentPhase == 3)
+            else if (selectedUnit != null && GameStats.currentPhasePlayer == 3)
             {
                 LeftClickToShakeAndDropDice();
+            }
+            else if (selectedUnit != null && GameStats.currentPhasePlayer == 4)
+            {
+                LeftClickToMove();
             }
 
             if (Input.GetKeyDown(KeyCode.W))
@@ -177,7 +177,7 @@ namespace DiceFate.Player
             if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
             { return; }
 
-            if (PhaseNumber.currentPhase != 4)
+            if (GameStats.currentPhasePlayer != 4)
             { return; }
 
             Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
@@ -202,7 +202,7 @@ namespace DiceFate.Player
 
         private void LeftClickToShakeAndDropDice()
         {
-            if (PhaseNumber.currentPhase != 3) { return; }
+            if (GameStats.currentPhasePlayer != 3) { return; }
                              
 
             if (Mouse.current.leftButton.wasPressedThisFrame)

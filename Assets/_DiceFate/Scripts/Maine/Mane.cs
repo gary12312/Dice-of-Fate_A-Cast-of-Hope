@@ -3,6 +3,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using DiceFate;
 using DiceFate.Dice;
 using DiceFate.UI;
 using DiceFate.Units;
@@ -47,6 +48,8 @@ namespace DiceFate.Maine
 
         [Header("Доп. настройки")]
         [SerializeField] private Button buttonReturne;
+        [SerializeField] private PhaseNumberText PhaseNumberText;
+
 
         private bool isDiceGroupActive = false;
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
@@ -84,6 +87,11 @@ namespace DiceFate.Maine
             buttonReturne.onClick.RemoveListener(ClickButtoneToReturne);
             dice.onClick.RemoveListener(PhaseTwoSelectedUnit);
             keg.onClick.RemoveListener(PhaseThreeSelectedUnit);
+        }
+
+        private void Update()
+        {
+            PhaseNumberText.UpdatePhaseNumberText(GameStats.currentPhasePlayer);
         }
 
         private void Start()
@@ -176,7 +184,7 @@ namespace DiceFate.Maine
         private void ShowPhaseTwoUIElements() => SetUIElementsVisible(isUnitMasterCard: true, isDice: false, isDiceGroup: true);
         private void ShowPhaseThreeUIElements() => SetUIElementsVisible(isUnitMasterCard: true, isDice: false, isDiceGroup: false);
 
-        private void Phase(int number) => PhaseNumber.currentPhase = number;
+        private void Phase(int number) => GameStats.currentPhasePlayer = number;
 
         //---------------------------------- События  ----------------------------------
         private void HandelUnitSelected(UnitSelectedEvent evt)
@@ -222,7 +230,7 @@ namespace DiceFate.Maine
         {
             Phase(1);
             ShowPhaseOneUIElements();
-            Debug.Log($"Фаза = {PhaseNumber.currentPhase}");
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
 
         //-------------- 2 Фаза - Активация кубиков для выбора --------------
@@ -230,7 +238,7 @@ namespace DiceFate.Maine
         {
             Phase(2);
             ShowPhaseTwoUIElements();
-            Debug.Log($"Фаза = {PhaseNumber.currentPhase}");
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
 
         //-------------- 3 Фаза Бросить кости выбранные кости --------------
@@ -242,7 +250,7 @@ namespace DiceFate.Maine
             CreatePrefabKeg();
             CreateDiceFromField();
             kegCylinderSystem.AddDiceToList();
-            Debug.Log($"Фаза = {PhaseNumber.currentPhase}");
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
 
         }
 
@@ -391,20 +399,27 @@ namespace DiceFate.Maine
 
 
 
-            Debug.Log($"Фаза = {PhaseNumber.currentPhase}");
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
 
         private IEnumerator PhaseFourCoroutine()
         {
-            //Ждем, пока кубики остановятся
+            //Ждем, пока кубики остановятся и показываем результат в UI
             yield return new WaitForSeconds(4f);
             uiMane.UiEnableResultDisplay();
 
+            // Записываем результат на карточку и в static
             yield return new WaitForSeconds(1f);
-            uiMane.UiSetResultToCard();
+            uiMane.SetResultToCard();
 
             yield return new WaitForSeconds(1f);
             uiMane.UiDisableResultDisplay();
+
+                        
+   
+            Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
+
+
         }
 
 
@@ -418,7 +433,7 @@ namespace DiceFate.Maine
         //-------------- Вспомогательные методы --------------
         public void ClickButtoneToReturne()
         {
-            switch (PhaseNumber.currentPhase)
+            switch (GameStats.currentPhasePlayer)
             {
                 case 0:
                     // Ничего не делаем
@@ -440,7 +455,7 @@ namespace DiceFate.Maine
                     PhaseFourSelectedUnit();
                     break;
                 default:
-                    Debug.Log($"Неизвестная фаза: {PhaseNumber.currentPhase}");
+                    Debug.Log($"Неизвестная фаза: {GameStats.currentPhasePlayer}");
                     break;
             }
         }

@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using System.Collections;
 using DiceFate.Events;
 using DiceFate.EventBus;
+using System;
 
 namespace DiceFate.Units
 {
@@ -46,13 +47,18 @@ namespace DiceFate.Units
 
         private void Awake()
         {
-            //Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
-            //Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+            Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+            Bus<OnGridEvent>.OnEvent += HandeleOnGrid;
         }
+
+      
+
         private void OnDestroy()
         {
             Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandeleUnitDeselect;
+            Bus<OnGridEvent>.OnEvent -= HandeleOnGrid;
         }
 
         void Start()
@@ -86,13 +92,19 @@ namespace DiceFate.Units
         //---------------------------------- запуск событий    ----------------------------------
         private void HandelUnitSelected(UnitSelectedEvent evt)
         {
-            if (gridSystem != null) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
+          //  if (gridSystem != null) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
         }
 
         private void HandeleUnitDeselect(UnitDeselectedEvent evt)
         {
             if (gridSystem != null) gridSystem.DisablePreview(); // Выключаем систему предпросмотра сетки
         }
+
+        private void HandeleOnGrid(OnGridEvent args)
+        {
+            if (gridSystem != null) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
+        }
+
 
 
         //-------------- IMoveable реализация --------------

@@ -5,7 +5,7 @@ namespace DiceFate.UI
 {
     public class UI_Mane : MonoBehaviour
     {
-        [SerializeField] private UiDiceTargetResult uiResultDisplay;
+        [SerializeField] private UiDiceTargetResult uiResultTargetDisplay;
 
         private void Start()
         {
@@ -17,36 +17,39 @@ namespace DiceFate.UI
         {
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                uiResultDisplay.InitializeResultDisplay();
+                uiResultTargetDisplay.InitializeResultDisplay();
             }
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                uiResultDisplay.UpdateResultDisplay();
+                uiResultTargetDisplay.UpdateResultDisplay();
             }
         }
 
         // проверка установки скриптов  
         private void ValidateScripts()
         {
-            if (uiResultDisplay == null)
+            if (uiResultTargetDisplay == null)
                 Debug.LogError($" дл€ {this.name} Ќе установлена ссылка на uiResultDisplay!");
-
         }
 
 
         // ѕоказываем в UI какие кубики были брошены
         public void UiEnableResultDisplay()
         {
-            uiResultDisplay.InitializeResultDisplay();
+            uiResultTargetDisplay.InitializeResultDisplay();
         }
 
-        // ќбновл€ем значени€ на карточке в UI
-        public void UiSetResultToCard()
+        // записываем в GameStats и обновл€ем значени€ на карточке в UI 
+        public void SetResultToCard()
         {
-            uiResultDisplay.UpdateResultDisplay();
+            uiResultTargetDisplay.SaveResultsToGameStats();
+            uiResultTargetDisplay.UpdateResultDisplay();
         }
 
-        public void UiDisableResultDisplay() => uiResultDisplay.OffResultOnDisplays();
+
+
+
+        public void UiDisableResultDisplay() => uiResultTargetDisplay.OffResultOnDisplays();
     }
 }

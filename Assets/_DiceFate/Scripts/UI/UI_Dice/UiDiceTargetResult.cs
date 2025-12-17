@@ -14,30 +14,24 @@ namespace DiceFate.UI_Dice
         [SerializeField] private TextMeshProUGUI textMovment;
         [SerializeField] private TextMeshProUGUI textAttack;
         [SerializeField] private TextMeshProUGUI textShield;
-        [SerializeField] private TextMeshProUGUI textCounterattack;   
+        [SerializeField] private TextMeshProUGUI textCounterattack;
 
-        private List<DiceCubeValue> diceCubes = new List<DiceCubeValue>();       
-       
+        private List<DiceCubeValue> diceCubes = new List<DiceCubeValue>();
+
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
         {
             { "Movement", 0 },
             { "Attack", 0 },
             { "Shield", 0 },
-            { "Counterattack", 0 } 
+            { "Counterattack", 0 }
         };
 
-        private void Awake()
-        {
-            resultContainer.SetActive(false);
-        }
+        private void Awake() => resultContainer.SetActive(false);      
 
-        private void Start()
-        {
-           
-            Checked();
-        }
-     
-     
+        private void Start() => Checked();
+
+
+
         public void InitializeResultDisplay()
         {
             resultContainer.SetActive(true);
@@ -96,35 +90,27 @@ namespace DiceFate.UI_Dice
                 uiResultDice.ColorDiceResult(dice.diceType.ToString());
 
                 // Обновить словарь результатов по типам кубиков
-                diceResultsDict[dice.diceType.ToString()] += currentValue;       
+                diceResultsDict[dice.diceType.ToString()] += currentValue;
             }
         }
 
-        void Checked()
+
+        public void SaveResultsToGameStats()
         {
-            if (resultContainer == null)
-            {
-                Debug.LogError("Не назначен контейнер для результатов (C_ResultDice)!");
-            }
-
-            if (uiResultDicePrefab == null)
-            {
-                Debug.LogError("Не назначен префаб UiResultDice в инспекторе!");
-            }
-
-            ClearAll();
+            GameStats.diceMovement = diceResultsDict["Movement"];
+            GameStats.diceAttack = diceResultsDict["Attack"];
+            GameStats.diceShield = diceResultsDict["Shield"];
+            GameStats.diceCounterattack = diceResultsDict["Counterattack"];
         }
-
-
 
         public void UpdateResultDisplay()
         {
             Debug.Log("Обновление результатов кубиков...");
-            textMovment.text = diceResultsDict["Movement"].ToString();
-            textAttack.text = diceResultsDict["Attack"].ToString();
-            textShield.text = diceResultsDict["Shield"].ToString();
-            textCounterattack.text = diceResultsDict["Counterattack"].ToString();
-        }     
+            textMovment.text = GameStats.diceMovement.ToString();
+            textAttack.text = GameStats.diceAttack.ToString();
+            textShield.text = GameStats.diceShield.ToString();
+            textCounterattack.text = GameStats.diceCounterattack.ToString();
+        }
 
         private void ClearAll()
         {
@@ -145,6 +131,20 @@ namespace DiceFate.UI_Dice
             resultContainer.SetActive(false);
         }
 
+        void Checked()
+        {
+            if (resultContainer == null)
+            {
+                Debug.LogError("Не назначен контейнер для результатов (C_ResultDice)!");
+            }
+
+            if (uiResultDicePrefab == null)
+            {
+                Debug.LogError("Не назначен префаб UiResultDice в инспекторе!");
+            }
+
+            ClearAll();
+        }
 
     }
 }
