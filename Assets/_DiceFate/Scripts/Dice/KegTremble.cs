@@ -12,7 +12,7 @@ namespace DiceFate.Dice
         [SerializeField] public float moveSpeed = 30f; //управляется из Mane
         private Vector3 start_position;
 
-        private DiceCubeValue diceCubeValue;
+        private DiceCube diceCubeValue;
 
         private void Awake()
         {

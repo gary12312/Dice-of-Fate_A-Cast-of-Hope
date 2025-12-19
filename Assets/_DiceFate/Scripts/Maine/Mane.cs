@@ -39,7 +39,7 @@ namespace DiceFate.Maine
 
         [SerializeField] private float prefabScale = 0.2f;
         [SerializeField] private float spacingBetweenDice = 0.5f;     // Расстояние между кубиками одного типа
-        [SerializeField] private KegCylinderSystem kegCylinderSystem; // Ссылка виртуальный цылиндр
+        [SerializeField] private KegCylinderVirtual kegCylinderSystem; // Ссылка виртуальный цылиндр
         [SerializeField] private UiDropTargetField uiDropTargetField;     // Ссылка на поле с кубиками
 
         [Header("Фаза 3 настройки")]
@@ -337,7 +337,7 @@ namespace DiceFate.Maine
             spawnedObject.transform.SetParent(baseSpawnPoint);
 
             // Устанавливаем скорость перемещения Кубика с боченком к мыши  (для исключения вылиатания кубика сквозь боченок)
-            DiceCubeValue diceCubeValue = prefab.GetComponent<DiceCubeValue>();
+            DiceCube diceCubeValue = prefab.GetComponent<DiceCube>();
             diceCubeValue.moveSpeed = moveSpeedToMouse;
 
             // Настраиваем компонент кубика (если есть)

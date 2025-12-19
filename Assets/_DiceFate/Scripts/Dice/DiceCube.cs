@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DiceFate.Dice
 {
-    public class DiceCubeValue : MonoBehaviour
+    public class DiceCube : MonoBehaviour
     {
         [Header("Dice Settings")]
         [SerializeField] private Rigidbody diceRigidbody;

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace DiceFate.Dice
 {
-    public class KegCylinderSystem : MonoBehaviour
+    public class KegCylinderVirtual : MonoBehaviour
     {
         [Header("Виртуальный Цилиндр")]
         [SerializeField] private float cylinderRadius = 3f;

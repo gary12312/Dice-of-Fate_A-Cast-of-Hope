@@ -16,7 +16,7 @@ namespace DiceFate.UI_Dice
         [SerializeField] private TextMeshProUGUI textShield;
         [SerializeField] private TextMeshProUGUI textCounterattack;
 
-        private List<DiceCubeValue> diceCubes = new List<DiceCubeValue>();
+        private List<DiceCube> diceCubes = new List<DiceCube>();
 
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
         {
@@ -49,7 +49,7 @@ namespace DiceFate.UI_Dice
             diceCubes.Clear(); // Очищаем список перед заполнением
             foreach (GameObject cube in cubeObjects)
             {
-                DiceCubeValue diceValue = cube.GetComponent<DiceCubeValue>();
+                DiceCube diceValue = cube.GetComponent<DiceCube>();
                 if (diceValue != null)
                 {
                     diceCubes.Add(diceValue);
@@ -67,7 +67,7 @@ namespace DiceFate.UI_Dice
             ClearAll();
 
             // Создать новые UI-элементы
-            foreach (DiceCubeValue dice in diceCubes)
+            foreach (DiceCube dice in diceCubes)
             {
                 // Создать экземпляр префаба
                 GameObject uiInstance = Instantiate(uiResultDicePrefab, resultContainer.transform);
