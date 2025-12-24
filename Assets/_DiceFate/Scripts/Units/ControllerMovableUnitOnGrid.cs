@@ -1,16 +1,19 @@
+using DiceFate.EventBus;
+using DiceFate.Events;
+using System;
+using System.Collections;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
-using DiceFate.Events;
-using DiceFate.EventBus;
-using System;
 
 namespace DiceFate.Units
 {
     public class ControllerMovableUnitOnGrid : MonoBehaviour, IMoveable
     {
+        [field: SerializeField] public bool isIMoveable { get; private set; }
+
         [Header("Настройки перемещения")]
-        public float moveDistance = 20f; // Максимальная дистанция перемещения
+        public float moveDistance = 6f; // Максимальная дистанция перемещения
         public float liftHeight = 0.5f; // Высота подъема при движении
 
         [Header("Настройки автоматического выбора режима")]
@@ -32,8 +35,12 @@ namespace DiceFate.Units
         public float rotationThreshold = 0.1f; // Минимальная дистанция для начала поворота
         public bool keepFinalRotation = true; // Сохранять финальный поворот после движения
 
-        private DF_MiniFigureIsSelectable selectionController; // Контроллер выделения
-        public GridMovableForUnit gridSystem; // Система сетки
+        //private DF_MiniFigureIsSelectable selectionController; // Контроллер выделения
+        [SerializeField] public GridMovableForUnit gridSystem; // Система сетки
+        [SerializeField] public UnitPlayer unitPlayer; // Ссылка на юнита игрока
+        [SerializeField] private GameObject decalZoneMove;
+  
+
 
         private NavMeshAgent agent;
         private Vector3 originalPosition; // Исходная позиция фигуры
@@ -42,27 +49,31 @@ namespace DiceFate.Units
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
 
-
+       
         public bool IsSelected => throw new System.NotImplementedException();
 
         private void Awake()
         {
-            Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
+           // Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+            Bus<OnMovmentValueEvent>.OnEvent += HandeleMovmentValue;
             Bus<OnGridEvent>.OnEvent += HandeleOnGrid;
         }
 
-      
+  
 
         private void OnDestroy()
         {
-            Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
+          //  Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandeleUnitDeselect;
+            Bus<OnMovmentValueEvent>.OnEvent -= HandeleMovmentValue;
             Bus<OnGridEvent>.OnEvent -= HandeleOnGrid;
         }
 
         void Start()
         {
+            ValidateScripts();
+
             // Получаем компонент NavMeshAgent
             agent = GetComponent<NavMeshAgent>();
 
@@ -79,6 +90,16 @@ namespace DiceFate.Units
             Debug.Log($"Настройки перемещения: distanceToJump = {distanceToJump}, isJump = {isJump}");
         }
 
+        private void ValidateScripts()
+        {
+            if (gridSystem == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на GridSystem!");
+
+            if (unitPlayer == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на UnitPlayer!");
+        }
+
+
         void Update()
         {
             // Плавный поворот к целевой ориентации
@@ -90,19 +111,35 @@ namespace DiceFate.Units
 
 
         //---------------------------------- запуск событий    ----------------------------------
+       
         private void HandelUnitSelected(UnitSelectedEvent evt)
         {
-          //  if (gridSystem != null) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
-        }
+          //  selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+        }   
 
         private void HandeleUnitDeselect(UnitDeselectedEvent evt)
         {
             if (gridSystem != null) gridSystem.DisablePreview(); // Выключаем систему предпросмотра сетки
+            selectedUnit = null;                                 // Сбросить текущий выделенный юнит 
+        }
+
+        private void HandeleMovmentValue(OnMovmentValueEvent args)
+        {
+            if (unitPlayer.IsSelected)
+            { 
+                
+                gridSystem.circleCount = args.MoveValue; 
+               
+
+                SetDecalSize(args.MoveValue);
+            }
+            Debug.Log($"Движение  = {gridSystem.circleCount}");
         }
 
         private void HandeleOnGrid(OnGridEvent args)
-        {
-            if (gridSystem != null) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
+        {            
+            if (gridSystem != null && unitPlayer.IsSelected) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
+            
         }
 
 
@@ -114,8 +151,8 @@ namespace DiceFate.Units
             // Используем позицию из системы круговой сетки
             Vector3 targetPosition = gridSystem.GetCircularGridPosition(position);
 
-            // Проверяем, что позиция валидная (не нулевая)
-            if (targetPosition != Vector3.zero)
+            // Проверяем, что позиция валидная (не нулевая)  и можно двигаться
+            if (targetPosition != Vector3.zero && GameStats.isPlayerMoveble == true)
             {
                 MoveToPosition(targetPosition);
             }
@@ -164,6 +201,11 @@ namespace DiceFate.Units
             if (!NavMesh.SamplePosition(targetPosition, out navHit, 1.0f, NavMesh.AllAreas))
             {
                 Debug.Log("Целевая позиция недоступна на NavMesh");
+                return false;
+            }
+            if (!gridSystem.isMouseInsideGrid)
+            {
+                Debug.Log("Слишком далеко!");
                 return false;
             }
 
@@ -516,5 +558,15 @@ namespace DiceFate.Units
             return isJump ? "Принудительный прыжок" :
                    $"Авто (ходьба до {distanceToJump}, прыжок после)";
         }
+
+        //-------------- Вспомогательные методы --------------
+
+        public void SetDecalSize(float size)
+        {
+            decalZoneMove.transform.localScale = new Vector3(size*2, size*2, decalZoneMove.transform.localScale.z);      
+        }
+
+
+
     }
 }

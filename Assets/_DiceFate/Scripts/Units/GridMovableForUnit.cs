@@ -22,6 +22,9 @@ namespace DiceFate.Units
         public GameObject previewPrefab; // Префаб для предпросмотра (куб2)
         public GameObject decalPoint; // Префаб декали точки для узлов сетки
 
+        [Header("Для доступа из других скриптов")]
+        public bool isMouseInsideGrid = false; // Мышка внутри круга ? для движения юнита
+
         private GameObject currentPreview; // Текущий объект предпросмотра
         private bool isActive = false; // Активен ли режим предпросмотра
         private Vector3 gridCenter; // Центр сетки (позиция выделенного куба)
@@ -37,7 +40,39 @@ namespace DiceFate.Units
             }
         }
 
-        // Обновление позиции префаба предпросмотра
+        // Обновление позиции префаба предпросмотра вариант 1
+        //void UpdatePreviewPosition()
+        //{
+        //    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //    RaycastHit hit;
+
+        //    // Бросаем луч на плоскость с тегом "Ground"
+        //    if (Physics.Raycast(ray, out hit) && hit.collider.CompareTag("Ground"))
+        //    {
+        //        // Получаем позицию на круговой сетке
+        //        Vector3 gridPosition = GetCircularGridPosition(hit.point);
+
+        //        // Показываем или обновляем префаб предпросмотра
+        //        if (currentPreview == null && previewPrefab != null)
+        //        {
+        //            currentPreview = Instantiate(previewPrefab, gridPosition, Quaternion.identity);
+        //            // Поднимаем немного над поверхностью для видимости
+        //            currentPreview.transform.position += Vector3.up * previewHeight;
+
+        //        }
+        //        else if (currentPreview != null)
+        //        {
+        //            currentPreview.transform.position = gridPosition + Vector3.up * previewHeight;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // Если луч не попадает на землю - скрываем префаб
+        //       // HidePreview(); // отключил т.к префаб мерцал
+        //    }
+        //}
+
+        // Обновление позиции префаба предпросмотра вариант 2
         void UpdatePreviewPosition()
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -49,6 +84,21 @@ namespace DiceFate.Units
                 // Получаем позицию на круговой сетке
                 Vector3 gridPosition = GetCircularGridPosition(hit.point);
 
+                // Вычисляем расстояние от центра сетки до позиции мыши
+                Vector3 directionFromCenter = hit.point - gridCenter;
+                directionFromCenter.y = 0; // Игнорируем высоту
+                float distanceFromCenter = directionFromCenter.magnitude;
+
+                // Максимальное расстояние для последней круговой линии
+                float maxGridDistance = circleCount * gridStep;
+
+                // Если луч от мыши дальше последней круговой линии на 2f, скрываем префаб
+                if (distanceFromCenter > maxGridDistance + 2f)
+                {
+                    HidePreview();
+                    return;
+                }
+
                 // Показываем или обновляем префаб предпросмотра
                 if (currentPreview == null && previewPrefab != null)
                 {
@@ -58,15 +108,24 @@ namespace DiceFate.Units
                 }
                 else if (currentPreview != null)
                 {
+                    // Если префаб был скрыт, создаем его заново
+                    if (!currentPreview.activeSelf)
+                    {
+                        currentPreview.SetActive(true);
+                    }
                     currentPreview.transform.position = gridPosition + Vector3.up * previewHeight;
                 }
             }
             else
             {
                 // Если луч не попадает на землю - скрываем префаб
-               // HidePreview(); // отключил т.к префаб мерцал
+               // HidePreview();
             }
         }
+
+
+
+
 
         // Получение позиции на круговой сетке
         public Vector3 GetCircularGridPosition(Vector3 worldPosition)
@@ -114,6 +173,10 @@ namespace DiceFate.Units
             Debug.Log("Сетка: входная позиция " + worldPosition + ", выходная позиция " + gridPosition +
                      ", расстояние " + distance + " -> " + roundedDistance +
                      ", круг " + targetCircle + ", точек на круге: " + pointsOnTargetCircle);
+
+            if ( distance <= roundedDistance) ;
+            
+            isMouseInsideGrid = distance <= roundedDistance+1; //+1 для отладки
 
             return gridPosition;
         }
@@ -183,7 +246,7 @@ namespace DiceFate.Units
 
                     // Создаем декаль точки
                     GameObject decal = Instantiate(decalPoint, pointPosition, Quaternion.identity);
-                    decal.transform.Rotate(90f, 0f, 0f); // Поворачиваем для отображения на плоскости
+                    //decal.transform.Rotate(90f, 0f, 0f); // Поворачиваем для отображения на плоскости для Декалей толко
 
                     // Добавляем в список для управления
                     decalPoints.Add(decal);

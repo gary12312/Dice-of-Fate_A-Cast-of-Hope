@@ -5,14 +5,17 @@ using UnityEngine.PlayerLoop;
 
 namespace DiceFate.Units
 {
-    public class AbstractUnit : MonoBehaviour, ISelectable, IDamageable, IHover
+    public class AbstractUnit : MonoBehaviour, ISelectable, IDamageable, IHover, ISelectableForVisibleUi
     {
 
         [field: SerializeField] public bool IsSelected { get; private set; }   // ISelectable
+        [field: SerializeField] public bool IsSelectedForVisibleUi { get; private set; }   // IsSelectedForVisibleUi
         [field: SerializeField] public int CurrentHealth { get; private set; } // IDamageable
         [field: SerializeField] public int MaxHealth { get; private set; }     // IDamageable
+     
 
         [SerializeField] private GameObject object1;
+        [SerializeField] private GameObject objectTestUi;
         [SerializeField] private UnitSO UnitSO;
         [SerializeField] private ObjectOutline Outline; //обводка
 
@@ -42,6 +45,7 @@ namespace DiceFate.Units
             MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
             CurrentHealth = MaxHealth;
 
+            
 
         }
 
@@ -64,6 +68,27 @@ namespace DiceFate.Units
 
             IsSelected = false;
         }
+
+
+        //-------------- ISelectableForVisibleUi реализация --------------
+        public void SelectForUi()
+        {
+            Bus<OnSelectedForUiEvent>.Raise(new OnSelectedForUiEvent(this));
+            IsSelectedForVisibleUi = true;
+            objectTestUi.SetActive(true);
+
+        }
+
+        public void DeselectForUi()
+        {
+            Bus<OnSelectedForUiEvent>.Raise(new OnSelectedForUiEvent(this));
+            IsSelectedForVisibleUi = false;
+            objectTestUi.SetActive(false);
+        }
+
+
+
+
 
         //-------------- IDamageable реализация --------------
         public void TakeDamage(int damage)
@@ -103,6 +128,9 @@ namespace DiceFate.Units
             // ---
         }
 
+        //-------------- Размер декали --------------
+
+    
 
 
         //-------------- Управление обводкой юнита --------------
@@ -135,7 +163,6 @@ namespace DiceFate.Units
             IsSelected = true;
         }
 
-
-
+  
     }
 }

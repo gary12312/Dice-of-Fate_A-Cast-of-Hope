@@ -47,6 +47,8 @@ namespace DiceFate.UI
             uiResultTargetDisplay.UpdateResultDisplay();
         }
 
+        
+
 
 
 

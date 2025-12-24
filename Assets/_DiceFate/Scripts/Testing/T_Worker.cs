@@ -12,6 +12,8 @@ public class T_Worker : MonoBehaviour, ISelectable, IMoveable
 
     public bool IsSelected => throw new System.NotImplementedException();
 
+    public bool isIMoveable => throw new System.NotImplementedException();
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();

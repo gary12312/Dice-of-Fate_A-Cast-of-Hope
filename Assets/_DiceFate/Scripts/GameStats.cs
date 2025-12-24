@@ -34,6 +34,8 @@ namespace DiceFate
         public static int diceShieldEnemy;
         public static int diceCounterattackEnemy;
 
+        // Флаги для мышки
+        public static bool isPlayerMoveble; // заглушка для Фазы 4 чтобы фигурка не двигалась пока кубики не остановятся
 
     }
 }

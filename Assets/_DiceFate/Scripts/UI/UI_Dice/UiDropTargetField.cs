@@ -252,7 +252,7 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         return Vector2.zero;
     }
 
-    // Публичный метод для получения списка кубиков на поле
+    // Публичный метод для получения списка кубиков на поле   ???
     public List<UiDragAndDropDice> GetDiceOnField()
     {
         // Очищаем список от null-ссылок
@@ -391,4 +391,51 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
     {
         return GetOccupiedPoints().Count;
     }
+
+
+    // Возврат всех кубиков на стартовую позицию и очистка списков 
+    public void ResetAllDiceAndClearField()
+    {
+        Debug.Log("Начинаем сброс всех кубиков и очистку поля...");
+
+        // Создаем копию списка, чтобы избежать ошибок при изменении во время итерации
+        List<UiDragAndDropDice> diceToReset = new List<UiDragAndDropDice>(uiDiceOnField);
+
+        // Возвращаем каждый кубик на стартовую позицию
+        foreach (var dice in diceToReset)
+        {
+            if (dice != null)
+            {
+                Debug.Log($"Возвращаем кубик {dice.GetDiceName()} на стартовую позицию");
+                dice.ReturnToStart();
+            }
+        }
+
+        // Очищаем список кубиков на поле
+        uiDiceOnField.Clear();
+        Debug.Log($"Список кубиков на поле очищен. Количество: {uiDiceOnField.Count}");
+
+        // Освобождаем все точки в словаре
+        if (uiOccupiedPoints != null)
+        {
+            List<RectTransform> points = new List<RectTransform>(uiOccupiedPoints.Keys);
+            foreach (var point in points)
+            {
+                if (uiOccupiedPoints.ContainsKey(point))
+                {
+                    uiOccupiedPoints[point] = null;
+                }
+            }
+            Debug.Log($"Все точки освобождены. Занятых точек: {GetOccupiedPointsCount()}");
+        }
+
+        // Дополнительная проверка и очистка
+        CleanOccupiedPoints();
+
+        Debug.Log("Поле полностью очищено. Все кубики возвращены на стартовые позиции.");
+    }
+
+
+
+
 }

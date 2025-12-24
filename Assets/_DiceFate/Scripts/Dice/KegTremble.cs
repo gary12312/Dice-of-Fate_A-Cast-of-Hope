@@ -48,7 +48,7 @@ namespace DiceFate.Dice
 
         IEnumerator DilayBeforDeletObject()
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.2f);
             Destroy(this.gameObject);
         }
     }
