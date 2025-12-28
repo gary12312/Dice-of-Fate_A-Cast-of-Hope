@@ -16,7 +16,14 @@ namespace DiceFate.UI_Dice
         [SerializeField] private TextMeshProUGUI textShield;
         [SerializeField] private TextMeshProUGUI textCounterattack;
 
+        [SerializeField] private TextMeshProUGUI textLightList;
+
         private List<DiceCube> diceCubes = new List<DiceCube>();
+        private List<DiceCube> diceCubesTestList = new List<DiceCube>();
+
+        private bool isTestList = false;
+        private int amountDiceInTestList = 0;
+
 
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
         {
@@ -30,7 +37,66 @@ namespace DiceFate.UI_Dice
 
         private void Start() => Checked();
 
+        private void FixedUpdate()
+        {
+            if (isTestList)
+            { 
+                Debug.Log("Обновление тестового списка кубиков...");
+                AddDiceToTestList();           
+            }
+            
 
+
+
+            // Для тестирования: показать список типов кубиков в текстовом поле
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                EnableTestListUpdate();
+            }
+        }
+
+        //------ Добавление кубиков в тестовый список
+
+        public void EnableTestListUpdate()
+        {
+            diceCubesTestList.Clear();
+           
+            GameObject[] cubeObjects = GameObject.FindGameObjectsWithTag("Cube");
+            amountDiceInTestList = cubeObjects.Length;
+
+            isTestList = true;
+        }
+
+
+
+
+        private void AddDiceToTestList()
+        {
+            diceCubesTestList.Clear(); // Придумать другой способ, чтобы не очищать список каждый кадр
+
+            GameObject[] cubeObjects = GameObject.FindGameObjectsWithTag("Cube");
+
+            foreach (GameObject cube in cubeObjects)
+            {
+                DiceCube diceValue = cube.GetComponent<DiceCube>();
+                if (diceValue != null && diceValue.isDiceReady)
+                {
+                    diceCubesTestList.Add(diceValue);
+                }
+            }
+
+            textLightList.text = "Кубики в списке: " + diceCubesTestList.Count;
+
+            if (diceCubesTestList.Count >= amountDiceInTestList)
+            {
+                isTestList = false;
+                Debug.Log("Тестовый список кубиков заполнен.");
+                amountDiceInTestList= 0;
+            }
+
+        }    
+
+        //------------
 
         public void InitializeResultDisplay()
         {
@@ -112,7 +178,7 @@ namespace DiceFate.UI_Dice
             textCounterattack.text = GameStats.diceCounterattack.ToString();
         }
 
-        private void ClearAll()
+        public void ClearAll()
         {
             foreach (Transform child in resultContainer.transform) { Destroy(child.gameObject); } // Очистить старые элементы
             ClearDictionaryResult();

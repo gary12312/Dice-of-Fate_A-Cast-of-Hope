@@ -20,7 +20,9 @@ namespace DiceFate.Dice
         private Vector3 positionBeforeToMove; // сохранить позицию перед движением к мыши
         private Vector3 vectorEntrePositionAndZero;
         private Vector3 randomOffset;
-       // private bool IsShake = false;
+        // private bool IsShake = false;
+
+        [SerializeField] public bool isDiceReady = false;
 
 
         // ѕубличный параметр типа кубика с использованием enum
@@ -39,8 +41,8 @@ namespace DiceFate.Dice
         {
         Vector3.up,      // 1
         Vector3.down,    // 6
-        Vector3.right,   // 4
-        Vector3.left,    // 3
+        Vector3.left,    // 4
+        Vector3.right,   // 3
         Vector3.forward, // 2
         Vector3.back     // 5
         };
@@ -72,6 +74,7 @@ namespace DiceFate.Dice
                 diceRigidbody = GetComponent<Rigidbody>();
 
             start_position = transform.position;
+            isDiceReady = false;
 
             // √енерируем случайное смещение в пределах 0.5f
             float randomX = Random.Range(-0.5f, 0.5f);
@@ -83,7 +86,7 @@ namespace DiceFate.Dice
 
 
 
-        void Update()
+        void FixedUpdate()
         {
             // ≈сли кубик движетс€ и мы еще не начали проверку
             if (!isChecking && (diceRigidbody.linearVelocity.magnitude > sleepThreshold ||
@@ -112,7 +115,7 @@ namespace DiceFate.Dice
             }
 
             // ƒобавл€ем дополнительную задержку дл€ уверенности
-            yield return new WaitForSeconds(0.5f);
+            //yield return new WaitForSeconds(0.5f);
 
             // ќпредел€ем значение кубика
             int result = GetDiceValue();
@@ -121,6 +124,8 @@ namespace DiceFate.Dice
 
             lastResult = result;
             isChecking = false;
+
+            isDiceReady = true; //  убик готов, значение определено - Test 
 
             Debug.Log("«начение кубика: " + result);
         }
@@ -232,6 +237,9 @@ namespace DiceFate.Dice
             //RotateDice();
             GetComponent<Rigidbody>().AddForce(Vector3.forward * 500);
         }
+
+        public void DestroyDice() => Destroy(gameObject);
+      
 
         // --------------------- ¬изуализаци€ направлений граней в редакторе (дл€ отладки) ------------------
         void OnDrawGizmosSelected()

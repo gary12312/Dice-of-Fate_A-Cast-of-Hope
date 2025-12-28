@@ -14,7 +14,7 @@ namespace DiceFate.Units
         [field: SerializeField] public int MaxHealth { get; private set; }     // IDamageable
      
 
-        [SerializeField] private GameObject object1;
+        [SerializeField] private GameObject detectorZone;
         [SerializeField] private GameObject objectTestUi;
         [SerializeField] private UnitSO UnitSO;
         [SerializeField] private ObjectOutline Outline; //обводка
@@ -31,7 +31,7 @@ namespace DiceFate.Units
         //Проверки на null
         private void InitializationСheck()
         {
-            if (object1 == null) { Debug.LogError($"Установить decal для {this} "); }
+            if (detectorZone == null) { Debug.LogError($"Установить decal для {this} "); }
             if (UnitSO == null) { Debug.LogError($"Установить UnitSO для {this} "); }
             if (Outline == null) { Debug.LogError($"Установить Outline для {this} "); }
         }
@@ -39,7 +39,7 @@ namespace DiceFate.Units
         // Настройка при запуске 
         private void InitializationStart()
         {
-            object1.SetActive(false);                   // 1. отключть Decal        
+            detectorZone.SetActive(false);                   // 1. отключть Decal        
             Outline?.DisableOutline();                // 2. отключить Обводку       
                                                       //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
             MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
@@ -62,7 +62,7 @@ namespace DiceFate.Units
         {
             Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this)); // Вызвать событие, изаписать себя как отмененный юнит слушает DF_PlayerInput
 
-            object1.SetActive(false);
+            detectorZone.SetActive(false);
 
             OutlineOffSelected();
 
@@ -94,9 +94,10 @@ namespace DiceFate.Units
         public void TakeDamage(int damage)
         {
             int lastHealth = CurrentHealth;
+            CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, CurrentHealth);
 
             //  OnHealthUpdate?.Invoke(this, lastHealth, CurrentHealth);
-            CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, CurrentHealth);
+          
             if (CurrentHealth == 0)
             {
                 Die();
@@ -125,6 +126,7 @@ namespace DiceFate.Units
         {
             int lastHealth = CurrentHealth;
             CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
+            
             // ---
         }
 
@@ -156,13 +158,23 @@ namespace DiceFate.Units
         //-------------- Фазы --------------
         private void ReadyToMove()
         {
-            object1.SetActive(true);
+            detectorZone.SetActive(true);
 
             OutlineOnSelected();
 
             IsSelected = true;
         }
 
-  
+
+        // -------------- Вспомогательные методы --------------
+        private void OnDestroy()
+        {           
+          
+             //   Bus<UnitDeadEvent>.Raise(new UnitDeadEvent(this));
+           
+        }
+
+
+
     }
 }

@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ed0356c87ca20a4d85710b1b9504e68, type: 3}
-  m_Name: New Unit
+  m_Name: EnemyUnit
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.UnitSO
   <Health>k__BackingField: 50
-  <Armor>k__BackingField: 10
-  <colorSelected>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+  <Armor>k__BackingField: 0
+  <colorSelected>k__BackingField: {r: 1, g: 0, b: 0, a: 1}

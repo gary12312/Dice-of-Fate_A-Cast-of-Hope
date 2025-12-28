@@ -164,6 +164,9 @@ namespace DiceFate.Player
                     LeftClickToMove();
                     //LeftClickSelectOther();
                     break;
+                case 5: // Фаза атаки юнита
+                    LeftClickToAttack();
+                    break;
 
                 default:
                     break;
@@ -225,7 +228,7 @@ namespace DiceFate.Player
                 selectedUnit = null;
             }
         }
-     
+
 
 
 
@@ -275,13 +278,67 @@ namespace DiceFate.Player
                     if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
                     {
                         moveable.MoveTo(hit.point);
-                        
-                        //selectedUnit.Deselect();
+
+                        Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
+
+
                     }
+                }
+            }
+        }
+
+        private void LeftClickToAttack()
+        {
+            if (camera == null || selectedUnit == null)
+            { return; }
+
+            if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
+            { return; }
+
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+            RaycastHit hit;
+
+
+
+
+           
+
+
+
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                // Тест: бросаем луч на все слои
+                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))) //movmentLayers //LayerMask.GetMask("Default"))
+                {
+
+                    // Проверяем клик по юниту
+                    if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
+                    && hit.collider.TryGetComponent(out ISelectable selectable))
+                    {
+                        if (selectedUnit != null && selectedUnit == selectable) { return; } // Если клик по самому себе, ничего не делаем
+
+                        if (hit.collider.TryGetComponent(out IDamageable damageable))
+                        {
+                            DeselectCurrentUnit();
+
+                            // Наносим урон через интерфейс
+                            damageable.TakeDamage(15);
+                          //  damageable.TakeDamage(GameStats.diceAttack);
+                        }
+                    }
+
+
+
+
+
 
                 }
             }
         }
+
+
+
 
         private void LeftClickSelectOther()
         {
@@ -295,13 +352,13 @@ namespace DiceFate.Player
             Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
             RaycastHit hit;
             if (Mouse.current.leftButton.wasPressedThisFrame)
-            {                
-               // if (EventSystem.current.IsPointerOverGameObject()) { return; } // Проверяем, был ли клик по UI элементу
+            {
+                // if (EventSystem.current.IsPointerOverGameObject()) { return; } // Проверяем, был ли клик по UI элементу
 
                 // Проверяем клик по объекту
                 if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
                 && hit.collider.TryGetComponent(out ISelectableForVisibleUi selectableForUi))
-                {        
+                {
                     if (selectedUnit == selectableForUi) { return; }
                     if (selectableObjectForUi != null && selectableObjectForUi == selectableForUi) { return; }
                     if (selectableObjectForUi != null && selectableObjectForUi != selectableForUi) { DeselectCurrentObjectForUi(); }  // Если есть уже выделенный юнит для UI, снимаем с него выделение

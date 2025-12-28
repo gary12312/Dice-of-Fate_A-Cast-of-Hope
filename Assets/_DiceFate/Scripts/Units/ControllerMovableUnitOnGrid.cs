@@ -39,7 +39,7 @@ namespace DiceFate.Units
         [SerializeField] public GridMovableForUnit gridSystem; // Система сетки
         [SerializeField] public UnitPlayer unitPlayer; // Ссылка на юнита игрока
         [SerializeField] private GameObject decalZoneMove;
-  
+
 
 
         private NavMeshAgent agent;
@@ -49,22 +49,22 @@ namespace DiceFate.Units
 
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
 
-       
+
         public bool IsSelected => throw new System.NotImplementedException();
 
         private void Awake()
         {
-           // Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
+            // Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
             Bus<OnMovmentValueEvent>.OnEvent += HandeleMovmentValue;
             Bus<OnGridEvent>.OnEvent += HandeleOnGrid;
         }
 
-  
+
 
         private void OnDestroy()
         {
-          //  Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
+            //  Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandeleUnitDeselect;
             Bus<OnMovmentValueEvent>.OnEvent -= HandeleMovmentValue;
             Bus<OnGridEvent>.OnEvent -= HandeleOnGrid;
@@ -111,11 +111,11 @@ namespace DiceFate.Units
 
 
         //---------------------------------- запуск событий    ----------------------------------
-       
+
         private void HandelUnitSelected(UnitSelectedEvent evt)
         {
-          //  selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
-        }   
+            //  selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+        }
 
         private void HandeleUnitDeselect(UnitDeselectedEvent evt)
         {
@@ -126,10 +126,10 @@ namespace DiceFate.Units
         private void HandeleMovmentValue(OnMovmentValueEvent args)
         {
             if (unitPlayer.IsSelected)
-            { 
-                
-                gridSystem.circleCount = args.MoveValue; 
-               
+            {
+
+                gridSystem.circleCount = args.MoveValue;
+
 
                 SetDecalSize(args.MoveValue);
             }
@@ -137,9 +137,9 @@ namespace DiceFate.Units
         }
 
         private void HandeleOnGrid(OnGridEvent args)
-        {            
+        {
             if (gridSystem != null && unitPlayer.IsSelected) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
-            
+
         }
 
 
@@ -160,6 +160,8 @@ namespace DiceFate.Units
             {
                 Debug.Log("Не удалось определить позицию на сетке");
             }
+
+            gridSystem.DisablePreview(); // Выключаем систему предпросмотра 
         }
 
         public void StopMove()
@@ -563,10 +565,12 @@ namespace DiceFate.Units
 
         public void SetDecalSize(float size)
         {
-            decalZoneMove.transform.localScale = new Vector3(size*2, size*2, decalZoneMove.transform.localScale.z);      
+            decalZoneMove.transform.localScale = new Vector3(size * 2, size * 2, decalZoneMove.transform.localScale.z);
         }
 
-
-
+        public void DestroyFhisUnit()
+        {
+            if (gameObject != null) { Destroy(gameObject); }
+        }
     }
 }

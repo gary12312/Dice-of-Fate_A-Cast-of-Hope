@@ -10,6 +10,7 @@ using DiceFate.Units;
 using DiceFate.Events;
 using DiceFate.EventBus;
 using System.Collections;
+using System;
 
 namespace DiceFate.Maine
 {
@@ -67,6 +68,7 @@ namespace DiceFate.Maine
             Bus<EnemySelectedEvent>.OnEvent += HandelEnemySelected;
             Bus<EnemyDeselectedEvent>.OnEvent += HandelEnemyDeselected;
             Bus<OnDropEvent>.OnEvent += HandelDropDice;
+            Bus<OnMoveEvent>.OnEvent += HandelMove;
             Bus<OnTestingEvent>.OnEvent += TestingEvent;
 
 
@@ -82,12 +84,15 @@ namespace DiceFate.Maine
             Bus<EnemySelectedEvent>.OnEvent -= HandelEnemySelected;
             Bus<EnemyDeselectedEvent>.OnEvent -= HandelEnemyDeselected;
             Bus<OnDropEvent>.OnEvent -= HandelDropDice;
+            Bus<OnMoveEvent>.OnEvent -= HandelMove;
             Bus<OnTestingEvent>.OnEvent -= TestingEvent;
 
             buttonReturne.onClick.RemoveListener(ClickButtoneToReturne);
             dice.onClick.RemoveListener(PhaseTwoSelectedUnit);
             keg.onClick.RemoveListener(PhaseThreeSelectedUnit);
         }
+
+
 
         private void Update()
         {
@@ -103,9 +108,9 @@ namespace DiceFate.Maine
             UIInitializeSpawnPoints();
 
             HideAllScenrElements();
-            HideAllUIElements();          
+            HideAllUIElements();
 
-            kegCylinderSystem.cylinderFollowSpeed = moveSpeedToMouse; 
+            kegCylinderSystem.cylinderFollowSpeed = moveSpeedToMouse;
 
         }
 
@@ -214,6 +219,11 @@ namespace DiceFate.Maine
         {
             PhaseFourSelectedUnit();
         }
+        private void HandelMove(OnMoveEvent args)
+        {
+            PhaseFiveSelectedUnit();
+        }
+
 
 
 
@@ -229,7 +239,9 @@ namespace DiceFate.Maine
         public void PhaseOneSelectedUnit()
         {
             Phase(1);
-            ShowPhaseOneUIElements();
+            uiMane.UiShowPhaseOnePlayer();
+
+            //ShowPhaseOneUIElements();
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
 
@@ -237,7 +249,9 @@ namespace DiceFate.Maine
         public void PhaseTwoSelectedUnit()
         {
             Phase(2);
-            ShowPhaseTwoUIElements();
+            uiMane.UiShowPhaseTwoPlayer();
+
+            //ShowPhaseTwoUIElements();
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
 
@@ -245,7 +259,9 @@ namespace DiceFate.Maine
         public void PhaseThreeSelectedUnit()
         {
             Phase(3);
-            ShowPhaseThreeUIElements();
+            uiMane.UiShowPhaseThreePlayer();
+
+            //ShowPhaseThreeUIElements();
             ShowPhaseThreeSceneElements();
             CreatePrefabKeg();
             CreateDiceFromField();
@@ -391,16 +407,21 @@ namespace DiceFate.Maine
         public void PhaseFourSelectedUnit()
         {
             Phase(4);
+
+            uiMane.UiShowPhaseFourPlayer();
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока пока кубики не остановятся
+
+            uiMane.TestingListToDiceTargetResult();
+
 
             //Получаем значение кубиков на столе            
             StartCoroutine(PhaseFourCoroutine());
 
             // Очистить список кубиков на платке          
-             uiDropTargetField.ResetAllDiceAndClearField();
+            uiDropTargetField.ResetAllDiceAndClearField();
+           
 
-            
-          
+
 
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
@@ -438,11 +459,44 @@ namespace DiceFate.Maine
 
 
 
-        //-------------- 5 Фаза  --------------
+        //-------------- 5 Фаза (перемещение фигурки)  --------------
+
+        public void PhaseFiveSelectedUnit()
+        {
+            Phase(5);
+           // uiMane.UiShowPhaseFivePlayer();
+            GameStats.isPlayerMoveble = false; // Блокируем движение игрока 
+
+            RemoveDiceOnScene();
 
 
+            //uiMane.UiDisplayClearAll(); // Очистить UI от старых кубиков и сбросить значения на 0 -  yt hf,jnftn
+
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
+        }
+
+        private void RemoveDiceOnScene()
+        {
+            GameObject[] allDices = GameObject.FindGameObjectsWithTag("Cube");
+
+            foreach (GameObject dice in allDices)
+            {
+                Destroy(dice);
+            }
+
+        }
+
+        //--------------------------- 6 Фаза  атака  -------------------------
+        public void PhaseSixSelectedUnit()
+        {
+            Phase(6);           
+            GameStats.isPlayerMoveble = false; // Блокируем движение игрока 
+
+           
 
 
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
+        }
 
 
 
@@ -470,6 +524,9 @@ namespace DiceFate.Maine
                 case 5:
                     PhaseFourSelectedUnit();
                     break;
+                case 6:
+                    PhaseFiveSelectedUnit();
+                    break;
                 default:
                     Debug.Log($"Неизвестная фаза: {GameStats.currentPhasePlayer}");
                     break;
@@ -483,67 +540,67 @@ namespace DiceFate.Maine
         }
 
 
-            //// Метод для тестирования создания кубиков
-            //public void TestCreateDices()
-            //{
-            //    // Пример: создаем тестовый набор кубиков
-            //    Debug.Log("Тестовое создание кубиков...");
+        //// Метод для тестирования создания кубиков
+        //public void TestCreateDices()
+        //{
+        //    // Пример: создаем тестовый набор кубиков
+        //    Debug.Log("Тестовое создание кубиков...");
 
-            //    // Создаем по одному кубику каждого типа
-            //    CreateDiceByType(DragAndDropDice.DiceType.Movement, 1);
-            //    CreateDiceByType(DragAndDropDice.DiceType.Attack, 2);
-            //    CreateDiceByType(DragAndDropDice.DiceType.Shield, 1);
-            //    CreateDiceByType(DragAndDropDice.DiceType.Counterattack, 0);
-            //}
+        //    // Создаем по одному кубику каждого типа
+        //    CreateDiceByType(DragAndDropDice.DiceType.Movement, 1);
+        //    CreateDiceByType(DragAndDropDice.DiceType.Attack, 2);
+        //    CreateDiceByType(DragAndDropDice.DiceType.Shield, 1);
+        //    CreateDiceByType(DragAndDropDice.DiceType.Counterattack, 0);
+        //}
 
-            //// Метод для проверки правильности создания кубиков
-            //public void ValidateCreatedDices()
-            //{
-            //    int totalCreated = CountCreatedDices();
-            //    Debug.Log($"Всего создано кубиков: {totalCreated}");
+        //// Метод для проверки правильности создания кубиков
+        //public void ValidateCreatedDices()
+        //{
+        //    int totalCreated = CountCreatedDices();
+        //    Debug.Log($"Всего создано кубиков: {totalCreated}");
 
-            //    // Подсчет по типам
-            //    int movementCount = CountDicesByType(DragAndDropDice.DiceType.Movement);
-            //    int attackCount = CountDicesByType(DragAndDropDice.DiceType.Attack);
-            //    int shieldCount = CountDicesByType(DragAndDropDice.DiceType.Shield);
-            //    int counterattackCount = CountDicesByType(DragAndDropDice.DiceType.Counterattack);
+        //    // Подсчет по типам
+        //    int movementCount = CountDicesByType(DragAndDropDice.DiceType.Movement);
+        //    int attackCount = CountDicesByType(DragAndDropDice.DiceType.Attack);
+        //    int shieldCount = CountDicesByType(DragAndDropDice.DiceType.Shield);
+        //    int counterattackCount = CountDicesByType(DragAndDropDice.DiceType.Counterattack);
 
-            //    Debug.Log($"Создано Movement: {movementCount}");
-            //    Debug.Log($"Создано Attack: {attackCount}");
-            //    Debug.Log($"Создано Shield: {shieldCount}");
-            //    Debug.Log($"Создано Counterattack: {counterattackCount}");
-            //}
+        //    Debug.Log($"Создано Movement: {movementCount}");
+        //    Debug.Log($"Создано Attack: {attackCount}");
+        //    Debug.Log($"Создано Shield: {shieldCount}");
+        //    Debug.Log($"Создано Counterattack: {counterattackCount}");
+        //}
 
-            //private int CountCreatedDices()
-            //{
-            //    int count = 0;
-            //    count += spawnPointMovement?.childCount ?? 0;
-            //    count += spawnPointAttac?.childCount ?? 0;
-            //    count += spawnPointShield?.childCount ?? 0;
-            //    count += spawnPointCounterattack?.childCount ?? 0;
-            //    return count;
-            //}
+        //private int CountCreatedDices()
+        //{
+        //    int count = 0;
+        //    count += spawnPointMovement?.childCount ?? 0;
+        //    count += spawnPointAttac?.childCount ?? 0;
+        //    count += spawnPointShield?.childCount ?? 0;
+        //    count += spawnPointCounterattack?.childCount ?? 0;
+        //    return count;
+        //}
 
-            //private int CountDicesByType(DragAndDropDice.DiceType diceType)
-            //{
-            //    Transform spawnPoint = null;
-            //    switch (diceType)
-            //    {
-            //        case DragAndDropDice.DiceType.Movement:
-            //            spawnPoint = spawnPointMovement;
-            //            break;
-            //        case DragAndDropDice.DiceType.Attack:
-            //            spawnPoint = spawnPointAttac;
-            //            break;
-            //        case DragAndDropDice.DiceType.Shield:
-            //            spawnPoint = spawnPointShield;
-            //            break;
-            //        case DragAndDropDice.DiceType.Counterattack:
-            //            spawnPoint = spawnPointCounterattack;
-            //            break;
-            //    }
+        //private int CountDicesByType(DragAndDropDice.DiceType diceType)
+        //{
+        //    Transform spawnPoint = null;
+        //    switch (diceType)
+        //    {
+        //        case DragAndDropDice.DiceType.Movement:
+        //            spawnPoint = spawnPointMovement;
+        //            break;
+        //        case DragAndDropDice.DiceType.Attack:
+        //            spawnPoint = spawnPointAttac;
+        //            break;
+        //        case DragAndDropDice.DiceType.Shield:
+        //            spawnPoint = spawnPointShield;
+        //            break;
+        //        case DragAndDropDice.DiceType.Counterattack:
+        //            spawnPoint = spawnPointCounterattack;
+        //            break;
+        //    }
 
-            //    return spawnPoint?.childCount ?? 0;
-            //}
-        }
+        //    return spawnPoint?.childCount ?? 0;
+        //}
+    }
 }
