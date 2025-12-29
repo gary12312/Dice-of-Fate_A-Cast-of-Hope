@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using DiceFate.Dice;
 using TMPro;
+using DiceFate.EventBus;
+using DiceFate.Events;
 
 namespace DiceFate.UI_Dice
 {
@@ -16,15 +18,7 @@ namespace DiceFate.UI_Dice
         [SerializeField] private TextMeshProUGUI textShield;
         [SerializeField] private TextMeshProUGUI textCounterattack;
 
-        [SerializeField] private TextMeshProUGUI textLightList;
-
         private List<DiceCube> diceCubes = new List<DiceCube>();
-        private List<DiceCube> diceCubesTestList = new List<DiceCube>();
-
-        private bool isTestList = false;
-        private int amountDiceInTestList = 0;
-
-
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
         {
             { "Movement", 0 },
@@ -33,130 +27,63 @@ namespace DiceFate.UI_Dice
             { "Counterattack", 0 }
         };
 
-        private void Awake() => resultContainer.SetActive(false);      
+        private void Awake()
+        { 
+           resultContainer.SetActive(true); // - было  фолс Разобраться
 
+           Bus<OnDiceReadyEvent>.OnEvent += OnDiceReady;
+        }
+        private void OnDestroy()
+        {         
+            Bus<OnDiceReadyEvent>.OnEvent -= OnDiceReady;
+        }
         private void Start() => Checked();
 
-        private void FixedUpdate()
+        // Обработчик события: кубик остановился и готов
+        private void OnDiceReady(OnDiceReadyEvent evt)
         {
-            if (isTestList)
-            { 
-                Debug.Log("Обновление тестового списка кубиков...");
-                AddDiceToTestList();           
-            }
-            
+            DiceCube dice = evt.Dice;
 
+            // Проверяем, что кубик ещё не обработан
+            if (diceCubes.Contains(dice))
+                return;
 
+            diceCubes.Add(dice);
 
-            // Для тестирования: показать список типов кубиков в текстовом поле
-            if (Input.GetKeyDown(KeyCode.T))
-            {
-                EnableTestListUpdate();
-            }
+            // Создаём UI-элемент для этого кубика
+            CreateResultDisplayForDice(dice);
+
+            // Обновляем суммарные значения в интерфейсе
+            UpdateResultDisplay();
         }
 
-        //------ Добавление кубиков в тестовый список
-
-        public void EnableTestListUpdate()
+        // Создаёт UI-элемент для конкретного кубика
+        private void CreateResultDisplayForDice(DiceCube dice)
         {
-            diceCubesTestList.Clear();
-           
-            GameObject[] cubeObjects = GameObject.FindGameObjectsWithTag("Cube");
-            amountDiceInTestList = cubeObjects.Length;
-
-            isTestList = true;
-        }
-
-
-
-
-        private void AddDiceToTestList()
-        {
-            diceCubesTestList.Clear(); // Придумать другой способ, чтобы не очищать список каждый кадр
-
-            GameObject[] cubeObjects = GameObject.FindGameObjectsWithTag("Cube");
-
-            foreach (GameObject cube in cubeObjects)
+            // Создаём экземпляр префаба
+            GameObject uiInstance = Instantiate(uiResultDicePrefab, resultContainer.transform);
+     
+            // Получаем компонент UI
+            UiResultDice uiResultDice = uiInstance.GetComponent<UiResultDice>();
+            if (uiResultDice == null)
             {
-                DiceCube diceValue = cube.GetComponent<DiceCube>();
-                if (diceValue != null && diceValue.isDiceReady)
-                {
-                    diceCubesTestList.Add(diceValue);
-                }
-            }
-
-            textLightList.text = "Кубики в списке: " + diceCubesTestList.Count;
-
-            if (diceCubesTestList.Count >= amountDiceInTestList)
-            {
-                isTestList = false;
-                Debug.Log("Тестовый список кубиков заполнен.");
-                amountDiceInTestList= 0;
-            }
-
-        }    
-
-        //------------
-
-        public void InitializeResultDisplay()
-        {
-            resultContainer.SetActive(true);
-
-            // 1. Найти все кубики на сцене с тегом "Cube"
-            GameObject[] cubeObjects = GameObject.FindGameObjectsWithTag("Cube");
-
-            if (cubeObjects.Length == 0)
-            {
-                Debug.LogWarning("Не найдены объекты с тегом 'Cube' на сцене");
+                Debug.LogWarning("Созданный префаб не содержит компонент UiResultDice");
                 return;
             }
 
-            // 2. Получить компоненты DiceCubeValue
-            diceCubes.Clear(); // Очищаем список перед заполнением
-            foreach (GameObject cube in cubeObjects)
+            // Получаем значение кубика
+            int currentValue = dice.GetLastResult();     
+            Debug.Log($"Кубик {dice.gameObject.name} остановился. Тип: {dice.diceType}, значение: {currentValue}");
+
+            // Отображаем значение и окрашиваем по типу
+            uiResultDice.OnEnabledValue(currentValue);
+            uiResultDice.ColorDiceResult(dice.diceType.ToString());
+
+            // Обновляем словарь результатов
+            string type = dice.diceType.ToString();
+            if (diceResultsDict.ContainsKey(type))
             {
-                DiceCube diceValue = cube.GetComponent<DiceCube>();
-                if (diceValue != null)
-                {
-                    diceCubes.Add(diceValue);
-                }
-            }
-
-            Debug.Log($"Найдено кубиков: {diceCubes.Count}");
-
-            // 3. Создать UI-элементы для каждого кубика
-            CreateResultDisplays();
-        }
-
-        void CreateResultDisplays()
-        {
-            ClearAll();
-
-            // Создать новые UI-элементы
-            foreach (DiceCube dice in diceCubes)
-            {
-                // Создать экземпляр префаба
-                GameObject uiInstance = Instantiate(uiResultDicePrefab, resultContainer.transform);
-
-                // Получить компонент UiResultDice_q (изменили на новую версию)
-                UiResultDice uiResultDice = uiInstance.GetComponent<UiResultDice>();
-                if (uiResultDice == null)
-                {
-                    Debug.LogWarning("Созданный префаб не содержит компонент UiResultDice_q");
-                    continue;
-                }
-
-                // Получить текущее значение кубика
-                int currentValue = dice.GetLastResult();
-
-                Debug.Log($"Кубик {dice.gameObject.name}, тип: {dice.diceType}, значение: {currentValue}");
-
-                //Показать значение кубика сразу при создании
-                uiResultDice.OnEnabledValue(currentValue);
-                uiResultDice.ColorDiceResult(dice.diceType.ToString());
-
-                // Обновить словарь результатов по типам кубиков
-                diceResultsDict[dice.diceType.ToString()] += currentValue;
+                diceResultsDict[type] += currentValue;
             }
         }
 
@@ -170,17 +97,20 @@ namespace DiceFate.UI_Dice
         }
 
         public void UpdateResultDisplay()
-        {
-            Debug.Log("Обновление результатов кубиков...");
+        {           
             textMovment.text = GameStats.diceMovement.ToString();
             textAttack.text = GameStats.diceAttack.ToString();
             textShield.text = GameStats.diceShield.ToString();
-            textCounterattack.text = GameStats.diceCounterattack.ToString();
+            textCounterattack.text = GameStats.diceCounterattack.ToString();  
         }
 
         public void ClearAll()
         {
-            foreach (Transform child in resultContainer.transform) { Destroy(child.gameObject); } // Очистить старые элементы
+            foreach (Transform child in resultContainer.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            diceCubes.Clear();
             ClearDictionaryResult();
         }
 

@@ -126,6 +126,8 @@ namespace DiceFate.Dice
             isChecking = false;
 
             isDiceReady = true; // Кубик готов, значение определено - Test 
+                                // Отправляем событие о том, что кубик готов
+            Bus<OnDiceReadyEvent>.Raise(new OnDiceReadyEvent(this));         
 
             Debug.Log("Значение кубика: " + result);
         }

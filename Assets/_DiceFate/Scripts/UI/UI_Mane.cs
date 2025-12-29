@@ -17,6 +17,7 @@ namespace DiceFate.UI
         [SerializeField] private GameObject inactiveElement;
         [SerializeField] private GameObject activeElement;
         [SerializeField] private GameObject textDiceValue;
+
         [SerializeField] private Button startDice;             // Фаза 1
         [SerializeField] private Button keg;                   // Фаза 2
 
@@ -26,33 +27,54 @@ namespace DiceFate.UI
         [SerializeField] private TextMeshProUGUI textDiceShield;
         [SerializeField] private TextMeshProUGUI textDiceCounterattack;
 
-
-        [Header("Дополнительно")]
+        [Header("Ссылки на системы")]
         [SerializeField] private UiDiceTargetResult uiDiceTargetResult;
-
-
 
 
 
         private void Start()
         {
             ValidateScriptsAndObject();
+
+            HideAllUIElements(); // Начальное состояние: всё скрыто
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
+            //UpdateDiceValuesDisplay();
+
+
+            //if (Input.GetKeyDown(KeyCode.Q))
+            //{
+            //    uiDiceTargetResult.InitializeResultDisplay();
+            //}
+
+            //if (Input.GetKeyDown(KeyCode.E))
+            //{
+            //    uiDiceTargetResult.UpdateResultDisplay();
+            //}
+
+
+            // Обновляем значения кубиков в интерфейсе (каждую кадр, но без нагрузки)
             UpdateDiceValuesDisplay();
 
-
+            // Тестовые клавиши (можно убрать в релизе)
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                uiDiceTargetResult.InitializeResultDisplay();
+                UiEnableResultDisplay();
             }
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                uiDiceTargetResult.UpdateResultDisplay();
+                SetResultToCard();
             }
+
+
+
+
+
+
+
         }
 
 
@@ -60,7 +82,7 @@ namespace DiceFate.UI
         // Показываем в UI какие кубики были брошены
         public void UiEnableResultDisplay()
         {
-            uiDiceTargetResult.InitializeResultDisplay();
+            //uiDiceTargetResult.InitializeResultDisplay();
         }
 
         // записываем в GameStats и обновляем значения на карточке в UI 
@@ -109,7 +131,7 @@ namespace DiceFate.UI
 
         public void TestingListToDiceTargetResult()
         {
-            uiDiceTargetResult.EnableTestListUpdate();
+           // uiDiceTargetResult.EnableTestListUpdate();
         }
 
 

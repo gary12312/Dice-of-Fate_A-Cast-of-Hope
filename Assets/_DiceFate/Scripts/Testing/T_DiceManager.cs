@@ -9,7 +9,7 @@ public class T_DiceManager : MonoBehaviour
     { 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            uiResultDisplay.InitializeResultDisplay();
+           // uiResultDisplay.InitializeResultDisplay();
         }
 
         if (Input.GetKeyDown(KeyCode.W))
