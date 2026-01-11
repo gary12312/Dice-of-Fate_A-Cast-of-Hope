@@ -1,9 +1,12 @@
-using UnityEngine;
-using System.Collections.Generic;
 using DiceFate.Dice;
-using TMPro;
 using DiceFate.EventBus;
 using DiceFate.Events;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using DiceFate.Maine;
+using NUnit.Framework;
 
 namespace DiceFate.UI_Dice
 {
@@ -17,6 +20,14 @@ namespace DiceFate.UI_Dice
         [SerializeField] private TextMeshProUGUI textAttack;
         [SerializeField] private TextMeshProUGUI textShield;
         [SerializeField] private TextMeshProUGUI textCounterattack;
+        [SerializeField] private Mane mane;
+
+        private bool isDiceReady = false;
+
+        private int moveUser;
+        private int attackUser;
+        private int shildUser;
+        private int conterAttackUser;
 
         private List<DiceCube> diceCubes = new List<DiceCube>();
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
@@ -28,41 +39,52 @@ namespace DiceFate.UI_Dice
         };
 
         private void Awake()
-        { 
-           resultContainer.SetActive(true); // - было  фолс Разобраться
+        {
+            resultContainer.SetActive(true); // - было  фолс Разобраться
 
-           Bus<OnDiceReadyEvent>.OnEvent += OnDiceReady;
+            Bus<OnDiceReadyEvent>.OnEvent += OnDiceReady;
+            Bus<OnDropEvent>.OnEvent += HandelDropDice;
         }
         private void OnDestroy()
-        {         
+        {
             Bus<OnDiceReadyEvent>.OnEvent -= OnDiceReady;
+            Bus<OnDropEvent>.OnEvent -= HandelDropDice;
         }
         private void Start() => Checked();
 
-        // Обработчик события: кубик остановился и готов
+
+
+
+        //---------------------------------- События  ---------------------------------- 
+        private void HandelDropDice(OnDropEvent evt)
+        {
+            isDiceReady = true;
+        }
+
+        // Rубик остановился и готов
         private void OnDiceReady(OnDiceReadyEvent evt)
         {
             DiceCube dice = evt.Dice;
 
-            // Проверяем, что кубик ещё не обработан
-            if (diceCubes.Contains(dice))
-                return;
+            if (!isDiceReady) return;
+            if (diceCubes.Contains(dice)) return;      // Проверяем, что кубик ещё не обработан
 
             diceCubes.Add(dice);
 
             // Создаём UI-элемент для этого кубика
             CreateResultDisplayForDice(dice);
-
-            // Обновляем суммарные значения в интерфейсе
-            UpdateResultDisplay();
         }
+
+
+        //---------------------------------- Логика  ---------------------------------- 
+
 
         // Создаёт UI-элемент для конкретного кубика
         private void CreateResultDisplayForDice(DiceCube dice)
         {
             // Создаём экземпляр префаба
             GameObject uiInstance = Instantiate(uiResultDicePrefab, resultContainer.transform);
-     
+
             // Получаем компонент UI
             UiResultDice uiResultDice = uiInstance.GetComponent<UiResultDice>();
             if (uiResultDice == null)
@@ -72,7 +94,7 @@ namespace DiceFate.UI_Dice
             }
 
             // Получаем значение кубика
-            int currentValue = dice.GetLastResult();     
+            int currentValue = dice.GetLastResult();
             Debug.Log($"Кубик {dice.gameObject.name} остановился. Тип: {dice.diceType}, значение: {currentValue}");
 
             // Отображаем значение и окрашиваем по типу
@@ -85,24 +107,91 @@ namespace DiceFate.UI_Dice
             {
                 diceResultsDict[type] += currentValue;
             }
+
+            StartCoroutine(DelayOnCreateResult());
+            // CheckListDiceCube();
         }
 
+        private IEnumerator DelayOnCreateResult()
+        {
+            yield return new WaitForSeconds(0.7f);
+            if (diceCubes.Count >= 4)
+            {
+                //  UpdateResultDisplay();
+                SaveResultsDiseToGameStats();
+                mane.MovementAndGridEnable();
+            }
+            else
+            {
+                yield break;
+            }
 
-        public void SaveResultsToGameStats()
+
+
+
+            //UpdateResultDisplay();
+            //SaveResultsToGameStats();
+            //CheckListDiceCube();
+
+            yield return new WaitForSeconds(5f);
+            OffResultOnDisplays();
+
+        }
+
+        //private void CheckListDiceCube()
+        //{
+        //    if (diceCubes.Count >= 4)
+        //    {
+        //        UpdateResultDisplay();
+        //        SaveResultsDiseToGameStats();
+        //        mane.MovementAndGridEnable();
+        //    }
+        //}
+
+        public void SaveResultsDiseToGameStats()
         {
             GameStats.diceMovement = diceResultsDict["Movement"];
             GameStats.diceAttack = diceResultsDict["Attack"];
             GameStats.diceShield = diceResultsDict["Shield"];
             GameStats.diceCounterattack = diceResultsDict["Counterattack"];
+
+            //moveUser = GameStats.moveUser + GameStats.diceMovement;
+            //attackUser = GameStats.attackUser + GameStats.diceAttack;
+            //shildUser = GameStats.shildUser + GameStats.attackUser;
+            //conterAttackUser = GameStats.conterAttackUser + GameStats.shildUser;
+        }
+
+        public void UpdateResultValuePlayerToGameStats()
+        {
+            GameStats.moveUser = GameStats.moveUser + GameStats.diceMovement;
+            GameStats.attackUser = GameStats.attackUser + GameStats.diceAttack;
+            GameStats.shildUser = GameStats.shildUser + GameStats.attackUser;
+            GameStats.conterAttackUser = GameStats.conterAttackUser + GameStats.shildUser;
+
+            //GameStats.moveUser = moveUser;
+            //GameStats.attackUser = attackUser;
+            //GameStats.shildUser = shildUser;
+            //GameStats.conterAttackUser = conterAttackUser;
+
+
         }
 
         public void UpdateResultDisplay()
-        {           
-            textMovment.text = GameStats.diceMovement.ToString();
-            textAttack.text = GameStats.diceAttack.ToString();
-            textShield.text = GameStats.diceShield.ToString();
-            textCounterattack.text = GameStats.diceCounterattack.ToString();  
+        {
+
+            textMovment.text = GameStats.moveUser.ToString();
+            textAttack.text = GameStats.attackUser.ToString();
+            textShield.text = GameStats.shildUser.ToString();
+            textCounterattack.text = GameStats.conterAttackUser.ToString();
+
+
+            //textMovment.text = GameStats.diceMovement.ToString();
+            //textAttack.text = GameStats.diceAttack.ToString();
+            //textShield.text = GameStats.diceShield.ToString();
+            //textCounterattack.text = GameStats.diceCounterattack.ToString();
         }
+
+
 
         public void ClearAll()
         {
@@ -112,6 +201,7 @@ namespace DiceFate.UI_Dice
             }
             diceCubes.Clear();
             ClearDictionaryResult();
+            SaveResultsDiseToGameStats();
         }
 
         private void ClearDictionaryResult()
@@ -125,9 +215,14 @@ namespace DiceFate.UI_Dice
         public void OffResultOnDisplays()
         {
             resultContainer.SetActive(false);
+
+            UpdateResultValuePlayerToGameStats();
+            UpdateResultDisplay();
+
+            ClearAll();
         }
 
-        void Checked()
+        private void Checked()
         {
             if (resultContainer == null)
             {

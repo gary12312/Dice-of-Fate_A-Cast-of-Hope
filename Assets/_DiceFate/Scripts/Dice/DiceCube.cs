@@ -16,6 +16,10 @@ namespace DiceFate.Dice
         [SerializeField] private float powerShake = 2f;
         [SerializeField] public float moveSpeed = 30f; //управл€етс€ из Mane
         [SerializeField] public float moveSpeed2 = 500f; //управл€етс€ из Mane
+
+        public int powerDropDice = 500; //—ила броска кубика
+
+
         private Vector3 start_position; // дл€ движени€ совместно со станканом  к мыши
         private Vector3 positionBeforeToMove; // сохранить позицию перед движением к мыши
         private Vector3 vectorEntrePositionAndZero;
@@ -210,7 +214,7 @@ namespace DiceFate.Dice
         private void HandelDiceDrop(OnDropEvent evt)
         {
             Debug.Log("Ѕросок");
-            DropDice();
+            DropDice(powerDropDice);
         }
 
 
@@ -233,11 +237,11 @@ namespace DiceFate.Dice
         }
 
 
-        public void DropDice()
+        public void DropDice(int powerDrop)
         {
             //drop = true;
             //RotateDice();
-            GetComponent<Rigidbody>().AddForce(Vector3.forward * 500);
+            GetComponent<Rigidbody>().AddForce(Vector3.forward * powerDrop);
         }
 
         public void DestroyDice() => Destroy(gameObject);

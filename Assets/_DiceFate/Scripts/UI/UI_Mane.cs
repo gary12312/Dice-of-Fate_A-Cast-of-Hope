@@ -1,8 +1,10 @@
-using DiceFate.UI_Dice;
-using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using DiceFate.Events;
+using DiceFate.EventBus;
+using DiceFate.UI_Dice;
+using System;
 
 namespace DiceFate.UI
 {
@@ -11,7 +13,7 @@ namespace DiceFate.UI
         [Header("Фаза 1 настройки")]
 
 
-        [Header("PlayerCard")]
+        [Header("Player Card")]
         [SerializeField] private GameObject unitMasterCard;    // Фаза 1
         [SerializeField] private GameObject diceOnTable;       // Фаза 2
         [SerializeField] private GameObject inactiveElement;
@@ -27,11 +29,37 @@ namespace DiceFate.UI
         [SerializeField] private TextMeshProUGUI textDiceShield;
         [SerializeField] private TextMeshProUGUI textDiceCounterattack;
 
+        [Header("Enemy Card")]
+        [SerializeField] private GameObject uiCardEnemy;
+        [SerializeField] private TextMeshProUGUI textNameEnemy;
+        [SerializeField] private TextMeshProUGUI textEnemyMovement;
+        [SerializeField] private TextMeshProUGUI textEnemyAttack;
+        [SerializeField] private TextMeshProUGUI texEnemyShield;
+        [SerializeField] private TextMeshProUGUI textEnemyCounterattack;
+        
         [Header("Ссылки на системы")]
         [SerializeField] private UiDiceTargetResult uiDiceTargetResult;
+        [SerializeField] private UiDropTargetField uiDropTargetField;     // Ссылка на поле с кубиками
+       
+        [Header("Для теста")]
+        [SerializeField] private TextMeshProUGUI testNameEnemy;
+        [SerializeField] private TextMeshProUGUI testPhase;
 
+        private void Awake()
+        {
+            uiCardEnemy.SetActive(false);
 
+            Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+        }
 
+        private void OnDestroy()
+        {
+            Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent -= HandeleUnitDeselect;
+        }
+
+   
         private void Start()
         {
             ValidateScriptsAndObject();
@@ -41,58 +69,44 @@ namespace DiceFate.UI
 
         private void Update()
         {
-            //UpdateDiceValuesDisplay();
-
-
-            //if (Input.GetKeyDown(KeyCode.Q))
-            //{
-            //    uiDiceTargetResult.InitializeResultDisplay();
-            //}
-
-            //if (Input.GetKeyDown(KeyCode.E))
-            //{
-            //    uiDiceTargetResult.UpdateResultDisplay();
-            //}
-
+            TestingGameStats();
 
             // Обновляем значения кубиков в интерфейсе (каждую кадр, но без нагрузки)
-            UpdateDiceValuesDisplay();
+            UpdateDiceValuesDisplayToTasting();
 
             // Тестовые клавиши (можно убрать в релизе)
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                UiEnableResultDisplay();
+                //UiEnableResultDisplay();
             }
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                SetResultToCard();
+                //SetResultToCard();
             }
-
-
-
-
-
-
-
         }
 
+        private void TestingGameStats()
+        {         
+            testNameEnemy.text = GameStats.currentUser;
+            testPhase.text = $"Текущая фаза {GameStats.currentPhasePlayer}";
 
+        }
 
         // Показываем в UI какие кубики были брошены
-        public void UiEnableResultDisplay()
-        {
-            //uiDiceTargetResult.InitializeResultDisplay();
-        }
+        //public void UiEnableResultDisplay()
+        //{
+        //    //uiDiceTargetResult.InitializeResultDisplay();
+        //}
 
         // записываем в GameStats и обновляем значения на карточке в UI 
-        public void SetResultToCard()
-        {
-            uiDiceTargetResult.SaveResultsToGameStats();
-            uiDiceTargetResult.UpdateResultDisplay();
-        }
+        //public void SetResultToCard()
+        //{
+        //    uiDiceTargetResult.SaveResultsToGameStats();
+        //    uiDiceTargetResult.UpdateResultDisplay();
+        //}
 
-        private void UpdateDiceValuesDisplay()
+        private void UpdateDiceValuesDisplayToTasting()
         {
             textDiceMovement.text = "Move - " + GameStats.diceMovement.ToString();
             textDiceAttack.text = "Attack - " + GameStats.diceAttack.ToString();
@@ -100,6 +114,22 @@ namespace DiceFate.UI
             textDiceCounterattack.text = "Counter - " + GameStats.diceCounterattack.ToString();
 
         }
+
+        //---------------------------------- События  ----------------------------------
+        private void HandelUnitSelected(UnitSelectedEvent evt)
+        {
+            //selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+
+            EnableUISelectedEnemyOrOherUnit();
+        }
+        private void HandeleUnitDeselect(UnitDeselectedEvent args)
+        {
+            DisableUISelectedEnemyOrOherUnit();
+        }
+
+
+
+
 
         // ------------------------ UI управление ---------------------------------
 
@@ -122,24 +152,78 @@ namespace DiceFate.UI
 
 
         public void HideAllUIElements() => SetUiPlayerCard(false, false, false, false, false, false);
-        public void UiShowPhaseOnePlayer() => SetUiPlayerCard(true, false, true, true, false, false);
-        public void UiShowPhaseTwoPlayer() => SetUiPlayerCard(true, true, false, false, true, false);
-        public void UiShowPhaseThreePlayer() => SetUiPlayerCard(true, false, false, false, true, false);
+        public void UiShowPhaseOnePlayer()
+        {
+            uiDiceTargetResult.UpdateResultDisplay();
+            SetUiPlayerCard(true, false, true, true, false, true); 
+        }
+        public void UiShowPhaseTwoPlayer() => SetUiPlayerCard(true, true, false, false, true, true);
+        public void UiShowPhaseThreePlayer() => SetUiPlayerCard(true, false, false, false, true, true);
         public void UiShowPhaseFourPlayer() => SetUiPlayerCard(true, false, false, false, false, true);
         public void UiShowPhaseFivePlayer() => SetUiPlayerCard(false, false, false, false, false, false);
 
 
         public void TestingListToDiceTargetResult()
         {
-           // uiDiceTargetResult.EnableTestListUpdate();
+            // uiDiceTargetResult.EnableTestListUpdate();
+        }
+
+        //-------------------- Управление отображением UI для Enemy или Other -------------------
+        private void EnableUISelectedEnemyOrOherUnit()
+        {
+            Debug.Log("Выбор Врвг ЮЙ");
+
+           // testNameEnemy.text = GameStats.currentUser;
+
+
+            if (GameStats.currentUser == "Enemy")
+            {
+               
+                uiCardEnemy.SetActive(true);
+
+                textNameEnemy.text = GameStats.nameUnit;
+                textEnemyMovement.text = GameStats.moveUser.ToString();
+                textEnemyAttack.text = GameStats.attackUser.ToString();
+                texEnemyShield.text = GameStats.shildUser.ToString();
+                textEnemyCounterattack.text = GameStats.conterAttackUser.ToString();
+            }
+
+            if (GameStats.currentUser == "Other")
+            {
+
+            }
+        }
+
+        private void DisableUISelectedEnemyOrOherUnit()
+        {
+            Debug.Log("отмена выбота Врвг ЮЙ");
+            if (GameStats.currentUser == "Enemy")
+            {
+                uiCardEnemy.SetActive(false);
+            }
+
+            if (GameStats.currentUser == "Other")
+            {
+
+            }
+        }
+
+        private void UpdateTextValuePlayer()
+        { 
+        
         }
 
 
 
 
         //--------- Управление отображением результатов броска кубиков --------------
-        public void UiDisableResultDisplay() => uiDiceTargetResult.OffResultOnDisplays();
+
+        // public void UiDisableResultDisplay() => uiDiceTargetResult.OffResultOnDisplays();
         public void UiDisplayClearAll() => uiDiceTargetResult.ClearAll();
+        public void UiClearAllDiceOnField() => uiDropTargetField.ResetAllDiceAndClearField(); // Очистить список кубиков на платке
+
+
+
 
 
         // ------------------------ Проверки ---------------------------------
@@ -161,6 +245,8 @@ namespace DiceFate.UI
                 Debug.LogError($" для {this.name} Не установлена ссылка на textDiceShield!");
             if (textDiceCounterattack == null)
                 Debug.LogError($" для {this.name} Не установлена ссылка на textDiceCounterattack!");
+            if (uiDropTargetField == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на uiDropTargetField!");
         }
     }
 }

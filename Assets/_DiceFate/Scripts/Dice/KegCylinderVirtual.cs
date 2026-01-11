@@ -34,6 +34,7 @@ namespace DiceFate.Dice
         public float detectionMultiplier = 1.5f;
 
         private Vector3 cylinderCenter;
+        private Vector3 cylinderStartPosition;
         private List<GameObject> cubesInside = new List<GameObject>();
         private Dictionary<GameObject, Vector3> cubePositions = new Dictionary<GameObject, Vector3>();
         private bool isCylinderActive = false;
@@ -55,6 +56,7 @@ namespace DiceFate.Dice
         private void Start()
         {
             cylinderCenter = pointToCreate.transform.position;
+            cylinderStartPosition = cylinderCenter;
             isCylinderActive = true;
         }
 
@@ -218,6 +220,15 @@ namespace DiceFate.Dice
             cubesInside.Clear();
             cubePositions.Clear();
             Debug.Log("Cylinder destroyed.");
+        }
+
+        public void EnableVirtualCylinder()
+        {
+            if (!isCylinderActive)
+            {
+                isCylinderActive = true;
+                cylinderCenter = cylinderStartPosition;
+            }
         }
 
         //------------------------ для редактора Unity -------------------------------------

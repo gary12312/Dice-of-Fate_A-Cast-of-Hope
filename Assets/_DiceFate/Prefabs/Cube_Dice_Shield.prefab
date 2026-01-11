@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1159212381062733415}
   - component: {fileID: 5181991698032677174}
   - component: {fileID: 6069299803663583557}
-  - component: {fileID: 128342360729210580}
+  - component: {fileID: -5126451873912882944}
   m_Layer: 0
   m_Name: Cube_Dice_Shield
   m_TagString: Cube
@@ -140,7 +140,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &128342360729210580
+--- !u!114 &-5126451873912882944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,18 +152,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f11ed270fa2a9e74bb80351fc6e6c2d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Dice.DiceCube
-  diceRigidbody: {fileID: 0}
+  diceRigidbody: {fileID: 6069299803663583557}
   sleepThreshold: 0.1
   checkDelay: 1
   powerShake: 2
   moveSpeed: 30
   moveSpeed2: 500
+  powerDropDice: 500
+  isDiceReady: 0
   diceType: 2
   faceDirections:
   - {x: 0, y: 1, z: 0}
   - {x: 0, y: -1, z: 0}
-  - {x: 1, y: 0, z: 0}
   - {x: -1, y: 0, z: 0}
+  - {x: 1, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
   - {x: 0, y: 0, z: -1}
   faceValues: 010000000600000004000000030000000200000005000000

@@ -27,7 +27,9 @@ namespace DiceFate.Player
         private Vector2 mouseDelta;       // Изменение положения мыши
         private bool isWasMouseDownUI;   //  был ли клик по UI
 
-        private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
+        private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс Vector3 unitPosition 
+        private Vector3 selectUnitPosition;
+
         private ISelectableForVisibleUi selectableObjectForUi; // Текущий выделенный юнит который имеет интерфейс ISelectableForVisibleUi
         //private List<ISelectableDice> selectableDice = new(10); //емкость для выделенных кубиков
         //private ISelectableDice selectableDiceTest;  //емкость для выделенных кубиков
@@ -35,7 +37,7 @@ namespace DiceFate.Player
         private IMoveable moveable;       // Текущий перемещаемый юнит
 
         // Управление частотой обновления
-        [SerializeField] private float updateInterval = 0.05f;
+        [SerializeField] private float updateInterval = 0.05f; 
         private float accumulatedTime;
 
 
@@ -111,9 +113,8 @@ namespace DiceFate.Player
             LeftClick();           // Обработка правого клика
 
 
-            UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
-
-
+           // UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
+            IsMouseOnObjectOrNot(); // Без уменьшения частоты - оставить чтото одно после теста прозводительности
 
             if (Input.GetKeyDown(KeyCode.W))
             {
@@ -171,22 +172,6 @@ namespace DiceFate.Player
                 default:
                     break;
             }
-
-
-
-            //if (GameStats.currentPhasePlayer <= 1)
-            //{
-            //    LeftClickToSelected();
-            //}
-            //else if (selectedUnit != null && GameStats.currentPhasePlayer == 3)
-            //{
-            //    LeftClickToShakeAndDropDice();
-            //}
-            //else if (selectedUnit != null && GameStats.currentPhasePlayer == 4)
-            //{
-            //    LeftClickToMove();
-            //}
-
         }
 
 
@@ -226,6 +211,12 @@ namespace DiceFate.Player
             {
                 selectedUnit.Deselect();
                 selectedUnit = null;
+
+
+                //GameStats.diceMovement = 0;
+                //GameStats.diceAttack = 0;
+                //GameStats.diceShield = 0;
+                //GameStats.diceCounterattack = 0;
             }
         }
 
@@ -281,6 +272,7 @@ namespace DiceFate.Player
 
                         Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
 
+                        selectUnitPosition = hit.point;
 
                     }
                 }
@@ -299,13 +291,6 @@ namespace DiceFate.Player
             RaycastHit hit;
 
 
-
-
-           
-
-
-
-
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
                 // Тест: бросаем луч на все слои
@@ -320,19 +305,13 @@ namespace DiceFate.Player
 
                         if (hit.collider.TryGetComponent(out IDamageable damageable))
                         {
-                            DeselectCurrentUnit();
 
                             // Наносим урон через интерфейс
-                            damageable.TakeDamage(15);
-                          //  damageable.TakeDamage(GameStats.diceAttack);
+                            damageable.TakeDamage(15, selectUnitPosition);
+                            //  damageable.TakeDamage(GameStats.diceAttack);
+                            DeselectCurrentUnit();
                         }
                     }
-
-
-
-
-
-
                 }
             }
         }
@@ -508,7 +487,7 @@ namespace DiceFate.Player
         public void DropDiceIsMouseUp()
         {
             //selectableDiceTest.DropSelectDice();
-            Bus<OnDropEvent>.Raise(new OnDropEvent(1));
+            Bus<OnDropEvent>.Raise(new OnDropEvent(500));
         }
 
 

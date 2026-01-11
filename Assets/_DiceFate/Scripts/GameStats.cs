@@ -6,10 +6,10 @@ namespace DiceFate
 {
     public class GameStats
     {
-        
+
         // Прогресс по сценам: 0 = первая сцена, 1 = вторая и т.д.
         public static int sceneProgress;
-     
+
         public static int currentPhasePlayer = 0;
         // 0 - пусто 
         // 1 - выбор юнита
@@ -36,6 +36,24 @@ namespace DiceFate
 
         // Флаги для мышки
         public static bool isPlayerMoveble; // заглушка для Фазы 4 чтобы фигурка не двигалась пока кубики не остановятся
+       
+        public static bool isPlayerUnitSelect; 
+        public static bool isEnemyUnitSelect;
+        public static bool isOtherUnitSelect;
+
+        public static bool isBattle; // битва
+        public static bool isTurentPlayer; // Ход игрока
+        public static bool isTurentEnemy;  // Ход врага
+
+
+
+        // Характкристики Юнита (для временного хранения) для UI_Mane
+        public static string currentUser; // Player, Enemy, Other
+        public static string nameUnit;
+        public static int moveUser;
+        public static int attackUser;
+        public static int shildUser;
+        public static int conterAttackUser;
 
     }
 }

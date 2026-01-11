@@ -12,6 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ed0356c87ca20a4d85710b1b9504e68, type: 3}
   m_Name: EnemyUnit
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.UnitSO
-  <Health>k__BackingField: 50
-  <Armor>k__BackingField: 0
+  <Unit>k__BackingField: Enemy
+  <NameUnit>k__BackingField: "\u0438\u043C\u044F"
+  <PrefabAvatarBoard>k__BackingField: {fileID: 4461586637416194217, guid: 1c50ac1193556c74196d42001719ebb9, type: 3}
+  <Health>k__BackingField: 20
+  <DistanceToAttack>k__BackingField: 3
+  <Move>k__BackingField: 3
+  <Attack>k__BackingField: 4
+  <Shild>k__BackingField: 2
+  <ConterAttack>k__BackingField: 2
+  <Protection>k__BackingField: 0
   <colorSelected>k__BackingField: {r: 1, g: 0, b: 0, a: 1}

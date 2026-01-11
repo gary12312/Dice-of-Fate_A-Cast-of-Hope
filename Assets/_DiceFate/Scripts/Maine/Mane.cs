@@ -10,7 +10,6 @@ using DiceFate.Units;
 using DiceFate.Events;
 using DiceFate.EventBus;
 using System.Collections;
-using System;
 
 namespace DiceFate.Maine
 {
@@ -69,7 +68,9 @@ namespace DiceFate.Maine
             Bus<EnemyDeselectedEvent>.OnEvent += HandelEnemyDeselected;
             Bus<OnDropEvent>.OnEvent += HandelDropDice;
             Bus<OnMoveEvent>.OnEvent += HandelMove;
+            Bus<OnDamageEvent>.OnEvent += HandelDamageEvent;
             Bus<OnTestingEvent>.OnEvent += TestingEvent;
+
 
 
             buttonReturne.onClick.AddListener(ClickButtoneToReturne); // подписывается на щелчок
@@ -85,6 +86,7 @@ namespace DiceFate.Maine
             Bus<EnemyDeselectedEvent>.OnEvent -= HandelEnemyDeselected;
             Bus<OnDropEvent>.OnEvent -= HandelDropDice;
             Bus<OnMoveEvent>.OnEvent -= HandelMove;
+            Bus<OnDamageEvent>.OnEvent -= HandelDamageEvent;
             Bus<OnTestingEvent>.OnEvent -= TestingEvent;
 
             buttonReturne.onClick.RemoveListener(ClickButtoneToReturne);
@@ -102,6 +104,8 @@ namespace DiceFate.Maine
         private void Start()
         {
             ValidateScripts();
+
+            BattleToBegin(); // временно устанавливает что бой начался
 
             // Инициализируем словари
             UIInitializeDicePrefabs();
@@ -195,6 +199,7 @@ namespace DiceFate.Maine
         private void HandelUnitSelected(UnitSelectedEvent evt)
         {
             selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+
             PhaseOneSelectedUnit();
         }
 
@@ -205,26 +210,22 @@ namespace DiceFate.Maine
             Phase(0);
         }
 
-        private void HandelEnemySelected(EnemySelectedEvent evt)
-        {
-            selectedEnemy = evt.Enemy; // Обновить текущий выделенный Враг
-        }
-
-        private void HandelEnemyDeselected(EnemyDeselectedEvent evt)
-        {
-            selectedEnemy = null;  // Сбросить текущий выделенный Враг          
-        }
+        private void HandelEnemySelected(EnemySelectedEvent evt) => selectedEnemy = evt.Enemy; // Обновить текущий выделенный Враг      
+        private void HandelEnemyDeselected(EnemyDeselectedEvent evt) => selectedEnemy = null;  // Сбросить текущий выделенный Враг 
 
         private void HandelDropDice(OnDropEvent evt)
         {
-            PhaseFourSelectedUnit();
+            switch (GameStats.currentPhasePlayer)
+            {
+                case 3:
+                    PhaseFourSelectedUnit();
+                    break;
+            }
         }
-        private void HandelMove(OnMoveEvent args)
-        {
-            PhaseFiveSelectedUnit();
-        }
+        private void HandelMove(OnMoveEvent args) => PhaseFiveSelectedUnit();
+        private void HandelDamageEvent(OnDamageEvent damageObject) => PhaseSevenSelectedUnit(damageObject);
 
-
+        //   PhaseSixSelectedUnit//
 
 
         private void TestingEvent(OnTestingEvent evt)
@@ -234,10 +235,21 @@ namespace DiceFate.Maine
         }
 
         //-------------- Ход игрока --------------
+        private void BattleToBegin()
+        {
+            GameStats.isBattle = true;
+        }
+        private void BattleToEnd()
+        {
+            GameStats.isBattle = false;
+        }
 
         //-------------- 1 Фаза - Выбрать игрока --------------
         public void PhaseOneSelectedUnit()
         {
+            //if (GameStats.currentUser != "Player")
+            //    return;
+
             Phase(1);
             uiMane.UiShowPhaseOnePlayer();
 
@@ -248,6 +260,9 @@ namespace DiceFate.Maine
         //-------------- 2 Фаза - Активация кубиков для выбора --------------
         public void PhaseTwoSelectedUnit()
         {
+            //if (GameStats.currentUser != "Player")
+            //    return;
+
             Phase(2);
             uiMane.UiShowPhaseTwoPlayer();
 
@@ -258,12 +273,16 @@ namespace DiceFate.Maine
         //-------------- 3 Фаза Бросить кости выбранные кости --------------
         public void PhaseThreeSelectedUnit()
         {
+            //if (GameStats.currentUser != "Player")
+            //    return;
+
             Phase(3);
             uiMane.UiShowPhaseThreePlayer();
 
             //ShowPhaseThreeUIElements();
             ShowPhaseThreeSceneElements();
             CreatePrefabKeg();
+            kegCylinderSystem.EnableVirtualCylinder();
             CreateDiceFromField();
             kegCylinderSystem.AddDiceToList();
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
@@ -406,45 +425,56 @@ namespace DiceFate.Maine
 
         public void PhaseFourSelectedUnit()
         {
+            //if (GameStats.currentUser != "Player")
+            //    return;
             Phase(4);
-
-            uiMane.UiShowPhaseFourPlayer();
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока пока кубики не остановятся
 
+            uiMane.UiShowPhaseFourPlayer();
+            uiMane.UiClearAllDiceOnField(); // Очистить список кубиков на платке
             uiMane.TestingListToDiceTargetResult();
 
 
             //Получаем значение кубиков на столе            
-            StartCoroutine(PhaseFourCoroutine());
+            // StartCoroutine(PhaseFourCoroutine());
 
-            // Очистить список кубиков на платке          
-            uiDropTargetField.ResetAllDiceAndClearField();
-           
+            // uiDropTargetField.ResetAllDiceAndClearField();
+
 
 
 
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
 
+        public void MovementAndGridEnable()
+        {
+            GameStats.isPlayerMoveble = true;
+           // int movementDiceCount = GameStats.diceMovement; // Получаем количество кубиков движения из GameStats
+            int movementDiceCount = GameStats.moveUser; // Получаем количество кубиков движения из GameStats
+
+            Bus<OnMovmentValueEvent>.Raise(new OnMovmentValueEvent(movementDiceCount));
+            Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
+        }
+
         private IEnumerator PhaseFourCoroutine()
         {
             //Ждем, пока кубики остановятся и показываем результат в UI
-            yield return new WaitForSeconds(4f);
-            uiMane.UiEnableResultDisplay();
+            //yield return new WaitForSeconds(4f);
+            //uiMane.UiEnableResultDisplay();
 
             // Записываем результат на карточку и в static
-            yield return new WaitForSeconds(1f);
-            uiMane.SetResultToCard();
+            yield return new WaitForSeconds(5f);
+            //uiMane.SetResultToCard();
             MovementValueFromDice(); // Назначить количество очков движений
 
-            yield return new WaitForSeconds(1f);
-            uiMane.UiDisableResultDisplay();
+            //yield return new WaitForSeconds(1f);
+            //uiMane.UiDisableResultDisplay();
 
 
 
 
-            Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
-            GameStats.isPlayerMoveble = true;
+            //Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
+            //GameStats.isPlayerMoveble = true;
 
         }
 
@@ -464,7 +494,7 @@ namespace DiceFate.Maine
         public void PhaseFiveSelectedUnit()
         {
             Phase(5);
-           // uiMane.UiShowPhaseFivePlayer();
+            // uiMane.UiShowPhaseFivePlayer();
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока 
 
             RemoveDiceOnScene();
@@ -486,17 +516,55 @@ namespace DiceFate.Maine
 
         }
 
-        //--------------------------- 6 Фаза  атака  -------------------------
-        public void PhaseSixSelectedUnit()
+        //--------------------------- 6 Фаза наведение на противника  -------------------------
+        public void PhaseSixSelectedUnit(OnDamageEvent damageObject)
         {
-            Phase(6);           
+            Phase(6);
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока 
-
-           
 
 
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
+
+        //-------------------------- 7 Фаза - Атака  и Завершение хода игрока  ------------------------
+        public void PhaseSevenSelectedUnit(OnDamageEvent damageObject)
+        {
+            Phase(7);
+            GameStats.isPlayerMoveble = false; // Блокируем движение игрока 
+
+            // uiMane.UiShowPhaseSixPlayer();
+
+
+            if (selectedUnit != null)
+            {
+                // selectedUnit.HoverBeforAttack(); // Поднять юнита для атаки через интерфейс
+                selectedUnit.JumpBeforeAttack(); // Поднять юнита для атаки через интерфейс
+            }
+
+            // Наносим урон через интерфейс
+
+            Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
+
+        }
+
+
+
+
+
+
+        //-------------------------- 8 Фаза - Ожидание контр атаки  ------------------------
+
+
+
+
+        // -------------------------- Enemy  Защита и контратака  ------------------------
+
+
+
+
+
+        // -------------------------- Enemy  ход  ------------------------
+
 
 
 
@@ -533,10 +601,14 @@ namespace DiceFate.Maine
             }
         }
 
+        // Метод для снятия выделения
         public void DeselectPlayerUnit()
         {
             if (selectedUnit != null)
+            {
                 selectedUnit.Deselect();
+                selectedUnit = null;
+            }
         }
 
 

@@ -6,6 +6,10 @@ namespace DiceFate.Units
         bool IsSelected { get; }
         void Select();
         void Deselect();
+
+        void JumpBeforeAttack();
+        void UnitsSOCurrent(string userName);
+       
     }
 }
 

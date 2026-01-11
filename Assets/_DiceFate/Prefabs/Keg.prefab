@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 4352851830027798092}
   - component: {fileID: 1327278491066895214}
   - component: {fileID: 2118122864867194179}
+  - component: {fileID: -4925291425025811570}
   m_Layer: 0
   m_Name: Keg
   m_TagString: Untagged
@@ -279,3 +280,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Dice.KegTremble
   powerShake: 0.001
   moveSpeed: 30
+--- !u!225 &-4925291425025811570
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7293922874138301937}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
