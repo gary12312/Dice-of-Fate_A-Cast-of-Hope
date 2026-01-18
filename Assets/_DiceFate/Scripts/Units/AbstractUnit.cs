@@ -14,9 +14,12 @@ namespace DiceFate.Units
         [field: SerializeField] public int CurrentHealth { get; private set; } // IDamageable
         [field: SerializeField] public int MaxHealth { get; private set; }     // IDamageable
 
-        [field: SerializeField] public GameObject avatarPrefab; // Префаб аватара для UI
+        [SerializeField] public string unitType;
 
-        private string unit;          // player, enemy, other
+        [field: SerializeField] public GameObject avatarPrefab; // Префаб аватара для UI
+        [field: SerializeField] public bool IsHover { get; private set; }   // IHover
+
+       // private string unit;          // player, enemy, other
         private string nameUnit;
         private int distanceToAttack; // Расстояние атаки юнита
         private int move;
@@ -62,7 +65,7 @@ namespace DiceFate.Units
             MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
             CurrentHealth = MaxHealth;
 
-            unit = UnitSO.Unit;
+            unitType = UnitSO.UnitType;
             nameUnit = UnitSO.NameUnit;
             distanceToAttack = UnitSO.DistanceToAttack; // 5. Назначить Расстояние атаки
             move = UnitSO.Move;
@@ -178,7 +181,7 @@ namespace DiceFate.Units
         public void Die() => Destroy(gameObject);
         private void RecValueInGameStaticForUIMane()
         {
-            GameStats.currentUser = unit;
+            GameStats.currentUser = unitType;
             GameStats.nameUnit = nameUnit;
             GameStats.moveUser = move;
             GameStats.attackUser = attack;
@@ -188,16 +191,20 @@ namespace DiceFate.Units
         }
 
 
-
-        //-------------- Управление обводкой юнита --------------
+        //-------------- IHover реализация --------------
+        
         public void OnEnterHover()
         {
             if (IsSelected == false) { Outline?.EnableOutline(); }
+            IsHover = true;
+
         }
         public void OnExitHover()
         {
             if (IsSelected == false) { Outline?.DisableOutline(); }
+            IsHover = false;
         }
+        //-------------- Управление обводкой юнита --------------
         public void OutlineOnSelected()
         {
             Outline?.EnableOutline();
@@ -227,6 +234,7 @@ namespace DiceFate.Units
             //   Bus<UnitDeadEvent>.Raise(new UnitDeadEvent(this));
 
         }
+
 
 
     }

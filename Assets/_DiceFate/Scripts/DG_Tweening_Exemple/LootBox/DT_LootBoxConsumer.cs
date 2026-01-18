@@ -17,7 +17,7 @@ namespace DG_Tweening_Exemple
 
         }
 
-        private void OpenLootBox()
+        public void OpenLootBox()
         {
             StartCoroutine(ProcessOpenLootBox());
         }

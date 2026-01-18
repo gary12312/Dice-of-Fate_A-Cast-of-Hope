@@ -37,7 +37,7 @@ namespace DiceFate.Player
         private IMoveable moveable;       // Текущий перемещаемый юнит
 
         // Управление частотой обновления
-        [SerializeField] private float updateInterval = 0.05f; 
+        [SerializeField] private float updateInterval = 0.05f;
         private float accumulatedTime;
 
 
@@ -113,7 +113,7 @@ namespace DiceFate.Player
             LeftClick();           // Обработка правого клика
 
 
-           // UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
+            // UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
             IsMouseOnObjectOrNot(); // Без уменьшения частоты - оставить чтото одно после теста прозводительности
 
             if (Input.GetKeyDown(KeyCode.W))
@@ -199,6 +199,8 @@ namespace DiceFate.Player
                     if (selectedUnit != null && selectedUnit != selectable) { DeselectCurrentUnit(); }  // Если есть уже выделенный юнит, снимаем с него выделение
 
                     selectable.Select();
+                    Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
+
                 }
                 else { DeselectCurrentUnit(); } // Клик в пустом месте 
             }
@@ -212,6 +214,7 @@ namespace DiceFate.Player
                 selectedUnit.Deselect();
                 selectedUnit = null;
 
+                Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
 
                 //GameStats.diceMovement = 0;
                 //GameStats.diceAttack = 0;
@@ -460,23 +463,34 @@ namespace DiceFate.Player
         {
             Ray cameraRay = camera.ScreenPointToRay(Input.mousePosition);
 
-            // Если луч попал в объект и у него есть компонент IHover
+            // Проверяем, закрываеи ли  UI элемент
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return; // Не обрабатываем наведение через UI
+            }
+
+
+            // Если луч попал в объект и у него есть компонент IHover или ISelectable
             if (Physics.Raycast(cameraRay, out RaycastHit hit, 100) && hit.collider.TryGetComponent(out IHover hover))
             {
 
-                if (hoverableUnit != null && hoverableUnit == hover)
+                if (hoverableUnit != null && hoverableUnit == hover) //|| selectedUnit != null
                 {
                     return; // Если уже есть наведение, ничего не делаем
                 }
 
+
                 hover.OnEnterHover();  // Включаем обводку через интерфейс IHover 
                 hoverableUnit = hover; // Сохраняем текущий наведение юнит
+                Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
+
             }
             // Если луч не попал в объект с IHover, снимаем обводку
             else if (hoverableUnit != null)
             {
                 hoverableUnit.OnExitHover(); // Снимаем обводку через интерфейс IHover 
                 hoverableUnit = null;        // Сбрасываем текущее наведение юнит
+                Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
             }
 
         }

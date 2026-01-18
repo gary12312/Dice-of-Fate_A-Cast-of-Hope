@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ed0356c87ca20a4d85710b1b9504e68, type: 3}
   m_Name: EnemyUnit
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.UnitSO
-  <Unit>k__BackingField: Enemy
+  <UnitType>k__BackingField: Enemy
   <NameUnit>k__BackingField: "\u0438\u043C\u044F"
   <PrefabAvatarBoard>k__BackingField: {fileID: 4461586637416194217, guid: 1c50ac1193556c74196d42001719ebb9, type: 3}
   <Health>k__BackingField: 20

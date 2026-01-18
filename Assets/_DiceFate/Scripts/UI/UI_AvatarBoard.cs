@@ -10,6 +10,9 @@ namespace DiceFate.UI
         [SerializeField] private Image iBoardColor;
 
         private Color defaultColor;
+        private string curentUnitType; // Тип юнита: игрок, враг и т.д.
+
+
         private AbstractUnit linkedUnit; // Ссылка на связанный юнит
 
         private void Awake()
@@ -37,6 +40,8 @@ namespace DiceFate.UI
             linkedUnit = unit;
 
             // if (unitNameText != null) { unitNameText.text = unit.name; }// Устанавливаем имя юнита
+
+            curentUnitType = unit.unitType; // Получаем тип юнита 
 
             SetHealth(unit.CurrentHealth, unit.MaxHealth); // Устанавливаем начальное здоровье            
             AvatarBoardDefault(); // Устанавливаем цвет по умолчанию           
@@ -73,19 +78,61 @@ namespace DiceFate.UI
                 return;
             }
 
-            if (linkedUnit.IsSelected)
-            {
-                AvatarBoardSelected();
-            }
-            else if (linkedUnit.IsSelectedForVisibleUi)
+            //if (curentUnitType == "Player" && linkedUnit.IsSelected == true)
+            //{
+
+                if (linkedUnit.IsSelected)
+                {
+                    AvatarBoardSelected();
+                }
+                //else if (linkedUnit.IsSelectedForVisibleUi) // в дальнейшем добавтть
+                //{
+                //    AvatarBoardInactiveInBattle();
+                //}
+                else
+                {
+                    AvatarBoardDefault();
+                }
+            //}
+
+        }
+
+        public void UpdateHoverState() // Наведене
+        {
+            if (linkedUnit == null )
             {
                 AvatarBoardInactiveInBattle();
+                return;
             }
-            else
+
+            if (curentUnitType == "Player" && linkedUnit.IsSelected == false)
             {
-                AvatarBoardDefault();
+                if (linkedUnit.IsHover)
+                {
+                    AvatarBoardPlayer();
+                }
+                else
+                {
+                    AvatarBoardDefault();
+                }
+
             }
+            else if (curentUnitType == "Enemy")
+            {
+                if (linkedUnit.IsHover)
+                {
+                    AvatarBoardEnemy();
+                }
+                else
+                {
+                    AvatarBoardDefault();
+                }
+            }     
         }
+
+
+
+
 
         private void SetBoardColor(Color color) => iBoardColor.color = color;
         public void AvatarBoardDefault() => SetBoardColor(defaultColor);
@@ -94,6 +141,8 @@ namespace DiceFate.UI
         public void AvatarBoardDamaged() => SetBoardColor(Color.red);
         public void AvatarBoardHealed() => SetBoardColor(Color.green);
         public void AvatarBoardWarning() => SetBoardColor(Color.yellow);  // Метод для установки предупреждающего цвета
+        public void AvatarBoardPlayer() => SetBoardColor(Color.white);  
+        public void AvatarBoardEnemy() => SetBoardColor(Color.red);  
 
 
         public void SetHealth(int currentHealth, int maxHealth)

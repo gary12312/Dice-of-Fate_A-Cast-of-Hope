@@ -5,7 +5,7 @@ namespace DiceFate.Units
     [CreateAssetMenu(fileName = "New Unit", menuName = "DiceFate/Unit")]
     public class UnitSO : ScriptableObject
     {
-        [field: SerializeField] public string Unit { get; private set; } = "Player"; // Player, Enemy, Other
+        [field: SerializeField] public string UnitType { get; private set; } = "Player"; // Player, Enemy, Other
         [field: SerializeField] public string NameUnit { get; private set; } = "имя";
         [field: SerializeField] public GameObject PrefabAvatarBoard { get; private set; }
         [field: SerializeField] public int Health { get; private set; } = 20;

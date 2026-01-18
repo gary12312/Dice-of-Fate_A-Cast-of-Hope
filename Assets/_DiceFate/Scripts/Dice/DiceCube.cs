@@ -28,6 +28,8 @@ namespace DiceFate.Dice
 
         [SerializeField] public bool isDiceReady = false;
 
+        
+
 
         // Публичный параметр типа кубика с использованием enum
         [Header("Тип кубика")]
@@ -131,12 +133,17 @@ namespace DiceFate.Dice
 
             isDiceReady = true; // Кубик готов, значение определено - Test 
                                 // Отправляем событие о том, что кубик готов
-            Bus<OnDiceReadyEvent>.Raise(new OnDiceReadyEvent(this));         
+            Bus<OnDiceReadyEvent>.Raise(new OnDiceReadyEvent(this));
 
             Debug.Log("Значение кубика: " + result);
+
+            yield return null;
         }
 
-        int GetDiceValue()
+
+        //--------------------- Методы для определения значения кубика ----------------------
+        // Метод для определения значения кубика по его ориентации
+        private int GetDiceValue()
         {
             int topFaceIndex = -1;
             float maxDot = -Mathf.Infinity;
@@ -202,7 +209,7 @@ namespace DiceFate.Dice
                 rb.isKinematic = true;
             }
         }
-  
+
 
         // --------------------- Реализация событий ----------------------
 
@@ -245,7 +252,7 @@ namespace DiceFate.Dice
         }
 
         public void DestroyDice() => Destroy(gameObject);
-      
+
 
         // --------------------- Визуализация направлений граней в редакторе (для отладки) ------------------
         void OnDrawGizmosSelected()

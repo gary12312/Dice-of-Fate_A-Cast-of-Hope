@@ -1,6 +1,9 @@
-using DiceFate.Units;
 using System.Collections.Generic;
 using UnityEngine;
+using DiceFate.Units;
+using DiceFate.Events;
+using DiceFate.EventBus;
+using System;
 
 namespace DiceFate.UI
 {
@@ -19,9 +22,31 @@ namespace DiceFate.UI
 
         private bool isBattle = false;
 
+
+        private void Awake()
+        {   
+            Bus<OnUpdateUIAvatarEvent>.OnEvent += HandelHover;   
+        }
+
+        private void OnDestroy()
+        {
+            Bus<OnUpdateUIAvatarEvent>.OnEvent -= HandelHover;
+        }
+
+        //---------------------------------- События  ----------------------------------
+        private void HandelHover(OnUpdateUIAvatarEvent args)
+        {
+            UpdateAllAvatars();
+        }
+
         private void Start()
         {
             FindAndSetupUnits();
+        }
+
+        private void Update()
+        {
+           // UpdateAllAvatars();  // временно  - обрать из Update
         }
 
         public void StartBattleUI()
@@ -246,7 +271,7 @@ namespace DiceFate.UI
                     UI_AvatarBoard avatarBoard = avatar.GetComponent<UI_AvatarBoard>();
                     if (avatarBoard != null)
                     {
-                        avatarBoard.UpdateSelectionState();
+                        avatarBoard.UpdateSelectionState();                       
                     }
                 }
             }
@@ -263,6 +288,43 @@ namespace DiceFate.UI
                 }
             }
         }
+
+        // Метод для обновления состояния При наведении для всех аватаров
+        public void UpdateAllAvatarHoverStates()
+        {
+            foreach (var avatar in playerAvatars)
+            {
+                if (avatar != null)
+                {
+                    UI_AvatarBoard avatarBoard = avatar.GetComponent<UI_AvatarBoard>();
+                    if (avatarBoard != null)
+                    {                        
+                        avatarBoard.UpdateHoverState();
+                    }
+                }
+            }
+
+            foreach (var avatar in enemyAvatars)
+            {
+                if (avatar != null)
+                {
+                    UI_AvatarBoard avatarBoard = avatar.GetComponent<UI_AvatarBoard>();
+                    if (avatarBoard != null)
+                    {
+                        avatarBoard.UpdateHoverState();
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
 
         // Метод для нахождения аватара по юниту
         public UI_AvatarBoard GetAvatarByUnit(AbstractUnit unit)
@@ -315,8 +377,11 @@ namespace DiceFate.UI
             // Обновляем здоровье
             UpdateHealthUI();
 
-            // Обновляем состояния выделения
+            // Обновляем состояния при выделении
             UpdateAllAvatarSelectionStates();
+
+            // Обновляем состояния при наведении
+            UpdateAllAvatarHoverStates();
         }
 
         // Метод для очистки всех аватаров

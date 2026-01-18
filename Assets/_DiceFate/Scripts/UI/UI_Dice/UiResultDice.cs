@@ -12,6 +12,9 @@ namespace DiceFate.UI_Dice
         [SerializeField] private GameObject value4;
         [SerializeField] private GameObject value5;
         [SerializeField] private GameObject value6;
+        [Space]
+        [SerializeField] private GameObject ferstParticle;
+        [SerializeField] private GameObject secondParticle;
 
         private Color colorOfType;
 
