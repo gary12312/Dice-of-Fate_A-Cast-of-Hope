@@ -582,7 +582,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1879515135}
-  - {fileID: 278308507}
   - {fileID: 2129825220}
   m_Father: {fileID: 1827940943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2263,12 +2262,12 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 278308506}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 98666946}
+  m_Father: {fileID: 1000526733}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4952,7 +4951,7 @@ GameObject:
   - component: {fileID: 684609813}
   - component: {fileID: 684609815}
   m_Layer: 5
-  m_Name: Dice_Ferst_ (2)
+  m_Name: Dice_Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7074,6 +7073,7 @@ RectTransform:
   - {fileID: 2004194374}
   - {fileID: 1938978936}
   - {fileID: 1533329846}
+  - {fileID: 278308507}
   m_Father: {fileID: 1827940943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -9904,7 +9904,7 @@ GameObject:
   - component: {fileID: 1481954478}
   - component: {fileID: 1481954480}
   m_Layer: 5
-  m_Name: Dice_Ferst_ (1)
+  m_Name: Dice_Move
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13183,7 +13183,7 @@ GameObject:
   - component: {fileID: 1938978937}
   - component: {fileID: 1938978939}
   m_Layer: 5
-  m_Name: Dice_Ferst_ (4)
+  m_Name: Dice_ConterAtack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13972,7 +13972,7 @@ GameObject:
   - component: {fileID: 2004194375}
   - component: {fileID: 2004194377}
   m_Layer: 5
-  m_Name: Dice_Ferst_ (3)
+  m_Name: Dice_Shild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14527,6 +14527,11 @@ MonoBehaviour:
   - {fileID: 1290883042}
   - {fileID: 1460082309}
   fieldOutline: {fileID: 1414855324}
+  textNumberDiceToDrop: {fileID: 278308508}
+  diceMove: {fileID: 1481954476}
+  diceAttack: {fileID: 684609811}
+  diceShield: {fileID: 2004194373}
+  diceConterAttack: {fileID: 1938978935}
 --- !u!222 &2112492955
 CanvasRenderer:
   m_ObjectHideFlags: 0
