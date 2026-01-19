@@ -14,7 +14,7 @@ public class T_DiceManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            uiResultDisplay.UpdateResultDisplay(); 
+            uiResultDisplay.UpdateTextUiDisplay(); 
         }
     }
 

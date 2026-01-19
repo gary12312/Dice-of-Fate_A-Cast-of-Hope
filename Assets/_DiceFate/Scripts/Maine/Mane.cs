@@ -15,6 +15,10 @@ namespace DiceFate.Maine
 {
     public class Mane : MonoBehaviour
     {
+        [Header("Параметры игрока")]
+        [SerializeField] private int numberDiceToDrop = 3;
+
+
         [Header("Фаза 1 настройки")]
         [SerializeField] private GameObject unitMasterCard;
         [SerializeField] private Button dice;
@@ -49,6 +53,7 @@ namespace DiceFate.Maine
         [Header("Доп. настройки")]
         [SerializeField] private Button buttonReturne;
         [SerializeField] private PhaseNumberText PhaseNumberText;
+
 
 
         private bool isDiceGroupActive = false;
@@ -103,6 +108,8 @@ namespace DiceFate.Maine
 
         private void Start()
         {
+            GameStats.numberDiceToDrop = numberDiceToDrop;
+
             ValidateScripts();
 
             BattleToBegin(); // временно устанавливает что бой начался
@@ -449,7 +456,7 @@ namespace DiceFate.Maine
         public void MovementAndGridEnable()
         {
             GameStats.isPlayerMoveble = true;
-           // int movementDiceCount = GameStats.diceMovement; // Получаем количество кубиков движения из GameStats
+            // int movementDiceCount = GameStats.diceMovement; // Получаем количество кубиков движения из GameStats
             int movementDiceCount = GameStats.moveUser; // Получаем количество кубиков движения из GameStats
 
             Bus<OnMovmentValueEvent>.Raise(new OnMovmentValueEvent(movementDiceCount));

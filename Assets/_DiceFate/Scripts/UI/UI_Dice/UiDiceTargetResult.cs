@@ -1,12 +1,13 @@
+using DG.Tweening;
 using DiceFate.Dice;
 using DiceFate.EventBus;
 using DiceFate.Events;
+using DiceFate.Maine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using DiceFate.Maine;
-using DG.Tweening;
+using Архив;
 
 
 
@@ -15,14 +16,15 @@ namespace DiceFate.UI_Dice
     public class UiDiceTargetResult : MonoBehaviour
     {
         [Header("Настройки UI")]
-        [SerializeField] private GameObject resultContainer; // Родительский контейнер для результатов
+        //  [SerializeField] private GameObject resultContainer; // Родительский контейнер для результатов
         [SerializeField] private GameObject uiResultDicePrefab; // Префаб UI-кубика
-
+        [SerializeField] private Mane mane;
+        //[SerializeField] private int numberDiceToDtop=3;
+        [Space]
         [SerializeField] private TextMeshProUGUI textMovment;
         [SerializeField] private TextMeshProUGUI textAttack;
         [SerializeField] private TextMeshProUGUI textShield;
         [SerializeField] private TextMeshProUGUI textCounterattack;
-        [SerializeField] private Mane mane;
 
         [Header("Точки спавна и цели")]
         [SerializeField] private GameObject resultPosition; // Родительский контейнер для результатов
@@ -30,35 +32,27 @@ namespace DiceFate.UI_Dice
         [SerializeField] private UIParticalArrey UI_Particals_A;
         [SerializeField] private UIParticalArrey UI_Particals_S;
         [SerializeField] private UIParticalArrey UI_Particals_C;
-
-
+        [Space]
         [SerializeField] private int ferstPS = 1;
-        [SerializeField] private int secondPS =2;
-
+        [SerializeField] private int secondPS = 2;
+        [Space]
         [SerializeField] private RectTransform spawnPointMovment;
         [SerializeField] private RectTransform spawnPointAttack;
         [SerializeField] private RectTransform spawnPointShield;
         [SerializeField] private RectTransform spawnPointCounterattack;
-
+        [Space]
         [SerializeField] private RectTransform targetPointMovment;
         [SerializeField] private RectTransform targetPointAttack;
         [SerializeField] private RectTransform targetPointShield;
         [SerializeField] private RectTransform targetPointCounterattack;
-
-        [SerializeField] private AnimationCurve animationCurve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)); // Кривая для плавности
+        [Space]
+        [SerializeField] private AnimationCurve animCurveMove = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)); // Кривая для плавности
+        [SerializeField] private AnimationCurve animCurveScale = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f));
         [SerializeField] private float animationDuration = 0.5f;
-
+        [SerializeField] private float durationBeforeAnimation = 1.5f;
 
         private bool isDiceReady = false;
         private Sequence _sequenceAnimation;
-
-        //private Transform spawnPoint = null;
-        //private RectTransform targetPoint = null;
-
-        private int moveUser;
-        private int attackUser;
-        private int shildUser;
-        private int conterAttackUser;
 
         private List<DiceCube> diceCubes = new List<DiceCube>();
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
@@ -71,7 +65,7 @@ namespace DiceFate.UI_Dice
 
         private void Awake()
         {
-            resultContainer.SetActive(true); // - было  фолс Разобраться         
+            // resultContainer.SetActive(true); // - было  фолс Разобраться         
 
             Bus<OnDiceReadyEvent>.OnEvent += OnDiceReady;
             Bus<OnDropEvent>.OnEvent += HandelDropDice;
@@ -80,10 +74,14 @@ namespace DiceFate.UI_Dice
         {
             Bus<OnDiceReadyEvent>.OnEvent -= OnDiceReady;
             Bus<OnDropEvent>.OnEvent -= HandelDropDice;
+
+            _sequenceAnimation?.Kill();
         }
-        private void Start() => Checked();
-
-
+        private void Start()
+        {
+            ValidateScriptsAndObjects();
+            ClearAll();
+        }
 
 
         //---------------------------------- События  ---------------------------------- 
@@ -103,8 +101,7 @@ namespace DiceFate.UI_Dice
 
             diceCubes.Add(dice);
 
-            // Создаём UI-элемент для этого кубика
-           // CreateUiResultDisplayForDice(dice);
+            // Создаём UI-элемент для этого кубика           
             CreateUiResultInPointForDice(dice);
         }
 
@@ -113,73 +110,8 @@ namespace DiceFate.UI_Dice
         //---------------------------------- Логика  ---------------------------------- 
 
 
-        // Создаёт UI-элемент для конкретного кубика
-        private void CreateUiResultDisplayForDice(DiceCube dice)
-        {
-            // Создаём экземпляр префаба
-            GameObject uiInstance = Instantiate(uiResultDicePrefab, resultContainer.transform);
 
-            // Получаем компонент UI
-            UiResultDice uiResultDice = uiInstance.GetComponent<UiResultDice>();
-            if (uiResultDice == null)
-            {
-                Debug.LogWarning("Созданный префаб не содержит компонент UiResultDice");
-                return;
-            }
-
-            // Получаем значение кубика
-            int currentValue = dice.GetLastResult();
-            Debug.Log($"Кубик {dice.gameObject.name} остановился. Тип: {dice.diceType}, значение: {currentValue}");
-
-            // Отображаем значение и окрашиваем по типу
-            uiResultDice.OnEnabledValue(currentValue);
-            uiResultDice.ColorDiceResult(dice.diceType.ToString());
-
-            // Обновляем словарь результатов
-            string type = dice.diceType.ToString();
-            if (diceResultsDict.ContainsKey(type))
-            {
-                diceResultsDict[type] += currentValue;
-
-                // Немедленно сохраняем в GameStats
-                SaveToGameStats(type, currentValue);
-            }
-
-            StartCoroutine(DelayOnCreateResult());
-            // CheckListDiceCube();
-        }
-
-
-
-
-
-
-        private IEnumerator DelayOnCreateResult()
-        {
-            yield return new WaitForSeconds(0.7f);
-            if (diceCubes.Count >= 4)
-            {
-                //  UpdateResultDisplay();
-                //SaveResultsDiseToGameStats();
-                mane.MovementAndGridEnable();
-            }
-            else
-            {
-                yield break;
-            }
-
-            //UpdateResultDisplay();
-            //SaveResultsToGameStats();
-            //CheckListDiceCube();
-
-            yield return new WaitForSeconds(3f);
-            OffResultOnDisplays();
-
-        }
-
-
-
-        // V2    Создаёт UI-элемент для конкретного кубика 
+        //  Создаём UI-элемент для конкретного кубика 
         private void CreateUiResultInPointForDice(DiceCube dice)
         {
             RectTransform spawnPoint = null;
@@ -213,7 +145,7 @@ namespace DiceFate.UI_Dice
             if (spawnPoint == null || targetPoint == null)
             { return; }
 
-            ActiveParticalSystem (particals, ferstPS, spawnPoint);           
+            ActiveParticalSystem(particals, ferstPS, spawnPoint);
 
             // Создаём экземпляр префаба
             GameObject uiInstance = Instantiate(uiResultDicePrefab, spawnPoint.position,
@@ -235,46 +167,47 @@ namespace DiceFate.UI_Dice
             uiResultDice.OnEnabledValue(currentValue);
             uiResultDice.ColorDiceResult(dice.diceType.ToString());
 
-            // uiInstance.DOAnchorPos(targetPointMovment, 0.5f).SetEase(animationCurve).Play();
-
-            // Проверьте, что resultPosition имеет Canvas как родителя
+            // Проверяем, что resultPosition имеет Canvas как родителя
             RectTransform rectTransform = uiInstance.GetComponent<RectTransform>();
-            if (rectTransform == null)  { return; }
+            if (rectTransform == null) { return; }
 
-            SaveToGameStats(dice.diceType.ToString(), currentValue);
+            SaveResultDiceToGameStats(dice.diceType.ToString(), currentValue);          
 
-            StartCoroutine(TweemResultAnimation(particals, rectTransform, targetPoint, dice.diceType.ToString(), currentValue));
-
+            StartCoroutine(AnimateResultDice(particals, rectTransform, targetPoint, dice.diceType.ToString(), uiInstance));
         }
 
 
 
-        IEnumerator TweemResultAnimation(UIParticalArrey partical, RectTransform rectTransform, RectTransform targetPoint, string type, int currentValue)
+        IEnumerator AnimateResultDice(UIParticalArrey partical, RectTransform rectTransform, RectTransform targetPoint, string type, GameObject uiInstance)
         {
-            yield return new WaitForSeconds(2f);
-            
-                //rectTransform.DOAnchorPos(targetPoint.anchoredPosition, 0.5f)
-                //             .SetEase(animationCurve)
-                //             .Play();
-           
+            yield return new WaitForSeconds(durationBeforeAnimation);
 
             _sequenceAnimation = DOTween.Sequence();
-            _sequenceAnimation 
-                .Append(rectTransform.DOAnchorPos(targetPoint.anchoredPosition, animationDuration).SetEase(animationCurve))
-                .Join(rectTransform.transform.DOScale(0, 0.6f).SetEase(Ease.InBounce))
-               // .OnComplete(() => ActiveParticalSystem(partical, secondPS, targetPoint))
-                .OnComplete(() => SaveToUnitGameStats(type, partical, secondPS, targetPoint))
+            _sequenceAnimation
+                .Append(rectTransform.DOAnchorPos(targetPoint.anchoredPosition, animationDuration).SetEase(animCurveMove))
+                .Join(rectTransform.transform.DOScale(0, animationDuration).SetEase(animCurveScale))
+                .OnComplete(() => UpdateTextRunManeGrid(type, partical, targetPoint, uiInstance))
                 .Play();
         }
-           
-        public void ActiveParticalSystem(UIParticalArrey partical, int index, RectTransform rectTransform)
-        {                    
-            if (partical == null) return;
-            partical.ActivePartical(index, rectTransform);            
+        private void UpdateTextRunManeGrid(string diceType, UIParticalArrey partical, RectTransform targetPoint, GameObject uiInstance)
+        {
+            ActiveParticalSystem(partical, secondPS, targetPoint);
+            
+            UpdateUnitValueGameStats(diceType);
+            UpdateTextUiDisplay();
+
+            Destroy(uiInstance);
+
+            if (diceType == "Movement") mane.MovementAndGridEnable();
         }
 
+        public void ActiveParticalSystem(UIParticalArrey partical, int index, RectTransform rectTransform)
+        {
+            if (partical == null) return;
+            partical.ActivePartical(index, rectTransform);
+        }
 
-        private void SaveToGameStats(string diceType, int value)
+        private void SaveResultDiceToGameStats(string diceType, int value)
         {
             switch (diceType)
             {
@@ -292,49 +225,25 @@ namespace DiceFate.UI_Dice
                     break;
             }
         }
-        private void SaveToUnitGameStats(string diceType, UIParticalArrey partical, int index, RectTransform targetPoint)
+        private void UpdateUnitValueGameStats(string diceType)
         {
-            ActiveParticalSystem(partical, secondPS, targetPoint);
-
-
             switch (diceType)
             {
                 case "Movement":
-                    GameStats.moveUser = GameStats.moveUser + GameStats.diceMovement;
-                    textMovment.text = GameStats.moveUser.ToString();
+                    GameStats.moveUser += GameStats.diceMovement;
                     break;
                 case "Attack":
-                    GameStats.attackUser = GameStats.attackUser + GameStats.diceAttack;
-                    textAttack.text = GameStats.attackUser.ToString();
+                    GameStats.attackUser += GameStats.diceAttack;
                     break;
                 case "Shield":
-                    GameStats.shildUser = GameStats.shildUser + GameStats.diceAttack;
-                    textShield.text = GameStats.shildUser.ToString();
+                    GameStats.shildUser += GameStats.diceShield;
                     break;
                 case "Counterattack":
-                    GameStats.conterAttackUser = GameStats.conterAttackUser + GameStats.diceShield;
-                    textCounterattack.text = GameStats.conterAttackUser.ToString();
+                    GameStats.conterAttackUser += GameStats.diceCounterattack;
                     break;
             }
-        }
+        }        
 
-
-
-
-
-
-
-
-
-        //private void CheckListDiceCube()
-        //{
-        //    if (diceCubes.Count >= 4)
-        //    {
-        //        UpdateResultDisplay();
-        //        SaveResultsDiseToGameStats();
-        //        mane.MovementAndGridEnable();
-        //    }
-        //}
 
         public void SaveResultsDiseToGameStats()
         {
@@ -342,14 +251,29 @@ namespace DiceFate.UI_Dice
             GameStats.diceAttack = diceResultsDict["Attack"];
             GameStats.diceShield = diceResultsDict["Shield"];
             GameStats.diceCounterattack = diceResultsDict["Counterattack"];
-
-            //moveUser = GameStats.moveUser + GameStats.diceMovement;
-            //attackUser = GameStats.attackUser + GameStats.diceAttack;
-            //shildUser = GameStats.shildUser + GameStats.attackUser;
-            //conterAttackUser = GameStats.conterAttackUser + GameStats.shildUser;
         }
 
+        public void UpdateTextUiDisplay()
+        {
+            textMovment.text = GameStats.moveUser.ToString();
+            textAttack.text = GameStats.attackUser.ToString();
+            textShield.text = GameStats.shildUser.ToString();
+            textCounterattack.text = GameStats.conterAttackUser.ToString();
+        }
 
+        public void ClearAll()
+        {
+            diceCubes.Clear();
+            ClearDictionaryResult();
+            ResetPlayerDiceResultsToGameStats();
+        }
+        private void ClearDictionaryResult()
+        {
+            diceResultsDict["Movement"] = 0;
+            diceResultsDict["Attack"] = 0;
+            diceResultsDict["Shield"] = 0;
+            diceResultsDict["Counterattack"] = 0;
+        }
         private void ResetPlayerDiceResultsToGameStats()
         {
             GameStats.diceMovement = 0;
@@ -359,82 +283,50 @@ namespace DiceFate.UI_Dice
         }
 
 
-
-        public void UpdateResultValuePlayerToGameStats()
+        private void ValidateScriptsAndObjects()
         {
-            GameStats.moveUser = GameStats.moveUser + GameStats.diceMovement;
-            GameStats.attackUser = GameStats.attackUser + GameStats.diceAttack;
-            GameStats.shildUser = GameStats.shildUser + GameStats.diceAttack;
-            GameStats.conterAttackUser = GameStats.conterAttackUser + GameStats.diceShield;
-
-            //GameStats.moveUser = moveUser;
-            //GameStats.attackUser = attackUser;
-            //GameStats.shildUser = shildUser;
-            //GameStats.conterAttackUser = conterAttackUser;
-
-
-        }
-
-        public void UpdateResultDisplay()
-        {
-
-            textMovment.text = GameStats.moveUser.ToString();
-            textAttack.text = GameStats.attackUser.ToString();
-            textShield.text = GameStats.shildUser.ToString();
-            textCounterattack.text = GameStats.conterAttackUser.ToString();
-
-
-            //textMovment.text = GameStats.diceMovement.ToString();
-            //textAttack.text = GameStats.diceAttack.ToString();
-            //textShield.text = GameStats.diceShield.ToString();
-            //textCounterattack.text = GameStats.diceCounterattack.ToString();
-        }
-
-
-
-        public void ClearAll()
-        {
-            foreach (Transform child in resultContainer.transform)
-            {
-                Destroy(child.gameObject);
-            }
-            diceCubes.Clear();
-            ClearDictionaryResult();
-            SaveResultsDiseToGameStats();
-        }
-
-        private void ClearDictionaryResult()
-        {
-            diceResultsDict["Movement"] = 0;
-            diceResultsDict["Attack"] = 0;
-            diceResultsDict["Shield"] = 0;
-            diceResultsDict["Counterattack"] = 0;
-        }
-
-        public void OffResultOnDisplays()
-        {
-            resultContainer.SetActive(false);
-
-            UpdateResultValuePlayerToGameStats();
-            UpdateResultDisplay();
-
-            ClearAll();
-        }
-
-        private void Checked()
-        {
-            if (resultContainer == null)
-            {
-                Debug.LogError("Не назначен контейнер для результатов (C_ResultDice)!");
-            }
-
             if (uiResultDicePrefab == null)
-            {
-                Debug.LogError("Не назначен префаб UiResultDice в инспекторе!");
-            }
+                Debug.LogError($" для {this.name} Не назначен префаб UiResultDice в инспекторе!");
+            if (mane == null)
+                Debug.LogError($" для {this.name} Не назначен префаб mane в инспекторе!");
 
-            ClearAll();
+            if (textMovment == null)
+                Debug.LogError($" для {this.name} Не назначен префаб textMovment в инспекторе!");
+            if (textAttack == null)
+                Debug.LogError($" для {this.name} Не назначен префаб textAttack в инспекторе!");
+            if (textShield == null)
+                Debug.LogError($" для {this.name} Не назначен префаб textShield в инспекторе!");
+            if (textCounterattack == null)
+                Debug.LogError($" для {this.name} Не назначен префаб textCounterattack в инспекторе!");
+
+            if (resultPosition == null)
+                Debug.LogError($" для {this.name} Не назначен префаб resultPosition в инспекторе!");
+            if (UI_Particals_M == null)
+                Debug.LogError($" для {this.name} Не назначен префаб UI_Particals_M в инспекторе!");
+            if (UI_Particals_A == null)
+                Debug.LogError($" для {this.name} Не назначен префаб UI_Particals_A в инспекторе!");
+            if (UI_Particals_S == null)
+                Debug.LogError($" для {this.name} Не назначен префаб UI_Particals_S в инспекторе!");
+            if (UI_Particals_C == null)
+                Debug.LogError($" для {this.name} Не назначен префаб UI_Particals_C в инспекторе!");
+
+            if (spawnPointMovment == null)
+                Debug.LogError($" для {this.name} Не назначен префаб spawnPointMovment в инспекторе!");
+            if (spawnPointAttack == null)
+                Debug.LogError($" для {this.name} Не назначен префаб spawnPointAttack в инспекторе!");
+            if (spawnPointShield == null)
+                Debug.LogError($" для {this.name} Не назначен префаб spawnPointShield в инспекторе!");
+            if (spawnPointCounterattack == null)
+                Debug.LogError($" для {this.name} Не назначен префаб spawnPointCounterattack в инспекторе!");
+
+            if (targetPointMovment == null)
+                Debug.LogError($" для {this.name} Не назначен префаб targetPointMovment в инспекторе!");
+            if (targetPointAttack == null)
+                Debug.LogError($" для {this.name} Не назначен префаб targetPointAttack в инспекторе!");
+            if (targetPointShield == null)
+                Debug.LogError($" для {this.name} Не назначен префаб targetPointShield в инспекторе!");
+            if (targetPointCounterattack == null)
+                Debug.LogError($" для {this.name} Не назначен префаб targetPointCounterattack в инспекторе!");
         }
-
     }
 }

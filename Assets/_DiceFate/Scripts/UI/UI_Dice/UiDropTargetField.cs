@@ -12,6 +12,8 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
     private List<UiDragAndDropDice> uiDiceOnField = new List<UiDragAndDropDice>(); // Список кубиков на поле
     private Dictionary<RectTransform, UiDragAndDropDice> uiOccupiedPoints = new Dictionary<RectTransform, UiDragAndDropDice>(); // Словарь занятых точек
 
+    private int numberDiceToDrop;
+
     void Start()
     {
         // Отключаем Image компонент самого поля (прозрачность)

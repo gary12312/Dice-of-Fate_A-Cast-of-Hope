@@ -22,6 +22,7 @@ namespace DiceFate.UI
         [SerializeField] private Button startDice;             // Фаза 1
 
         [Header("Фаза 2 настройки")]
+        [SerializeField] private TextMeshProUGUI numberDiceToDtop;
         [SerializeField] private Button keg;                   // Фаза 2
         [SerializeField] private GameObject diceOnTable;       // Фаза 2
         [SerializeField] private GameObject iBackgroundOffClicker;       // Фаза 2
@@ -176,7 +177,7 @@ namespace DiceFate.UI
         }
         public void UiShowPhaseOnePlayer()
         {
-            uiDiceTargetResult.UpdateResultDisplay();
+            uiDiceTargetResult.UpdateTextUiDisplay();
             SetUiPlayerCard(true, false, true, true, false, true);
         }
         public void UiShowPhaseTwoPlayer()
@@ -189,7 +190,7 @@ namespace DiceFate.UI
             iBackgroundOffClicker.SetActive(false);
             SetUiPlayerCard(true, false, false, false, true, true);
         }
-        public void UiShowPhaseFourPlayer() => SetUiPlayerCard(true, false, false, false, false, true);
+        public void UiShowPhaseFourPlayer() => SetUiPlayerCard(true, false, false, false, true, true);
         public void UiShowPhaseFivePlayer() => SetUiPlayerCard(false, false, false, false, false, false);
 
 

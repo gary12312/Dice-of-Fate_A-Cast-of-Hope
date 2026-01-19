@@ -21,6 +21,8 @@ namespace DiceFate
         // 7 - процесс атаки
         // 8 - контрудар противника
 
+        // Прогрессия игрока
+        public static int numberDiceToDrop = 1;
 
         // Значения последних брошенных кубиков игрока на поле
         public static int diceMovement;
@@ -49,7 +51,7 @@ namespace DiceFate
 
         // Характкристики Юнита (для временного хранения) для UI_Mane
         public static string currentUser; // Player, Enemy, Other
-        public static string nameUnit;
+        public static string nameUnit; 
         public static int moveUser;
         public static int attackUser;
         public static int shildUser;
