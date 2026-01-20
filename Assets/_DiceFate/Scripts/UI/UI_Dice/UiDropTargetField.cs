@@ -12,20 +12,22 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
     [SerializeField] public GameObject fieldOutline; // Ссылка на объект с контуром поля
     [SerializeField] private TextMeshProUGUI textNumberDiceToDrop;
     [Space]
-    [SerializeField] public GameObject diceMove; 
-    [SerializeField] public GameObject diceAttack; 
-    [SerializeField] public GameObject diceShield; 
-    [SerializeField] public GameObject diceConterAttack; 
+    [SerializeField] public GameObject diceMove;
+    [SerializeField] public GameObject diceAttack;
+    [SerializeField] public GameObject diceShield;
+    [SerializeField] public GameObject diceConterAttack;
 
 
 
 
 
     private bool isPointerOver = false; // Флаг, указывающий что курсор над полем
+
     private List<UiDragAndDropDice> uiDiceOnField = new List<UiDragAndDropDice>(); // Список кубиков на поле
     private Dictionary<RectTransform, UiDragAndDropDice> uiOccupiedPoints = new Dictionary<RectTransform, UiDragAndDropDice>(); // Словарь занятых точек
 
     private int numberDiceToDrop;
+    private bool isThisobjectActive;
 
     void Start()
     {
@@ -63,14 +65,25 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         numberDiceToDrop = GameStats.numberDiceToDrop;
     }
 
-    private void FixedUpdate()
+    private void OnEnable()
     {
-     
+        isThisobjectActive = true;
+        textNumberDiceToDrop.text = numberDiceToDrop.ToString();
+
+        if (diceMove != null) diceMove.SetActive(true);
+        if (diceAttack != null) diceAttack.SetActive(true);
+        if (diceShield != null) diceShield.SetActive(true);
+        if (diceConterAttack != null) diceConterAttack.SetActive(true);
     }
 
-    private IEnumerator NumberDiceToDropToActivation() // Метод для активации/деактивации кубиков в UI в зависимости от количества кубиков на поле
+    private void OnDisable()
     {
-        yield return new WaitForSeconds(0.1f); // Небольшая задержка для стабильности
+        isThisobjectActive = false;
+    }
+
+    private void NumberDiceToDropToActivation() // Метод для активации/деактивации кубиков в UI в зависимости от количества кубиков на поле
+    {
+        if (!isThisobjectActive) return;
 
         // Получаем актуальный список имен кубиков на поле
         List<string> diceNamesOnField = GetDiceNamesOnField();
@@ -79,25 +92,10 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         if (uiDiceOnField.Count >= numberDiceToDrop)
         {
             // Определяем, какие кубики отсутствуют на поле и отключаем их
-            if (!diceNamesOnField.Contains("Movement") )
-            {
-                diceMove.SetActive(false);
-            }
-
-            if (!diceNamesOnField.Contains("Attack") )
-            {
-                diceAttack.SetActive(false);
-            }
-
-            if (!diceNamesOnField.Contains("Shield") ) 
-            {
-                diceShield.SetActive(false);
-            }
-
-            if (!diceNamesOnField.Contains("Counterattack"))
-            {
-                diceConterAttack.SetActive(false);
-            }
+            if (!diceNamesOnField.Contains("Movement")) diceMove.SetActive(false);
+            if (!diceNamesOnField.Contains("Attack")) diceAttack.SetActive(false);   
+            if (!diceNamesOnField.Contains("Shield")) diceShield.SetActive(false);
+            if (!diceNamesOnField.Contains("Counterattack")) diceConterAttack.SetActive(false);        
         }
         else
         {
@@ -109,13 +107,8 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         }
 
         int TextNumberDiceToDrop = numberDiceToDrop - uiDiceOnField.Count;
-
         textNumberDiceToDrop.text = TextNumberDiceToDrop.ToString();
     }
-
-
-
-
 
     // Вызывается когда объект отпускают над этим полем
     public void OnDrop(PointerEventData eventData)
@@ -139,7 +132,7 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
             }
         }
 
-       // StartCoroutine(NumberDiceToDropToActivation());
+        // StartCoroutine(NumberDiceToDropToActivation());
     }
 
     // Вызывается когда курсор входит в область поля
@@ -239,7 +232,7 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
             }
         }
 
-        StartCoroutine(NumberDiceToDropToActivation());
+        NumberDiceToDropToActivation();
     }
 
     // Метод для освобождения точки, когда кубик убран
@@ -274,8 +267,6 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         {
             uiDiceOnField.Remove(dice);
         }
-
-        StartCoroutine(NumberDiceToDropToActivation());
     }
 
     // Метод для получения списка свободных точек
@@ -319,7 +310,7 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         return occupied;
     }
 
-    
+
     // Метод для получения позиции точки по номеру
     public Vector2 GetPointPosition(int pointNumber)
     {
@@ -418,6 +409,7 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
 
         Debug.Log($"Кубик {dice.GetDiceName()} удален из поля");
 
+        NumberDiceToDropToActivation();
     }
 
     // Метод для проверки наличия конкретного типа кубика на поле
@@ -512,11 +504,5 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         CleanOccupiedPoints();
 
         Debug.Log("Поле полностью очищено. Все кубики возвращены на стартовые позиции.");
-
-        StartCoroutine(NumberDiceToDropToActivation());
     }
-
-
-
-
 }

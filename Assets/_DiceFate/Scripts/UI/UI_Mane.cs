@@ -23,7 +23,7 @@ namespace DiceFate.UI
 
         [Header("Фаза 2 настройки")]
         [SerializeField] private TextMeshProUGUI numberDiceToDtop;
-        [SerializeField] private Button keg;                   // Фаза 2
+       // [SerializeField] private Button keg;                   // Фаза 2
         [SerializeField] private GameObject diceOnTable;       // Фаза 2
         [SerializeField] private GameObject iBackgroundOffClicker;       // Фаза 2
 
@@ -109,8 +109,9 @@ namespace DiceFate.UI
         {
             testNameEnemy.text = GameStats.currentUser;
             testPhase.text = $"Текущая фаза {GameStats.currentPhasePlayer}";
-
         }
+
+        
 
         // Показываем в UI какие кубики были брошены
         //public void UiEnableResultDisplay()

@@ -339,6 +339,8 @@ namespace DiceFate.Maine
                     Debug.Log($"Создано {kvp.Value} кубика(ов) типа {kvp.Key}");
                 }
             }
+
+            uiDropTargetField.ResetAllDiceAndClearField(); // Сбросить все кубики с поля после создания
         }
         // Метод для создания кубиков определенного типа
         private void CreateDiceByType(UiDragAndDropDice.DiceType diceType, int count)

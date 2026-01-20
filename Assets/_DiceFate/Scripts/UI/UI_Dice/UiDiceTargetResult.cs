@@ -53,6 +53,7 @@ namespace DiceFate.UI_Dice
 
         private bool isDiceReady = false;
         private Sequence _sequenceAnimation;
+        private int countedCreatedDice = 0;
 
         private List<DiceCube> diceCubes = new List<DiceCube>();
         private Dictionary<string, int> diceResultsDict = new Dictionary<string, int>()
@@ -102,7 +103,7 @@ namespace DiceFate.UI_Dice
             diceCubes.Add(dice);
 
             // Создаём UI-элемент для этого кубика           
-            CreateUiResultInPointForDice(dice);
+            CreateUiResultInPointForDice(dice);        
         }
 
 
@@ -171,7 +172,7 @@ namespace DiceFate.UI_Dice
             RectTransform rectTransform = uiInstance.GetComponent<RectTransform>();
             if (rectTransform == null) { return; }
 
-            SaveResultDiceToGameStats(dice.diceType.ToString(), currentValue);          
+            SaveResultDiceToGameStats(dice.diceType.ToString(), currentValue);
 
             StartCoroutine(AnimateResultDice(particals, rectTransform, targetPoint, dice.diceType.ToString(), uiInstance));
         }
@@ -192,13 +193,26 @@ namespace DiceFate.UI_Dice
         private void UpdateTextRunManeGrid(string diceType, UIParticalArrey partical, RectTransform targetPoint, GameObject uiInstance)
         {
             ActiveParticalSystem(partical, secondPS, targetPoint);
-            
+
             UpdateUnitValueGameStats(diceType);
             UpdateTextUiDisplay();
 
             Destroy(uiInstance);
 
-            if (diceType == "Movement") mane.MovementAndGridEnable();
+            countedCreatedDice++;
+
+            ReadyAndGoNextPhase();
+        }
+
+        private void ReadyAndGoNextPhase()
+        {
+            if (countedCreatedDice >= diceCubes.Count)
+            {
+                mane.MovementAndGridEnable();
+                countedCreatedDice = 0;
+                diceCubes.Clear();
+                isDiceReady = false;
+            }
         }
 
         public void ActiveParticalSystem(UIParticalArrey partical, int index, RectTransform rectTransform)
@@ -242,7 +256,7 @@ namespace DiceFate.UI_Dice
                     GameStats.conterAttackUser += GameStats.diceCounterattack;
                     break;
             }
-        }        
+        }
 
 
         public void SaveResultsDiseToGameStats()

@@ -4542,7 +4542,6 @@ MonoBehaviour:
   textDiceValue: {fileID: 1863237220}
   startDice: {fileID: 2129825221}
   numberDiceToDtop: {fileID: 0}
-  keg: {fileID: 1533329847}
   diceOnTable: {fileID: 1000526732}
   iBackgroundOffClicker: {fileID: 1883965028}
   textDiceMovement: {fileID: 1866777979}
@@ -16162,6 +16161,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7439252974730508375, guid: f5687dd8b3a9dec4b98723c6a152c411, type: 3}
+      propertyPath: UnitSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 71e69e891f73af246b816a40eb144673, type: 2}
     - target: {fileID: 7439252974730508375, guid: f5687dd8b3a9dec4b98723c6a152c411, type: 3}
       propertyPath: avatarPrefab
       value: 

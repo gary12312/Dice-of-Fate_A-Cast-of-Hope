@@ -29,7 +29,7 @@ namespace DiceFate.Units
         protected override void ProtectedBeforeToAttack()
         {
             base.ProtectedBeforeToAttack();
-            StartCoroutine(EmemySpawnDice());
+            StartCoroutine(EmemySpawnDice()); 
         }
 
         private IEnumerator EmemySpawnDice()
