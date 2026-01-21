@@ -146,6 +146,7 @@ namespace DiceFate.Player
 
         private void LeftClick()
         {
+            if (!G.isCanLeftClick) { return; }
 
             switch (GameStats.currentPhasePlayer)
             {
@@ -523,8 +524,7 @@ namespace DiceFate.Player
 
         public void ShakeDiceIsMouseDown()
         {
-            // 
-
+            
             GetPointOnPlaneFromMouse();
 
             // Если это первый вызов, сохраняем начальную позицию

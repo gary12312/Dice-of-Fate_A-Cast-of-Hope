@@ -148,6 +148,7 @@ namespace DiceFate.Units
 
         public void MoveTo(Vector3 position)
         {
+
             // Используем позицию из системы круговой сетки
             Vector3 targetPosition = gridSystem.GetCircularGridPosition(position);
 
@@ -237,6 +238,7 @@ namespace DiceFate.Units
                 return;
             }
 
+
             // Вычисляем дистанцию перемещения
             float distance = Vector3.Distance(transform.position, targetPosition);
 
@@ -255,6 +257,8 @@ namespace DiceFate.Units
                 // Вычисляем поворот только вокруг оси Y
                 targetRotation = GetYRotationOnly(direction);
             }
+
+            G.isCanLeftClick = false;
 
             // Запускаем соответствующую корутину в зависимости от режима
             if (useJumpMode)
@@ -464,6 +468,7 @@ namespace DiceFate.Units
 
             Debug.Log("Прыжок завершен");
             isMoving = false;
+            G.isCanLeftClick = true;
         }
 
         // Метод для принудительного поворота в указанную сторону (только Y)
