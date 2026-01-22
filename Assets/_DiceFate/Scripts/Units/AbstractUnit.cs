@@ -1,5 +1,6 @@
 using DiceFate.EventBus;
 using DiceFate.Events;
+using DiceFate.Player;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -147,6 +148,7 @@ namespace DiceFate.Units
             }
             else
             {
+                Outline?.DisableOutline();
                 Die();
             }
         }
@@ -178,7 +180,8 @@ namespace DiceFate.Units
 
         //-------------- Основные методы --------------
 
-        public void Die() => Destroy(gameObject);
+        public void Die() => Destroy(gameObject);       
+
         private void RecValueInGameStaticForUIMane()
         {
             GameStats.currentUser = unitType;

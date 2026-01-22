@@ -146,7 +146,7 @@ namespace DiceFate.Player
 
         private void LeftClick()
         {
-            if (!G.isCanLeftClick) { return; }
+            if (!G.isLeftClickBlock) { return; }
 
             switch (GameStats.currentPhasePlayer)
             {

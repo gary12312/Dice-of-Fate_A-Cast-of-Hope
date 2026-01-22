@@ -438,10 +438,12 @@ namespace DiceFate.Maine
             //    return;
             Phase(4);
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока пока кубики не остановятся
+            G.isLeftClickBlock = false;
 
             uiMane.UiShowPhaseFourPlayer();
             uiMane.UiClearAllDiceOnField(); // Очистить список кубиков на платке
             uiMane.TestingListToDiceTargetResult();
+
 
 
             //Получаем значение кубиков на столе            
@@ -463,6 +465,7 @@ namespace DiceFate.Maine
 
             Bus<OnMovmentValueEvent>.Raise(new OnMovmentValueEvent(movementDiceCount));
             Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
+            G.isLeftClickBlock = true;
         }
 
         private IEnumerator PhaseFourCoroutine()

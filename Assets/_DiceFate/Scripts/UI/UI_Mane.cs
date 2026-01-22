@@ -52,6 +52,7 @@ namespace DiceFate.UI
 
         [Header("Доп")]
         [SerializeField] private UI_Mane_Battle uI_Mane_Battle;
+      //  [SerializeField] private UI_BlockOnClick uI_BlockOnClick;
 
 
 
@@ -283,6 +284,9 @@ namespace DiceFate.UI
                 Debug.LogError($" для {this.name} Не установлена ссылка на uI_Mane_Battle!");
             if (iBackgroundOffClicker == null)
                 Debug.LogError($" для {this.name} Не установлена ссылка на iBackgroundOffClicker!");
+            //if (uI_BlockOnClick == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на uI_BlockOnClick!");
+
         }
     }
 }

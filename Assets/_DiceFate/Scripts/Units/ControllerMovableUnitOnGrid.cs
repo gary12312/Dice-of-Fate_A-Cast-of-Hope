@@ -258,7 +258,7 @@ namespace DiceFate.Units
                 targetRotation = GetYRotationOnly(direction);
             }
 
-            G.isCanLeftClick = false;
+            G.isLeftClickBlock = false;
 
             // Запускаем соответствующую корутину в зависимости от режима
             if (useJumpMode)
@@ -389,6 +389,7 @@ namespace DiceFate.Units
 
             Debug.Log("Плавное перемещение завершено");
             isMoving = false;
+            G.isLeftClickBlock = true;
         }
 
         // Корутин для прыжка в указанную позицию
@@ -468,7 +469,7 @@ namespace DiceFate.Units
 
             Debug.Log("Прыжок завершен");
             isMoving = false;
-            G.isCanLeftClick = true;
+            G.isLeftClickBlock = true;
         }
 
         // Метод для принудительного поворота в указанную сторону (только Y)
