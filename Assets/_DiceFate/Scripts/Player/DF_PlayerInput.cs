@@ -50,12 +50,12 @@ namespace DiceFate.Player
 
         // Дополнительные параметры для управления камерой
         [Header("Настройки движения камеры")]
-        [SerializeField] private float cameraMoveSpeedX = 6f; // Скорость движения камеры
-        [SerializeField] private float cameraMoveSpeedY = 3f; // Скорость движения камеры
-        [SerializeField] private float cameraRotationSpeed = 2f; // Скорость вращения камеры
-                                                                 //[SerializeField] private float cameraZoomSpeed = 10f; // Скорость зума камеры
-                                                                 //[SerializeField] private float minZoomDistance = 2f; // Минимальное расстояние зума
-                                                                 //[SerializeField] private float maxZoomDistance = 20f; // Максимальное расстояние зума
+        [SerializeField] private float cameraMoveSpeedX = 2.1f; // Скорость движения камеры
+        [SerializeField] private float cameraMoveSpeedY = 4f; // Скорость движения камеры
+        [SerializeField] private float cameraRotationSpeed = 10f; // Скорость вращения камеры
+                                                                  //[SerializeField] private float cameraZoomSpeed = 10f; // Скорость зума камеры
+                                                                  //[SerializeField] private float minZoomDistance = 2f; // Минимальное расстояние зума
+                                                                  //[SerializeField] private float maxZoomDistance = 20f; // Максимальное расстояние зума
 
         //  private bool isCameraMoving = false; // Флаг движения камеры
 
@@ -141,7 +141,17 @@ namespace DiceFate.Player
 
         private void RightClickAndHold()
         {
-            if (Mouse.current.rightButton.isPressed) { MoveCamera(); }
+            if (cameraTarget == null) return;
+
+            if (Mouse.current.rightButton.isPressed)
+            {
+                MoveCamera();
+            }
+            else
+            {
+                // Останавливаем камеру при отпускании кнопки
+                cameraTarget.linearVelocity = Vector3.zero;
+            }
         }
 
         private void LeftClick()
@@ -381,24 +391,25 @@ namespace DiceFate.Player
 
 
         //---------------------------------- Функции Перемещение и вращение камеры  ----------------------------------
-
-        // Перемещение камеры за счет перемещения цели камеры ( cameraTarget )
+           
         private void MoveCamera()
         {
-            mouseDelta = Mouse.current.delta.ReadValue();                    // Получаем изменение положения мыши
-            float deltaX = mouseDelta.x * cameraMoveSpeedX * Time.deltaTime; // сколсть по X
-            float deltaY = mouseDelta.y * cameraMoveSpeedY * Time.deltaTime; // сколсть по Y
+            mouseDelta = Mouse.current.delta.ReadValue();                     // Получаем изменение положения мыши
+            float deltaX = -mouseDelta.x * cameraMoveSpeedX * Time.deltaTime; // сколсть по X  Инвертируем
+            float deltaY = -mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;
 
-            if (cameraTarget != null)
-            {
-                Vector3 moveDirection = new Vector3(-deltaX, 0, -deltaY);           // Вычисляем направление движения на основе положения мыши
+            if (camera == null) return;
 
-                moveDirection = camera.transform.TransformDirection(moveDirection); // Преобразуем направление в мировые координаты
-                moveDirection.y = 0;                                                // Игнорируем движение по Y
+            // Получаем направления камеры и игнорируем вертикальную ось
+            Vector3 moveDirection =
+                camera.transform.right * deltaX + 
+                camera.transform.forward * deltaY; // Вычисляем направление движения на основе положения мыши
+            moveDirection.y = 0;
 
-                cameraTarget.MovePosition(cameraTarget.position + moveDirection);   // Применяем движение к цели камеры
-            }
+            cameraTarget.linearVelocity = moveDirection; // Применяем движение к цели камеры
         }
+
+
 
         // Вращение камеры за счет вращения цели камеры ( cameraTarget )
         private void RotationCamera()
@@ -524,7 +535,7 @@ namespace DiceFate.Player
 
         public void ShakeDiceIsMouseDown()
         {
-            
+
             GetPointOnPlaneFromMouse();
 
             // Если это первый вызов, сохраняем начальную позицию
