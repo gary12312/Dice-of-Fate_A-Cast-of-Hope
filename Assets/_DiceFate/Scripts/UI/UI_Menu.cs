@@ -3,7 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Добавляем для работы со сценами
+using UnityEngine.SceneManagement;
 
 public class UI_Menu : MonoBehaviour
 {
@@ -15,6 +15,8 @@ public class UI_Menu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI tNewGame;
     [SerializeField] private TextMeshProUGUI tСontinueGame;
     [SerializeField] private TextMeshProUGUI tSettingsGame;
+    [SerializeField] private GameObject settings;
+    [SerializeField] private CanvasGroup settingsCanvasGroup;
 
     [Header("Временные задержки")]
     [SerializeField] private float dilayOpenButton = 1f;
@@ -40,22 +42,27 @@ public class UI_Menu : MonoBehaviour
     private Sequence sequenceAnimationNewGame;
     private Sequence sequenceAnimationСontinueGame;
     private Sequence sequenceAnimationSettingsGame;
+    private Sequence sequenceAnimationSettings;
 
-    private bool isReloadEnabled = true; // Флаг для включения/отключения перезагрузки
-    private bool canReloadScene = false; // Флаг, разрешающий перезагрузку
+    private bool isReloadEnabled = true;
+    private bool canReloadScene = false;
+    private Vector3 settingsInitialPosition;
+    private bool isSettingsActive = false;
 
-   
     private void Start()
     {
         ValidateScriptsAndObject();
 
-        //tNewGame.alpha = 0f;
-        //tСontinueGame.alpha = 0f;
-        //tSettingsGame.alpha = 0f; 
+        // Сохраняем начальную позицию настроек
+        settingsInitialPosition = settings.transform.position;
 
-        IsActiveButton(false); // Сначала скрываем кнопки
-
+        // Скрываем все элементы UI в начале
+        IsHideButtonOnStart();
         canvasGroupFirst.alpha = 0;
+
+        // Настройка настроек
+        settingsCanvasGroup.alpha = 0;
+        settings.SetActive(false);
 
         // Подписываемся на события кнопок
         newGame.onClick.AddListener(NewGame);
@@ -71,7 +78,6 @@ public class UI_Menu : MonoBehaviour
 
     private void Update()
     {
-        // Проверяем нажатие клавиши R для перезагрузки сцены
         if (canReloadScene && isReloadEnabled && Input.GetKeyDown(KeyCode.R))
         {
             ReloadCurrentScene();
@@ -92,7 +98,6 @@ public class UI_Menu : MonoBehaviour
 
         // 3. Появление кнопок меню
         yield return new WaitForSeconds(dilayOpenButton);
-       // IsActiveButton(true);
 
         // Разрешаем перезагрузку сцены после появления меню
         canReloadScene = true;
@@ -132,23 +137,25 @@ public class UI_Menu : MonoBehaviour
         ButtonAnimationInOut(tSettingsGame, ref sequenceAnimationSettingsGame, "In");
     }
 
+    private void IsHideButtonOnStart() => IsActiveObject(false, false, false, false);
+    private void IsActiveSettings() => IsActiveObject(false, false, false, true);
+    private void IsActiveManeMenuButton() => IsActiveObject(true, true, true, false);
 
-
-    private void IsActiveButton(bool isActive)
+    private void IsActiveObject(bool isNewGame, bool isContinueGame, bool isSettingsGame, bool issettings)
     {
-        newGame.gameObject.SetActive(isActive);
-        continueGame.gameObject.SetActive(isActive);
-        settingsGame.gameObject.SetActive(isActive);
-        back.gameObject.SetActive(false); // Кнопка "Назад" всегда скрыта в меню     
+        newGame.gameObject.SetActive(isNewGame);
+        continueGame.gameObject.SetActive(isContinueGame);
+        settingsGame.gameObject.SetActive(isSettingsGame);
+        //back.gameObject.SetActive(isback);
+        settings.SetActive(issettings);
     }
 
-    // Обработчики нажатий кнопок
+    // -------------------------  Обработчики нажатий кнопок ----------------------------------
     private void NewGame()
     {
         StartCoroutine(ButtonAnimationRun("Out", () =>
         {
-            Debug.Log("Начата новая игра!");
-            // Здесь добавьте логику запуска новой игры
+            Debug.Log("Начата новая игра!");           
         }));
     }
 
@@ -156,93 +163,95 @@ public class UI_Menu : MonoBehaviour
     {
         StartCoroutine(ButtonAnimationRun("Out", () =>
         {
-            Debug.Log("Продолжение игры!");
-            // Здесь добавьте логику продолжения игры
+            Debug.Log("Продолжение игры!");           
         }));
     }
 
     private void SettingsGame()
     {
-        StartCoroutine(ButtonAnimationRun("Out", () =>
-        {
-            Debug.Log("Открыты настройки!");
-            // Здесь добавьте логику открытия настроек
-            ShowBackButton();
-        }));
+        StartCoroutine(ButtonAnimationRun("Out", () => ShowSettingsPanel()));
     }
 
     private void Back()
     {
-        // Анимация возврата кнопок
-        StartCoroutine(AnimateButtonsIn());
-        HideBackButton();
-    }
-
-    /// <summary>
-    /// Перезагружает текущую сцену
-    /// </summary>
-    private void ReloadCurrentScene()
-    {
-        Debug.Log("Перезагрузка сцены по нажатию R...");
-
-        // Временно блокируем перезагрузку
-        isReloadEnabled = false;
-
-        // Анимация перед перезагрузкой (опционально)
-        StartCoroutine(ButtonAnimationRun("Out", () =>
+       
+            Debug.Log($"Для Back!");
+        if (isSettingsActive)
         {
-            // Получаем индекс текущей сцены
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-
-            // Загружаем текущую сцену заново
-            SceneManager.LoadScene(currentSceneIndex);
-        }));
+            HideSettingsPanel();
+        }
+        else
+        {
+            // Если нужно вернуться к меню
+            StartCoroutine(AnimateButtonsIn());
+            IsActiveManeMenuButton();
+        }
     }
 
-    /// <summary>
-    /// Включает или отключает возможность перезагрузки сцены
-    /// </summary>
-    public void SetReloadEnabled(bool enabled)
+    private void ShowSettingsPanel()
     {
-        isReloadEnabled = enabled;
+        isSettingsActive = true;
+
+        IsActiveSettings();     
+
+        settingsCanvasGroup.alpha = 0;
+
+        // Начальная позиция за пределами экрана (слева)
+        Vector3 startPos = settings.transform.position;
+        Vector3 targetPos = startPos;
+        startPos.x -= 300; // Смещение справа
+
+        settings.transform.position = startPos;
+
+        // Анимация
+        Sequence settingsSequence = DOTween.Sequence();
+        settingsSequence
+            .Append(settings.transform.DOMoveX(targetPos.x, 0.3f))
+            .Join(settingsCanvasGroup.DOFade(1, 0.2f))
+            .OnComplete(() =>
+            {
+                unClicker.SetActive(false); // Разблокируем клики
+            })
+            .Play();
     }
 
-    /// <summary>
-    /// Включает возможность перезагрузки сцены
-    /// </summary>
-    public void EnableReload()
+    private void HideSettingsPanel()
     {
-        isReloadEnabled = true;
+        unClicker.SetActive(true); // Блокируем клики во время анимации
+
+        // Анимация скрытия панели настроек
+        Vector3 startPos = settings.transform.position;
+        Vector3 targetPos = startPos;
+        targetPos.x += 300; // Смещение вправо для скрытия
+
+        Sequence settingsSequence = DOTween.Sequence();
+        settingsSequence
+            .Append(settings.transform.DOMoveX(targetPos.x, 0.3f)) 
+            .Join(settingsCanvasGroup.DOFade(0, 0.2f))
+            .OnComplete(() =>
+            {
+                // Скрываем панель настроек
+                settings.SetActive(false);
+                settings.transform.position = settingsInitialPosition; // Возвращаем на начальную позицию
+
+                // Показываем кнопки меню с анимацией
+                ShowMenuButtons();
+                isSettingsActive = false;
+            })
+            .Play();
     }
 
-    /// <summary>
-    /// Отключает возможность перезагрузки сцены
-    /// </summary>
-    public void DisableReload()
-    {
-        isReloadEnabled = false;
-    }
+    private void ShowMenuButtons()
+    {  
+        IsActiveManeMenuButton();       
+        StartCoroutine(AnimateButtonsIn());
 
-    private void ShowBackButton()
-    {
-        back.gameObject.SetActive(true);
-        newGame.gameObject.SetActive(false);
-        continueGame.gameObject.SetActive(false);
-        settingsGame.gameObject.SetActive(false);
-    }
-
-    private void HideBackButton()
-    {
-        back.gameObject.SetActive(false);
-        newGame.gameObject.SetActive(true);
-        continueGame.gameObject.SetActive(true);
-        settingsGame.gameObject.SetActive(true);
-    }
+        unClicker.SetActive(false);
+    }    
 
     private IEnumerator ButtonAnimationRun(string direction, System.Action onComplete = null)
     {
-        // Блокируем кнопки во время анимации
-        unClicker.SetActive(true); // Включаем блокировку кликов
+        unClicker.SetActive(true);
 
         ButtonAnimationInOut(tNewGame, ref sequenceAnimationNewGame, direction);
         yield return new WaitForSeconds(dilayAnimButton);
@@ -251,45 +260,42 @@ public class UI_Menu : MonoBehaviour
         yield return new WaitForSeconds(dilayAnimButton);
 
         ButtonAnimationInOut(tSettingsGame, ref sequenceAnimationSettingsGame, direction);
-        yield return new WaitForSeconds(0.5f); // Ждем завершения анимации
+        yield return new WaitForSeconds(0.5f);
 
-        // Вызываем колбэк после завершения анимации
         onComplete?.Invoke();
 
-        // Разблокируем кнопки (если не переходим на другую сцену)
-        unClicker.SetActive(false);
+        // Разблокируем только если не открыты настройки
+        if (!isSettingsActive)
+        {
+            unClicker.SetActive(false);
+        }
     }
 
     private void ButtonAnimationInOut(TextMeshProUGUI textUI, ref Sequence sequenceAnimation, string direction)
     {
-        // Останавливаем предыдущую анимацию
         sequenceAnimation?.Kill();
-
-        // Создаем новую последовательность
         sequenceAnimation = DOTween.Sequence();
 
-        // Сбрасываем начальное состояние
         textUI.alpha = (direction == "Out") ? 1f : 0f;
         var startPos = textUI.transform.position;
 
         switch (direction)
         {
             case "Out":
-                // Анимация исчезновения
                 sequenceAnimation
                     .Append(textUI.DOFade(0, 0.2f))
                     .Join(textUI.transform.DOMoveX(startPos.x + 300, 0.3f))
                     .AppendCallback(() =>
                     {
-                        // Возвращаем на начальную позицию (невидимо)
                         textUI.transform.position = new Vector3(startPos.x - 300, startPos.y, startPos.z);
+                        textUI.gameObject.SetActive(false); // Скрываем кнопки после анимации
                     })
                     .Append(textUI.transform.DOMoveX(startPos.x, 0.3f))
                     .SetAutoKill(true);
                 break;
 
             case "In":
-                // Анимация появления
+                textUI.gameObject.SetActive(true); // Активируем кнопку
                 textUI.transform.position = new Vector3(startPos.x - 300, startPos.y, startPos.z);
                 sequenceAnimation
                     .Append(textUI.transform.DOMoveX(startPos.x, 0.3f))
@@ -301,13 +307,22 @@ public class UI_Menu : MonoBehaviour
         sequenceAnimation.Play();
     }
 
-    private void SetButtonsInteractable(bool isInteractable)
+        // Перезагружает текущую сцену
+    private void ReloadCurrentScene()
     {
-        newGame.interactable = isInteractable;
-        continueGame.interactable = isInteractable;
-        settingsGame.interactable = isInteractable;
-        back.interactable = isInteractable;
-    }
+        Debug.Log("Тестирование Перезагрузка сцены по нажатию R ");
+
+        isReloadEnabled = false;
+
+        StartCoroutine(ButtonAnimationRun("Out", () =>
+        {
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(currentSceneIndex);
+        }));
+    }    
+    public void SetReloadEnabled(bool enabled) => isReloadEnabled = enabled;  // Включает или отключает возможность перезагрузки сцены   
+    public void EnableReload() => isReloadEnabled = true;                     // Включает  возможность перезагрузки сцены
+    public void DisableReload() => isReloadEnabled = false;                   // Отключает возможность перезагрузки сцены
 
     private void ValidateScriptsAndObject()
     {
@@ -323,19 +338,22 @@ public class UI_Menu : MonoBehaviour
             Debug.LogError($"Для {this.name} не установлена ссылка на textSecond!");
         if (canvasGroupFirst == null)
             Debug.LogError($"Для {this.name} не установлена ссылка на canvasGroupFirst!");
+        if (settings == null)
+            Debug.LogError($"Для {this.name} не установлена ссылка на settings!");
+        if (settingsCanvasGroup == null && settings.GetComponent<CanvasGroup>() == null)
+            Debug.LogWarning($"Для {this.name} не установлена ссылка на settingsCanvasGroup! Пытаемся получить компонент автоматически.");  
     }
 
     private void OnDestroy()
     {
-        // Очищаем анимации при уничтожении объекта
         sequenceAnimationNewGame?.Kill();
         sequenceAnimationСontinueGame?.Kill();
         sequenceAnimationSettingsGame?.Kill();
+        sequenceAnimationSettings?.Kill();
 
-        // Отписываемся от событий
         newGame.onClick.RemoveListener(NewGame);
         continueGame.onClick.RemoveListener(ContinueGame);
         settingsGame.onClick.RemoveListener(SettingsGame);
         back.onClick.RemoveListener(Back);
     }
-}
+} 
