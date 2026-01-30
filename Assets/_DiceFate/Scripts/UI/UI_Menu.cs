@@ -174,8 +174,6 @@ public class UI_Menu : MonoBehaviour
 
     private void Back()
     {
-       
-            Debug.Log($"Для Back!");
         if (isSettingsActive)
         {
             HideSettingsPanel();
@@ -188,6 +186,7 @@ public class UI_Menu : MonoBehaviour
         }
     }
 
+    // ----------------------------- Анимации -----------------------------
     private void ShowSettingsPanel()
     {
         isSettingsActive = true;
@@ -260,7 +259,7 @@ public class UI_Menu : MonoBehaviour
         yield return new WaitForSeconds(dilayAnimButton);
 
         ButtonAnimationInOut(tSettingsGame, ref sequenceAnimationSettingsGame, direction);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
 
         onComplete?.Invoke();
 
