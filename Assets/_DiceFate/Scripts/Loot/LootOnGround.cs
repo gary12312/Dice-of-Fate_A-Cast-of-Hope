@@ -23,11 +23,11 @@ namespace DiceFate.Loot
 
 
         private void InitializationStart()
-        {                 
+        {
             Outline?.DisableOutline();                // 2. отключить Обводку          
         }
 
-     
+
         private void InitializationСheck()
         {
             if (lootTwinAnimation == null) { Debug.LogError($"Установить lootTwinAnimation для {this} "); }
@@ -53,17 +53,13 @@ namespace DiceFate.Loot
         public void OutlineOnSelected()
         {
             Outline?.EnableOutline();
-           // Outline?.ChangeColorOutline(UnitSO.colorSelected);
+            // Outline?.ChangeColorOutline(UnitSO.colorSelected);
         }
         public void OutlineOffSelected()
         {
-           // Outline?.ResetColorOutline();
+            // Outline?.ResetColorOutline();
             Outline?.DisableOutline();
         }
-
-
-
-
 
 
 
@@ -71,7 +67,10 @@ namespace DiceFate.Loot
         //-------------- ISelectable реализация --------------
         public void Select()
         {
-            lootTwinAnimation.OpenLootBox();
+            if (lootTwinAnimation != null)
+            {
+                lootTwinAnimation.OpenLoot();
+            }
         }
         public void Deselect()
         {

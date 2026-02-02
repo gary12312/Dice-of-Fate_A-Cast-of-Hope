@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace DiceFate.Maine
 {
-    public class Mane : MonoBehaviour
+    public class ManeTutorial : MonoBehaviour
     {
         [Header("Параметры игрока")]
         [SerializeField] private int numberDiceToDrop = 3;
@@ -21,6 +21,7 @@ namespace DiceFate.Maine
 
         [Header("Фаза 1 настройки")]
         [SerializeField] private GameObject unitMasterCard;
+        [SerializeField] private PrologScenario prologScenario;
         [SerializeField] private Button dice;
 
         [Header("Фаза 2 настройки")]
@@ -167,18 +168,7 @@ namespace DiceFate.Maine
             }
         }
 
-        // проверка установки скриптов  
-        private void ValidateScripts()
-        {
-            if (uiDropTargetField == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на DropTargetField!");
 
-            if (kegCylinderSystem == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на KegCylinderSystem!");
-
-            if (uiMane == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на UI_Mane!");
-        }
 
         private void SetSceneElementsVisible(bool isKegAndDice)
         {
@@ -257,8 +247,11 @@ namespace DiceFate.Maine
             //if (GameStats.currentUser != "Player")
             //    return;
 
-            Phase(1);
-            uiMane.UiShowPhaseOnePlayer();
+            if (prologScenario.prologNumber >= 4 || prologScenario.isTesting == false)
+            {
+                Phase(1);
+                uiMane.UiShowPhaseOnePlayer();
+            }
 
             //ShowPhaseOneUIElements();
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
@@ -438,7 +431,7 @@ namespace DiceFate.Maine
             //    return;
             Phase(4);
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока пока кубики не остановятся
-            G.isLeftClickBlock = true; //False
+            G.isLeftClickBlock = false;
 
             uiMane.UiShowPhaseFourPlayer();
             uiMane.UiClearAllDiceOnField(); // Очистить список кубиков на платке
@@ -465,7 +458,7 @@ namespace DiceFate.Maine
 
             Bus<OnMovmentValueEvent>.Raise(new OnMovmentValueEvent(movementDiceCount));
             Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
-            G.isLeftClickBlock = false; // true
+            G.isLeftClickBlock = true;
         }
 
         private IEnumerator PhaseFourCoroutine()
@@ -624,67 +617,17 @@ namespace DiceFate.Maine
         }
 
 
-        //// Метод для тестирования создания кубиков
-        //public void TestCreateDices()
-        //{
-        //    // Пример: создаем тестовый набор кубиков
-        //    Debug.Log("Тестовое создание кубиков...");
-
-        //    // Создаем по одному кубику каждого типа
-        //    CreateDiceByType(DragAndDropDice.DiceType.Movement, 1);
-        //    CreateDiceByType(DragAndDropDice.DiceType.Attack, 2);
-        //    CreateDiceByType(DragAndDropDice.DiceType.Shield, 1);
-        //    CreateDiceByType(DragAndDropDice.DiceType.Counterattack, 0);
-        //}
-
-        //// Метод для проверки правильности создания кубиков
-        //public void ValidateCreatedDices()
-        //{
-        //    int totalCreated = CountCreatedDices();
-        //    Debug.Log($"Всего создано кубиков: {totalCreated}");
-
-        //    // Подсчет по типам
-        //    int movementCount = CountDicesByType(DragAndDropDice.DiceType.Movement);
-        //    int attackCount = CountDicesByType(DragAndDropDice.DiceType.Attack);
-        //    int shieldCount = CountDicesByType(DragAndDropDice.DiceType.Shield);
-        //    int counterattackCount = CountDicesByType(DragAndDropDice.DiceType.Counterattack);
-
-        //    Debug.Log($"Создано Movement: {movementCount}");
-        //    Debug.Log($"Создано Attack: {attackCount}");
-        //    Debug.Log($"Создано Shield: {shieldCount}");
-        //    Debug.Log($"Создано Counterattack: {counterattackCount}");
-        //}
-
-        //private int CountCreatedDices()
-        //{
-        //    int count = 0;
-        //    count += spawnPointMovement?.childCount ?? 0;
-        //    count += spawnPointAttac?.childCount ?? 0;
-        //    count += spawnPointShield?.childCount ?? 0;
-        //    count += spawnPointCounterattack?.childCount ?? 0;
-        //    return count;
-        //}
-
-        //private int CountDicesByType(DragAndDropDice.DiceType diceType)
-        //{
-        //    Transform spawnPoint = null;
-        //    switch (diceType)
-        //    {
-        //        case DragAndDropDice.DiceType.Movement:
-        //            spawnPoint = spawnPointMovement;
-        //            break;
-        //        case DragAndDropDice.DiceType.Attack:
-        //            spawnPoint = spawnPointAttac;
-        //            break;
-        //        case DragAndDropDice.DiceType.Shield:
-        //            spawnPoint = spawnPointShield;
-        //            break;
-        //        case DragAndDropDice.DiceType.Counterattack:
-        //            spawnPoint = spawnPointCounterattack;
-        //            break;
-        //    }
-
-        //    return spawnPoint?.childCount ?? 0;
-        //}
+        // проверка установки скриптов  
+        private void ValidateScripts()
+        {
+            if (uiDropTargetField == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на DropTargetField!");
+            if (kegCylinderSystem == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на KegCylinderSystem!");
+            if (uiMane == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на UI_Mane!");
+            if (prologScenario == null)
+                Debug.LogError($" для {this.name} Не установлена ссылка на prologScenario!");
+        }
     }
 }

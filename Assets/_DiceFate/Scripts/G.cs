@@ -7,7 +7,7 @@ namespace DiceFate
     public class G : MonoBehaviour
     {
         public static bool isGamePaused = false;
-        public static bool isLeftClickBlock = true;
+        public static bool isLeftClickBlock = false;
 
 
         public void PauseGame()

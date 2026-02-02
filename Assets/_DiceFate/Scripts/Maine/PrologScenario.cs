@@ -9,7 +9,7 @@ namespace DiceFate.Maine
         [Header("Camera Settings")]
         [SerializeField] private GameObject cameraMain;
         [SerializeField] private GameObject cameraVirtualOne;
-        [SerializeField] private bool isTesting;
+        [SerializeField] public bool isTesting;
 
         [Header("Настройки движения камеры")]       // Дополнительные параметры для управления камерой
         [SerializeField] private new Camera camera;
@@ -31,21 +31,23 @@ namespace DiceFate.Maine
 
         [Header("Objects")]
         [SerializeField] private GameObject canvas;
+        [SerializeField] private GameObject canvasBattle;
+        [SerializeField] private GameObject CanvasScenario;
         [SerializeField] private GameObject playerInput;
+        [SerializeField] private GameObject cold;
         [SerializeField] private GameObject[] texts;
         // 0 - Text 1
         // 1 - Text 2
         // 2 - Text 3
 
-
+        [Header("Five")]
+        [SerializeField] private GameObject cursor;
 
 
         private CanvasGroup currentCanvasGroup;
         private Vector2 mouseDelta;            // Изменение положения мыши
-        private bool ifPrologInput = true;
-
-        private bool isFerstPressMiddleButton = true;
-
+        public int prologNumber = 0;  // 1- часть.
+        private bool isColdActive = false;
 
 
         private void Awake()
@@ -55,62 +57,91 @@ namespace DiceFate.Maine
                 cameraMain.SetActive(false);
                 cameraVirtualOne.SetActive(true);
             }
+            else
+            {
+                cameraMain.SetActive(true);
+                cameraVirtualOne.SetActive(false);
+            }
 
             HideMouseAndPartical();
         }
 
         private void Start()
         {
+            PrologOneBegin();
+        }
+
+        private void Update()
+        {
+            switch (prologNumber)
+            {
+                case 1:
+                    RightClickAndHold();   // Обработка правого клика (перемещение)
+                    break;
+                case 2:
+                    MiddleClickAndHold();  // Обработка центрального клика (поворот)
+                    break;
+            }
+        }
+
+        private void PrologOneBegin()
+        {
             SetActiveAllObjectsOff(texts);
-            canvas.SetActive(false);
-            playerInput.SetActive(false);
+           // canvas.SetActive(false);
+            canvasBattle.SetActive(false);
+            cursor.SetActive(false);
+
+            //prologNumber = 1;
 
             if (isTesting)
             {
+                cold.SetActive(false);
+                playerInput.SetActive(false);
                 StartCoroutine(ScenarioOne());
             }
         }
 
 
-        private void Update()
-        {
-            if (ifPrologInput)
-            {
-                MiddleClickAndHold();  // Обработка центрального клика (поворот)
-                RightClickAndHold();   // Обработка правого клика (перемещение)
-            }
-
-        }
-
         //---------------------------------- Клики мышы  -------------------------------------------------------------
-        private void MiddleClickAndHold()
-        {
-            if (Mouse.current.middleButton.isPressed) { RotationCamera(); }
-            if (Mouse.current.middleButton.wasReleasedThisFrame && isFerstPressMiddleButton)
-            {
-
-                isFerstPressMiddleButton = false;
-                StartCoroutine(ScenarioTwo());
-            }
-        }
-
         private void RightClickAndHold()
         {
-            if (cameraTarget == null) return;
+            if (isTesting)
+            {
+                if (cameraTarget == null) return;
 
-            if (Mouse.current.rightButton.isPressed)
-            {
-                MoveCamera();
-            }
-            else
-            {
-                // Останавливаем камеру при отпускании кнопки
-                cameraTarget.linearVelocity = Vector3.zero;
+                if (Mouse.current.rightButton.isPressed)
+                {
+                    MoveCamera();
+                }
+                else
+                {
+                    // Останавливаем камеру при отпускании кнопки
+                    cameraTarget.linearVelocity = Vector3.zero;
+                }
+
+                if (Mouse.current.rightButton.wasReleasedThisFrame)
+                {
+                    //StartCoroutine(ScenarioThree());
+                    StartCoroutine(ScenarioTwo());
+                }
             }
         }
 
-        // -------------------------------- обучение Мышь ------------------------------------
+        private void MiddleClickAndHold()
+        {
+            if (isTesting)
+            {
+                if (Mouse.current.middleButton.isPressed) { RotationCamera(); }
+                if (Mouse.current.middleButton.wasReleasedThisFrame)
+                {
+                    //  StartCoroutine(ScenarioTwo());
+                    StartCoroutine(ScenarioThree());
+                }
+            }
+        }
 
+
+        // -------------------------------- обучение Мышь ------------------------------------
         private void HideMouseAndPartical()
         {
             psMouse_M.gameObject.SetActive(false);
@@ -171,9 +202,9 @@ namespace DiceFate.Maine
 
                 cameraTarget.rotation = newRotation;                            // Применяем вращение к cameraTarget
             }
+
+            ActiveCold();
         }
-
-
 
         // --------------------------- Сценарии ----------------------------
         private IEnumerator ScenarioOne()
@@ -184,36 +215,78 @@ namespace DiceFate.Maine
 
             yield return new WaitForSeconds(1.5f);
 
-            // Первый текст - появляется
+            // Первый текст 
             ShowObject(0);
             FadeTextIn();
 
-            yield return new WaitForSeconds(2f);
-            ShowMouse(mouse_M);
-
-            //yield return new WaitForSeconds(2f);
-            //FadeTextOut();          
+            yield return new WaitForSeconds(2f);      
+            ShowMouse(mouse_R);
+            prologNumber = 1;
         }
+
         private IEnumerator ScenarioTwo()
         {
-           
             FadeTextOut();
-            psMouse_M.gameObject.SetActive(true);
-            HideMouse(mouse_M);
-            
-            
-            // Второй текст - появляется
+           // psMouse_M.gameObject.SetActive(true);      
+            HideMouse(mouse_R);
+
+            // Второй текст 
             yield return new WaitForSeconds(0.5f);
             ShowObject(1);
             FadeTextIn();
+            prologNumber = 2;
+            ShowMouse(mouse_M);
+        }
 
-            yield return new WaitForSeconds(1.5f);
-            ShowMouse(mouse_R);
+        private IEnumerator ScenarioThree()
+        {
+            FadeTextOut();     
+            HideMouse(mouse_M);
 
-            yield return new WaitForSeconds(2f);
+            // третий текст - появляется
+            yield return new WaitForSeconds(0.5f);
+            playerInput.SetActive(true);
+            prologNumber = 3;
+            ShowObject(2);
+            FadeTextIn();
+            ShowMouse(mouse_L);
+        }
+
+        public void StartScenarioFour() => StartCoroutine(ScenarioFour());
+        private IEnumerator ScenarioFour()
+        {
+            FadeTextOut();
+            HideMouse(mouse_L);
+           // canvas.SetActive(true);
+
+            // текст - появляется Нужно подойти и забрать его.
+            yield return new WaitForSeconds(0.5f);           
+            prologNumber = 4;
+            ShowObject(3);
+            FadeTextIn();
+
+            yield return new WaitForSeconds(2.5f);
+            cursor.SetActive(true);
+
+            yield return new WaitForSeconds(3f);
+            cursor.SetActive(false);
             FadeTextOut();
         }
-       
+
+        public void StartScenarioFive() => StartCoroutine(ScenarioFive());       
+        private IEnumerator ScenarioFive()
+        {
+            FadeTextOut();
+            cursor.SetActive(true);
+
+            yield return new WaitForSeconds(4f);
+            cursor.SetActive(false);
+        }
+
+
+
+
+
 
         // --------------------------- Работа с текстами ----------------------------
         public void ShowObject(int index)
@@ -316,5 +389,22 @@ namespace DiceFate.Maine
                 currentCanvasGroup.gameObject.SetActive(false);
             }
         }
+
+        // --------------------------- 
+
+        private void ActiveCold()
+        {
+            if (!isColdActive)
+            {
+                cold.SetActive(true);
+            }
+
+            isColdActive = true;
+        }
+
+
+
+
+
     }
 }

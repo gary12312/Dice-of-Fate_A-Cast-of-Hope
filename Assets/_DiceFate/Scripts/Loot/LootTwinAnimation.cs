@@ -14,7 +14,7 @@ namespace DiceFate.Loot
 
     
 
-        public void OpenLootBox()
+        public void OpenLoot()
         {
             StartCoroutine(ProcessOpenLootBox());
         }

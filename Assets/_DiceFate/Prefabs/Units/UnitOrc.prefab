@@ -508,7 +508,7 @@ GameObject:
   - component: {fileID: 6245066219134034209}
   m_Layer: 0
   m_Name: UnitOrc
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -592,7 +592,9 @@ MonoBehaviour:
   <IsSelectedForVisibleUi>k__BackingField: 0
   <CurrentHealth>k__BackingField: 0
   <MaxHealth>k__BackingField: 0
-  distanceToAttack: 0
+  unitType: 
+  avatarPrefab: {fileID: 4461586637416194217, guid: 5658571f062b4294398a56e36ae93309, type: 3}
+  <IsHover>k__BackingField: 0
   detectorZone: {fileID: 2616941850196800061}
   objectTestUi: {fileID: 4650135379065922318}
   TweenAnimationUnit: {fileID: 8037654703997352414}
@@ -623,15 +625,15 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 4.9870114
-      outSlope: 4.9870114
+      inSlope: -0
+      outSlope: -0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.061111134
+      outWeight: 0.4055556
     - serializedVersion: 3
-      time: 0.5
-      value: 1
+      time: 0.7694377
+      value: 0.99523807
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -641,11 +643,11 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -4.6071496
-      outSlope: -4.6071496
+      inSlope: -9.85717
+      outSlope: -9.85717
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.088888764
+      inWeight: 0.043010637
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -692,10 +694,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Units.TweenAnimationUnit
   hight: 1
-  durationJump: 0.2
-  numberLoop: 2
+  durationJump: 0.4
+  numberLoop: 1
   punch: 0.4
   durationPunch: 0.2
+  jumpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.030394945
+      outSlope: 0.030394945
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.5585007
+    - serializedVersion: 3
+      time: 0.8473375
+      value: 0.9896463
+      inSlope: 0.0078042857
+      outSlope: 0.0078042857
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7843361
+    - serializedVersion: 3
+      time: 0.9999968
+      value: -0.003173938
+      inSlope: -16.387218
+      outSlope: -16.387218
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.04014943
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &8423167898389251887
 MonoBehaviour:
   m_ObjectHideFlags: 0
