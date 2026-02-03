@@ -22,8 +22,9 @@ namespace DiceFate.Player
         [SerializeField] private LayerMask movmentLayers;
         [SerializeField] private LayerMask enemyLayers;
         [SerializeField] private LayerMask lootLayers;
+        [SerializeField] private LayerMask unitLayers;
 
-      
+
 
         //private CinemachineFollow cinemachineFollow;
         //private Vector3 startingFollowOffset;
@@ -77,17 +78,18 @@ namespace DiceFate.Player
         }
 
         private void Start() => ValidateScripts();
-      
+
         private void Update()
         {
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
-            LeftClick();           // Обработка правого клика
+                                   // LeftClick();           // Обработка правого клика
+            LeftClickAll();
 
             // UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
             IsMouseOnObjectOrNot(); // Без уменьшения частоты - оставить чтото одно после теста прозводительности
 
-            if (Input.GetKeyDown(KeyCode.W))     
+            if (Input.GetKeyDown(KeyCode.W))
                 Bus<OnTestingEvent>.Raise(new OnTestingEvent(1));  // для теста       
         }
 
@@ -121,17 +123,17 @@ namespace DiceFate.Player
 
         private void LeftClick()
         {
-          
+
             if (G.isLeftClickBlock) { return; }
 
             switch (GameStats.currentPhasePlayer)
             {
                 case 0:
-                    LeftClickToHandleSelectionAndAttack();
+                    LeftClickAll();
                     break;
 
                 case 1:
-                    LeftClickToHandleSelectionAndAttack();
+                    LeftClickAll();
                     break;
 
                 case 3: // Фаза броска кубиков                   
@@ -139,7 +141,7 @@ namespace DiceFate.Player
                     break;
 
                 case 4: // Фаза перемещения юнита
-                    
+
                     LeftClickToMove();
                     //LeftClickSelectOther();
                     break;
@@ -152,10 +154,138 @@ namespace DiceFate.Player
             }
         }
 
+
+        private void LeftClickAll()
+        {
+            if (G.isLeftClickBlock) { return; }
+            if (GameStats.currentPhasePlayer == 3) // Фаза бросания кубиков
+            {
+                LeftClickToShakeAndDropDice();
+                return;
+            }
+
+            if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
+
+            if (EventSystem.current.IsPointerOverGameObject()) { return; }   // Проверяем, был ли клик по UI элементу                                                                             
+
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране            
+
+            //switch (GameStats.currentPhasePlayer)
+            //{
+            //    case 3:
+            //        LeftClickToShakeAndDropDice(); // Фаза бросания кубиков
+            //        break;
+
+            //    case 4:
+            //        ClickToMove(cameraRay); // Фаза движение
+            //        break;
+            //}
+
+            //if (GameStats.currentPhasePlayer == 3) // Фаза бросания кубиков
+            //{
+            //    ClickToShakeAndDropDice();
+            //    return;
+            //}
+
+
+            if (GameStats.currentPhasePlayer == 4)   // Фаза движение
+            {
+                ClickToMove(cameraRay);
+                return;
+            }
+
+            ClickToSelected(cameraRay);
+            ClickToLoot(cameraRay);
+            ClickToAttack(cameraRay);
+        }
+
+        private void ClickToSelected(Ray cameraRay)
+        {
+            RaycastHit hit;
+
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, unitLayers)
+            && hit.collider.TryGetComponent(out ISelectable selectable))
+            {
+                if (selectedUnit != null && selectedUnit == selectable) { return; }
+                if (selectedUnit != null && selectedUnit != selectable) { DeselectCurrentUnit(); }  // Если есть уже выделенный юнит, снимаем с него выделение
+
+                selectable.Select();
+                Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
+            }
+            else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers))
+            {
+                return;
+            }
+            else { DeselectCurrentUnit(); } // Клик в пустом месте 
+
+        }
+
+        private void ClickToLoot(Ray cameraRay)
+        {
+            RaycastHit hit;
+
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)
+            && hit.collider.TryGetComponent(out ILooter selectable))
+            {
+                selectable.LootSelection();
+            }
+        }
+
+        private void ClickToAttack(Ray cameraRay)
+        {
+            RaycastHit hit;
+
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers)
+                && selectedUnit != null
+                && hit.collider.TryGetComponent(out IDamageable damageable))
+            {
+                damageable.TakeDamage(15, selectUnitPosition);
+            }
+        }
+
+        private void ClickToMove(Ray cameraRay)
+        {
+            RaycastHit hit;
+
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))) //movmentLayers //LayerMask.GetMask("Default"))
+            {
+                MonoBehaviour selectedMono = selectedUnit as MonoBehaviour; // Прямой доступ через GameObject
+
+                if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
+                {
+                    moveable.MoveTo(hit.point);
+
+                    Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
+
+                    selectUnitPosition = hit.point;
+                }
+            }
+        }
+
+
+        private void ClickToShakeAndDropDice()
+        {
+            if (selectedUnit == null) { return; }
+
+            isDragging = true;
+
+            if (isDragging && Mouse.current.leftButton.isPressed)
+            {
+                ShakeDiceIsMouseDown();
+                MoveToMouseDiceAndKeg();
+            }
+            else if (isDragging && Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                DropDiceIsMouseUp();
+                isDragging = false;
+            }
+        }
+
+
         private void LeftClickToHandleSelectionAndAttack()
-        {           
+        {
             if (EventSystem.current.IsPointerOverGameObject())  // Проверяем, был ли клик по UI элементу
-                return;      
+                return;
 
             if (!Mouse.current.leftButton.wasPressedThisFrame) return;
 
@@ -185,19 +315,19 @@ namespace DiceFate.Player
                         return;
                     }
                 }
-                
-                if (hit.collider.TryGetComponent(out ISelectable selectable)) // ISelect
-                {
-                    if (selectedUnit != null && selectedUnit == selectable) return;
-
-                    if (selectedUnit != null && selectedUnit != selectable)
+                if (Mouse.current.leftButton.wasPressedThisFrame)
+                    if (hit.collider.TryGetComponent(out ISelectable selectable)) // ISelect
                     {
-                        DeselectCurrentUnit();
-                    }
+                        if (selectedUnit != null && selectedUnit == selectable) return;
 
-                    selectable.Select();
-                    Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
-                }
+                        if (selectedUnit != null && selectedUnit != selectable)
+                        {
+                            DeselectCurrentUnit();
+                        }
+
+                        selectable.Select();
+                        Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
+                    }
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)  // Loot
                 {
@@ -228,7 +358,7 @@ namespace DiceFate.Player
             RaycastHit hit;
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
-            {        
+            {
                 if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)
                 && hit.collider.TryGetComponent(out ILooter selectable))
                 {
@@ -284,7 +414,7 @@ namespace DiceFate.Player
         {
             if (selectedUnit == null) { return; }
 
-            if (GameStats.currentPhasePlayer != 3) { return; }
+            // if (GameStats.currentPhasePlayer != 3) { return; }
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
@@ -304,7 +434,7 @@ namespace DiceFate.Player
 
         private void LeftClickToMove()
         {
-        if (camera == null || selectedUnit == null)
+            if (camera == null || selectedUnit == null)
             { return; }
 
             if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
@@ -516,7 +646,7 @@ namespace DiceFate.Player
                 hoverableUnit = hover; // Сохраняем текущий наведение юнит
                 Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
 
-            }            
+            }
             else if (hoverableUnit != null) // Если луч не попал в объект с IHover, снимаем обводку
             {
                 hoverableUnit.OnExitHover(); // Снимаем обводку через интерфейс IHover 
@@ -527,7 +657,7 @@ namespace DiceFate.Player
         }
 
         //---------------------------------- Тряска и бросание кубиков  ----------------------------------
-        public void DropDiceIsMouseUp() => Bus<OnDropEvent>.Raise(new OnDropEvent(500));     
+        public void DropDiceIsMouseUp() => Bus<OnDropEvent>.Raise(new OnDropEvent(500));
 
         public Vector3? GetPointOnPlaneFromMouse()
         {
