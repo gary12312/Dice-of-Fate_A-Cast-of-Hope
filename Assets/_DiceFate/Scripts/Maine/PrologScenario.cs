@@ -10,6 +10,7 @@ namespace DiceFate.Maine
         [SerializeField] private GameObject cameraMain;
         [SerializeField] private GameObject cameraVirtualOne;
         [SerializeField] public bool isTesting;
+        [SerializeField] public int prologNumber = 0;  // 1- часть.
 
         [Header("Настройки движения камеры")]       // Дополнительные параметры для управления камерой
         [SerializeField] private new Camera camera;
@@ -43,10 +44,18 @@ namespace DiceFate.Maine
         [Header("Five")]
         [SerializeField] private GameObject cursor;
 
+        [Header("Six")]
+        [SerializeField] private GameObject diceMove;
+        [SerializeField] private GameObject diceAttack;
+        [SerializeField] private GameObject diceShild;
+        [SerializeField] private GameObject diceConterAtack;
+
+
+
 
         private CanvasGroup currentCanvasGroup;
         private Vector2 mouseDelta;            // Изменение положения мыши
-        public int prologNumber = 0;  // 1- часть.
+     
         private bool isColdActive = false;
 
 

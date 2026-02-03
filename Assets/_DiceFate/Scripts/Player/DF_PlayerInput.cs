@@ -83,8 +83,7 @@ namespace DiceFate.Player
         {
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
-                                   // LeftClick();           // Обработка правого клика
-            LeftClickAll();
+            LeftClick();           // Обработка правого клика
 
             // UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
             IsMouseOnObjectOrNot(); // Без уменьшения частоты - оставить чтото одно после теста прозводительности
@@ -121,43 +120,11 @@ namespace DiceFate.Player
             }
         }
 
+
         private void LeftClick()
         {
-
             if (G.isLeftClickBlock) { return; }
 
-            switch (GameStats.currentPhasePlayer)
-            {
-                case 0:
-                    LeftClickAll();
-                    break;
-
-                case 1:
-                    LeftClickAll();
-                    break;
-
-                case 3: // Фаза броска кубиков                   
-                    LeftClickToShakeAndDropDice();
-                    break;
-
-                case 4: // Фаза перемещения юнита
-
-                    LeftClickToMove();
-                    //LeftClickSelectOther();
-                    break;
-                case 5: // Фаза атаки юнита
-                    LeftClickToHandleSelectionAndAttack();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-
-        private void LeftClickAll()
-        {
-            if (G.isLeftClickBlock) { return; }
             if (GameStats.currentPhasePlayer == 3) // Фаза бросания кубиков
             {
                 LeftClickToShakeAndDropDice();
@@ -168,25 +135,7 @@ namespace DiceFate.Player
 
             if (EventSystem.current.IsPointerOverGameObject()) { return; }   // Проверяем, был ли клик по UI элементу                                                                             
 
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране            
-
-            //switch (GameStats.currentPhasePlayer)
-            //{
-            //    case 3:
-            //        LeftClickToShakeAndDropDice(); // Фаза бросания кубиков
-            //        break;
-
-            //    case 4:
-            //        ClickToMove(cameraRay); // Фаза движение
-            //        break;
-            //}
-
-            //if (GameStats.currentPhasePlayer == 3) // Фаза бросания кубиков
-            //{
-            //    ClickToShakeAndDropDice();
-            //    return;
-            //}
-
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране         
 
             if (GameStats.currentPhasePlayer == 4)   // Фаза движение
             {
@@ -195,15 +144,13 @@ namespace DiceFate.Player
             }
 
             ClickToSelected(cameraRay);
-            ClickToLoot(cameraRay);
-            ClickToAttack(cameraRay);
         }
 
         private void ClickToSelected(Ray cameraRay)
         {
             RaycastHit hit;
 
-            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, unitLayers)
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, unitLayers)                     // Выбор своих юнитов
             && hit.collider.TryGetComponent(out ISelectable selectable))
             {
                 if (selectedUnit != null && selectedUnit == selectable) { return; }
@@ -212,36 +159,23 @@ namespace DiceFate.Player
                 selectable.Select();
                 Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
             }
-            else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers))
-            {
-                return;
-            }
-            else { DeselectCurrentUnit(); } // Клик в пустом месте 
 
-        }
-
-        private void ClickToLoot(Ray cameraRay)
-        {
-            RaycastHit hit;
-
-            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)
-            && hit.collider.TryGetComponent(out ILooter selectable))
-            {
-                selectable.LootSelection();
-            }
-        }
-
-        private void ClickToAttack(Ray cameraRay)
-        {
-            RaycastHit hit;
-
-            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers)
+            else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers)               // Атака врага
                 && selectedUnit != null
                 && hit.collider.TryGetComponent(out IDamageable damageable))
             {
                 damageable.TakeDamage(15, selectUnitPosition);
             }
+
+            else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)                // сбор лута
+                     && hit.collider.TryGetComponent(out ILooter looter))
+            {
+                looter.LootSelection();
+            }
+
+            else { DeselectCurrentUnit(); } // Клик в пустом месте 
         }
+
 
         private void ClickToMove(Ray cameraRay)
         {
@@ -263,140 +197,6 @@ namespace DiceFate.Player
         }
 
 
-        private void ClickToShakeAndDropDice()
-        {
-            if (selectedUnit == null) { return; }
-
-            isDragging = true;
-
-            if (isDragging && Mouse.current.leftButton.isPressed)
-            {
-                ShakeDiceIsMouseDown();
-                MoveToMouseDiceAndKeg();
-            }
-            else if (isDragging && Mouse.current.leftButton.wasReleasedThisFrame)
-            {
-                DropDiceIsMouseUp();
-                isDragging = false;
-            }
-        }
-
-
-        private void LeftClickToHandleSelectionAndAttack()
-        {
-            if (EventSystem.current.IsPointerOverGameObject())  // Проверяем, был ли клик по UI элементу
-                return;
-
-            if (!Mouse.current.leftButton.wasPressedThisFrame) return;
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-            RaycastHit hit;
-
-            // Определяем слои для проверки в зависимости от фазы игры
-            LayerMask targetLayers = GameStats.currentPhasePlayer switch
-            {
-                5 => enemyLayers | lootLayers, // Фаза атаки: враги + лут
-                _ => LayerMask.GetMask("Default") // Обычное выделение
-            };
-
-            // Проверяем луч на целевые слои
-            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, targetLayers))
-            {
-                // Обработка врагов в фазе атаки
-                if (GameStats.currentPhasePlayer == 5 &&
-                    ((1 << hit.collider.gameObject.layer) & enemyLayers) != 0)
-                {
-                    if (selectedUnit != null &&
-                        hit.collider.TryGetComponent(out IDamageable damageable))
-                    {
-                        // Наносим урон
-                        damageable.TakeDamage(15, selectUnitPosition);
-                        DeselectCurrentUnit();
-                        return;
-                    }
-                }
-                if (Mouse.current.leftButton.wasPressedThisFrame)
-                    if (hit.collider.TryGetComponent(out ISelectable selectable)) // ISelect
-                    {
-                        if (selectedUnit != null && selectedUnit == selectable) return;
-
-                        if (selectedUnit != null && selectedUnit != selectable)
-                        {
-                            DeselectCurrentUnit();
-                        }
-
-                        selectable.Select();
-                        Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
-                    }
-
-                if (Mouse.current.leftButton.wasPressedThisFrame)  // Loot
-                {
-                    if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)
-                    && hit.collider.TryGetComponent(out ILooter looter))
-                    {
-                        looter.LootSelection();
-                    }
-                }
-                else
-                {
-                    // Клик по невыделяемому объекту в целевых слоях
-                    DeselectCurrentUnit();
-                }
-            }
-            else
-            {
-                // Клик в пустом месте
-                DeselectCurrentUnit();
-            }
-        }
-
-        private void LeftClickToLoot()
-        {
-            if (camera == null) { return; }
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
-            RaycastHit hit;
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)
-                && hit.collider.TryGetComponent(out ILooter selectable))
-                {
-                    selectable.LootSelection();
-                }
-            }
-        }
-
-        // Обработка левого клика Для ВЫБОРА юнита // TargetDecal
-        private void LeftClickToSelected()
-        {
-            if (camera == null) { return; }
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране
-            RaycastHit hit;
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                // Проверяем, был ли клик по UI элементу
-                if (EventSystem.current.IsPointerOverGameObject())
-                {
-                    return; // Не обрабатываем клик по UI
-                }
-
-                // Проверяем клик по юниту
-                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
-                && hit.collider.TryGetComponent(out ISelectable selectable))
-                {
-                    if (selectedUnit != null && selectedUnit == selectable) { return; }
-                    if (selectedUnit != null && selectedUnit != selectable) { DeselectCurrentUnit(); }  // Если есть уже выделенный юнит, снимаем с него выделение
-
-                    selectable.Select();
-                    Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
-
-                }
-                else { DeselectCurrentUnit(); } // Клик в пустом месте 
-            }
-        }
 
         // Метод для снятия выделения
         private void DeselectCurrentUnit()
@@ -429,131 +229,6 @@ namespace DiceFate.Player
             {
                 DropDiceIsMouseUp();
                 isDragging = false;
-            }
-        }
-
-        private void LeftClickToMove()
-        {
-            if (camera == null || selectedUnit == null)
-            { return; }
-
-            if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
-            { return; }
-
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-            RaycastHit hit;
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                // Тест: бросаем луч на все слои
-                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))) //movmentLayers //LayerMask.GetMask("Default"))
-                {
-                    // Прямой доступ через GameObject
-                    MonoBehaviour selectedMono = selectedUnit as MonoBehaviour;
-                    if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
-                    {
-                        moveable.MoveTo(hit.point);
-
-                        Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
-
-                        selectUnitPosition = hit.point;
-
-                    }
-                }
-            }
-        }
-
-        private void LeftClickToAttackOrLoot()
-        {
-            if (camera == null || selectedUnit == null)
-            { return; }
-
-            if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
-            { return; }
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-            RaycastHit hit;
-
-
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                // Проверяем, был ли клик по UI элементу
-                if (EventSystem.current.IsPointerOverGameObject())
-                {
-                    return; // Не обрабатываем клик по UI
-                }
-
-                // Тест: бросаем луч на слои Врага
-                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers)) //movmentLayers //LayerMask.GetMask("Default"))
-                {
-
-                    // Проверяем клик по юниту
-                    if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers)
-                    && hit.collider.TryGetComponent(out ISelectable selectable))
-                    {
-                        if (selectedUnit != null && selectedUnit == selectable) { return; } // Если клик по самому себе, ничего не делаем
-
-                        if (hit.collider.TryGetComponent(out IDamageable damageable))
-                        {
-
-                            // Наносим урон через интерфейс
-                            damageable.TakeDamage(15, selectUnitPosition);
-                            //  damageable.TakeDamage(GameStats.diceAttack);
-                            DeselectCurrentUnit();
-                        }
-                    }
-                }
-                else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)
-                && hit.collider.TryGetComponent(out ISelectable selectable))
-                {
-                    selectable.Select();
-                    Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
-                }
-            }
-        }
-
-
-
-
-        private void LeftClickSelectOther()
-        {
-            if (camera == null || selectedUnit == null)
-            { return; }
-            if (isWasMouseDownUI = EventSystem.current.IsPointerOverGameObject()) // проверяем находится ли курсор над UI элементом
-            { return; }
-
-
-
-            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
-            RaycastHit hit;
-            if (Mouse.current.leftButton.wasPressedThisFrame)
-            {
-                // if (EventSystem.current.IsPointerOverGameObject()) { return; } // Проверяем, был ли клик по UI элементу
-
-                // Проверяем клик по объекту
-                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
-                && hit.collider.TryGetComponent(out ISelectableForVisibleUi selectableForUi))
-                {
-                    if (selectedUnit == selectableForUi) { return; }
-                    if (selectableObjectForUi != null && selectableObjectForUi == selectableForUi) { return; }
-                    if (selectableObjectForUi != null && selectableObjectForUi != selectableForUi) { DeselectCurrentObjectForUi(); }  // Если есть уже выделенный юнит для UI, снимаем с него выделение
-
-                    selectableForUi.SelectForUi();
-                }
-                else { DeselectCurrentObjectForUi(); } // Клик в пустом месте
-
-                if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))
-             && hit.collider.TryGetComponent(out ISelectable selectable))
-                {
-                    if (selectedUnit != null && selectedUnit == selectable) { return; }
-                    if (selectedUnit != null && selectedUnit != selectable) { DeselectCurrentUnit(); }  // Если есть уже выделенный юнит, снимаем с него выделение
-
-                    selectable.Select();
-                }
-                else { DeselectCurrentUnit(); } // Клик в пустом месте 
-
-
             }
         }
 
