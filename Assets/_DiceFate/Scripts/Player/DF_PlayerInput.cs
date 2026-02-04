@@ -244,19 +244,44 @@ namespace DiceFate.Player
         //---------------------------------- Функции Перемещение и вращение камеры  ----------------------------------
         private void MoveCamera()
         {
-            mouseDelta = Mouse.current.delta.ReadValue();                     // Получаем изменение положения мыши
-            float deltaX = -mouseDelta.x * cameraMoveSpeedX * Time.deltaTime; // сколсть по X  Инвертируем
-            float deltaY = -mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;
+            //mouseDelta = Mouse.current.delta.ReadValue();                     // Получаем изменение положения мыши
+            //float deltaX = -mouseDelta.x * cameraMoveSpeedX * Time.deltaTime; // сколсть по X  Инвертируем
+            //float deltaY = -mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;
 
-            if (camera == null) return;
+            //if (camera == null) return;
 
-            // Получаем направления камеры и игнорируем вертикальную ось
-            Vector3 moveDirection =
-                camera.transform.right * deltaX +
-                camera.transform.forward * deltaY; // Вычисляем направление движения на основе положения мыши
-            moveDirection.y = 0;
+            //// Получаем направления камеры и игнорируем вертикальную ось
+            //Vector3 moveDirection =
+            //    camera.transform.right * deltaX +
+            //    camera.transform.forward * deltaY; // Вычисляем направление движения на основе положения мыши
+            //moveDirection.y = 0;
 
-            cameraTarget.linearVelocity = moveDirection; // Применяем движение к цели камеры
+            //cameraTarget.linearVelocity = moveDirection; // Применяем движение к цели камеры
+
+            //--------------------
+
+            mouseDelta = Mouse.current.delta.ReadValue();                    
+            float deltaX = mouseDelta.x * cameraMoveSpeedX * Time.deltaTime;
+            float deltaY = mouseDelta.y * cameraMoveSpeedY * Time.deltaTime; 
+
+
+            if (cameraTarget != null)
+            {
+                Vector3 moveDirection = new Vector3(-deltaX, 0, -deltaY);
+
+                moveDirection = camera.transform.TransformDirection(moveDirection); 
+                moveDirection.y = 0;
+
+                cameraTarget.MovePosition(cameraTarget.position + moveDirection);  
+            }
+
+
+
+
+
+
+
+
         }
 
         // Вращение камеры за счет вращения цели камеры ( cameraTarget )
