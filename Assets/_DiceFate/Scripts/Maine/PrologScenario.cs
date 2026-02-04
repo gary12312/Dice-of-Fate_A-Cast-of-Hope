@@ -10,7 +10,7 @@ namespace DiceFate.Maine
         [SerializeField] private GameObject cameraMain;
         [SerializeField] private GameObject cameraVirtualOne;
         [SerializeField] public bool isTesting;
-        [SerializeField] public int prologNumber = 0;  // 1- часть.
+        [SerializeField] public int prologNumber = 5;  // 1- часть.
 
         [Header("Настройки движения камеры")]       // Дополнительные параметры для управления камерой
         [SerializeField] private new Camera camera;
@@ -98,9 +98,7 @@ namespace DiceFate.Maine
             SetActiveAllObjectsOff(texts);
            // canvas.SetActive(false);
             canvasBattle.SetActive(false);
-            cursor.SetActive(false);
-
-            //prologNumber = 1;
+            cursor.SetActive(false);            
 
             if (isTesting)
             {
@@ -287,6 +285,7 @@ namespace DiceFate.Maine
         {
             FadeTextOut();
             cursor.SetActive(true);
+            prologNumber = 5;
 
             yield return new WaitForSeconds(4f);
             cursor.SetActive(false);

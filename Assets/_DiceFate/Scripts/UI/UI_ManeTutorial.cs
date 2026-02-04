@@ -15,11 +15,16 @@ namespace DiceFate.UI
 
 
         [Header("Player Card")]
-        [SerializeField] private GameObject unitMasterCard;    // Фаза 1
+        [SerializeField] private GameObject unitMasterCard;    // Фаза 1       
         [SerializeField] private GameObject inactiveElement;
         [SerializeField] private GameObject activeElement;
         [SerializeField] private GameObject textDiceValue;
-
+        [Space]
+        [SerializeField] private TextMeshProUGUI textUnitMovement;
+        [SerializeField] private TextMeshProUGUI textUnitAttack;
+        [SerializeField] private TextMeshProUGUI textUnitShield;
+        [SerializeField] private TextMeshProUGUI textUnitCounterattack;
+        [Space]
         [SerializeField] private Button startDice;             // Фаза 1
 
         [Header("Фаза 2 настройки")]
@@ -33,6 +38,8 @@ namespace DiceFate.UI
         [SerializeField] private TextMeshProUGUI textDiceAttack;
         [SerializeField] private TextMeshProUGUI textDiceShield;
         [SerializeField] private TextMeshProUGUI textDiceCounterattack;
+
+
 
         //[Header("Enemy Card")]
         //[SerializeField] private GameObject uiCardEnemy;
@@ -55,14 +62,15 @@ namespace DiceFate.UI
         [SerializeField] private UI_Mane_Battle uI_Mane_Battle;
         [SerializeField] private PrologScenario prologScenario;
 
-       
+        private Color colorTextDefault;
+        private Color colorAlfaZero = new Color(1f, 1f, 1f, 0f);
 
 
 
 
         private void Awake()
         {
-          //  uiCardEnemy.SetActive(false);
+            //  uiCardEnemy.SetActive(false);
 
             Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
@@ -77,6 +85,8 @@ namespace DiceFate.UI
 
         private void Start()
         {
+            colorTextDefault = textUnitMovement.color;
+
             ValidateScriptsAndObject();
 
             HideAllUIElements(); // Начальное состояние: всё скрыто
@@ -198,6 +208,37 @@ namespace DiceFate.UI
         public void UiShowPhaseFourPlayer() => SetUiPlayerCard(true, false, false, false, true, true);
         public void UiShowPhaseFivePlayer() => SetUiPlayerCard(false, false, false, false, false, false);
 
+        public void UiShowMasterCadrDependPrologNumber()
+        {      
+
+            switch (prologScenario.prologNumber)
+            {        
+                case 5: // только движение 
+                    iShowMasterCadrPrologFive();
+                    break;
+
+                //case 3: // Фаза броска кубиков                   
+                //    //LeftClickToShakeAndDropDice();
+                //    break;
+
+                default:
+                    break;
+            }
+            uiDiceTargetResult.UpdateTextUiDisplay();
+            SetUiPlayerCard(true, false, true, true, false, true);
+        }
+        private void iShowMasterCadrPrologFive()
+        {
+            uiDiceTargetResult.UpdateTextUiDisplay();
+            SetUiPlayerCard(true, false, true, true, false, true);
+           
+            textUnitAttack.color = colorAlfaZero;
+            textUnitShield.color = colorAlfaZero;
+            textUnitCounterattack.color = colorAlfaZero;
+
+        }
+
+
 
         public void TestingListToDiceTargetResult()
         {
@@ -235,7 +276,7 @@ namespace DiceFate.UI
             Debug.Log("отмена выбота Врвг ЮЙ");
             if (GameStats.currentUser == "Enemy")
             {
-               // uiCardEnemy.SetActive(false);
+                // uiCardEnemy.SetActive(false);
             }
 
             if (GameStats.currentUser == "Other")

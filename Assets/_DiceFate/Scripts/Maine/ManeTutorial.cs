@@ -48,7 +48,7 @@ namespace DiceFate.Maine
         [SerializeField] private UiDropTargetField uiDropTargetField;     // Ссылка на поле с кубиками
 
         [Header("Фаза 3 настройки")]
-        [SerializeField] private UI_Mane uiMane;
+        [SerializeField] private UI_ManeTutorial uiManeTutorial;      
 
 
         [Header("Доп. настройки")]
@@ -250,7 +250,9 @@ namespace DiceFate.Maine
             if (prologScenario.prologNumber >= 4 || prologScenario.isTesting == false)
             {
                 Phase(1);
-                uiMane.UiShowPhaseOnePlayer();
+                uiManeTutorial.UiShowMasterCadrDependPrologNumber();
+                MovementAndGridEnable(); /// - добавил но не работает
+               
             }
 
             //ShowPhaseOneUIElements();
@@ -264,7 +266,7 @@ namespace DiceFate.Maine
             //    return;
 
             Phase(2);
-            uiMane.UiShowPhaseTwoPlayer();
+            uiManeTutorial.UiShowPhaseTwoPlayer();
 
             //ShowPhaseTwoUIElements();
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
@@ -277,7 +279,7 @@ namespace DiceFate.Maine
             //    return;
 
             Phase(3);
-            uiMane.UiShowPhaseThreePlayer();
+            uiManeTutorial.UiShowPhaseThreePlayer();
 
             //ShowPhaseThreeUIElements();
             ShowPhaseThreeSceneElements();
@@ -433,9 +435,9 @@ namespace DiceFate.Maine
             GameStats.isPlayerMoveble = false; // Блокируем движение игрока пока кубики не остановятся
             G.isLeftClickBlock = false;
 
-            uiMane.UiShowPhaseFourPlayer();
-            uiMane.UiClearAllDiceOnField(); // Очистить список кубиков на платке
-            uiMane.TestingListToDiceTargetResult();
+            uiManeTutorial.UiShowPhaseFourPlayer();
+            uiManeTutorial.UiClearAllDiceOnField(); // Очистить список кубиков на платке
+            uiManeTutorial.TestingListToDiceTargetResult();
 
 
 
@@ -624,7 +626,7 @@ namespace DiceFate.Maine
                 Debug.LogError($" для {this.name} Не установлена ссылка на DropTargetField!");
             if (kegCylinderSystem == null)
                 Debug.LogError($" для {this.name} Не установлена ссылка на KegCylinderSystem!");
-            if (uiMane == null)
+            if (uiManeTutorial == null)
                 Debug.LogError($" для {this.name} Не установлена ссылка на UI_Mane!");
             if (prologScenario == null)
                 Debug.LogError($" для {this.name} Не установлена ссылка на prologScenario!");
