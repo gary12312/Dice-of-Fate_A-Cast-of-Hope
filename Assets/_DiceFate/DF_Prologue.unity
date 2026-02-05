@@ -3363,6 +3363,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ripples (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5849495694394266985, guid: 5a32a780a5ce7c64fb308b06088139c0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10239,7 +10243,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: bb6a145904d0eca4cbf3f0aec1bc09db, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
@@ -10247,7 +10251,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 1
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 10.21
+  m_PixelsPerUnitMultiplier: 0.8
 --- !u!222 &956531676
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10264,6 +10268,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1016535694349565516, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1467377214408888950, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -10308,6 +10316,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4422969952435534142, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4712267239899299997, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_FadeFactor
+      value: 0.034
+      objectReference: {fileID: 0}
     - target: {fileID: 4832610507537039587, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
       propertyPath: m_Name
       value: UnitOrc
@@ -10316,11 +10332,56 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5525799
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5525799
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.44119775
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.44119775
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 12.79
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7533341140656538686, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8377544191040969533, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
       propertyPath: ColorModule.enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4422969952435534142, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6610081135683451378, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
@@ -12474,7 +12535,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: bb6a145904d0eca4cbf3f0aec1bc09db, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
@@ -12482,7 +12543,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 1
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 10.21
+  m_PixelsPerUnitMultiplier: 0.8
 --- !u!222 &1241990967
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13328,7 +13389,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: bb6a145904d0eca4cbf3f0aec1bc09db, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
@@ -13336,7 +13397,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 1
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 10.21
+  m_PixelsPerUnitMultiplier: 0.8
 --- !u!222 &1288074410
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18988,7 +19049,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: bb6a145904d0eca4cbf3f0aec1bc09db, type: 3}
-  m_Type: 0
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
@@ -18996,7 +19057,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 1
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 10.21
+  m_PixelsPerUnitMultiplier: 0.8
 --- !u!222 &1805712595
 CanvasRenderer:
   m_ObjectHideFlags: 0
