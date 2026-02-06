@@ -82,9 +82,9 @@ namespace DiceFate.Units
         {
             RecValueInGameStaticForUIMane();
 
-            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this)); // Вызвать событие, изаписать себя как выбранный юнит слушает DF_PlayerInput
-
             ReadyToMove();
+
+            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this)); // Вызвать событие, изаписать себя как выбранный юнит слушает DF_PlayerInput
         }
 
         public void UnitsSOCurrent(string userName)

@@ -137,7 +137,7 @@ namespace DiceFate.Player
 
             Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране         
 
-            if (GameStats.currentPhasePlayer == 4)   // Фаза движение
+            if (GameStats.currentPhasePlayer == 4 || GameStats.currentPhasePlayer == 1)   // Фаза движение
             {
                 ClickToMove(cameraRay);
                 return;
@@ -181,7 +181,7 @@ namespace DiceFate.Player
         {
             RaycastHit hit;
 
-            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))) //movmentLayers //LayerMask.GetMask("Default"))
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, movmentLayers)) //movmentLayers //LayerMask.GetMask("Default"))
             {
                 MonoBehaviour selectedMono = selectedUnit as MonoBehaviour; // Прямой доступ через GameObject
 
@@ -261,27 +261,20 @@ namespace DiceFate.Player
             //--------------------
 
             mouseDelta = Mouse.current.delta.ReadValue();                    
-            float deltaX = mouseDelta.x * cameraMoveSpeedX * Time.deltaTime;
-            float deltaY = mouseDelta.y * cameraMoveSpeedY * Time.deltaTime; 
-
+            float deltaX = -mouseDelta.x * cameraMoveSpeedX * Time.deltaTime;
+            float deltaY = -mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;           
 
             if (cameraTarget != null)
-            {
-                Vector3 moveDirection = new Vector3(-deltaX, 0, -deltaY);
+            {         
+                Vector3 moveDirection = camera.transform.right * deltaX +
+                                      camera.transform.forward * deltaY;
+                moveDirection.y = 0; 
 
-                moveDirection = camera.transform.TransformDirection(moveDirection); 
-                moveDirection.y = 0;
+                if (moveDirection.magnitude > 1f)
+                    moveDirection.Normalize();
 
-                cameraTarget.MovePosition(cameraTarget.position + moveDirection);  
+                cameraTarget.MovePosition(cameraTarget.position + moveDirection);
             }
-
-
-
-
-
-
-
-
         }
 
         // Вращение камеры за счет вращения цели камеры ( cameraTarget )
@@ -370,6 +363,7 @@ namespace DiceFate.Player
                 if (hit.collider.CompareTag("Ground") || hit.collider.gameObject.name.Contains("Plane"))
                 {
                     pointMousePosition = hit.point;
+                    return hit.point; // Возвращаем точку попадания
                 }
             }
             return null; // Луч не попал в Plane

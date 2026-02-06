@@ -247,11 +247,13 @@ namespace DiceFate.Maine
             //if (GameStats.currentUser != "Player")
             //    return;
 
+      
+
             if (prologScenario.prologNumber >= 4 || prologScenario.isTesting == false)
             {
                 Phase(1);
                 uiManeTutorial.UiShowMasterCadrDependPrologNumber();
-              //  MovementAndGridEnable(); /// - добавил но не работает
+                MovementAndGridEnable(); /// - добавил но не работает
                
             }
 
@@ -460,7 +462,7 @@ namespace DiceFate.Maine
 
             Bus<OnMovmentValueEvent>.Raise(new OnMovmentValueEvent(movementDiceCount));
             Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
-            G.isLeftClickBlock = true;
+            //G.isLeftClickBlock = true;
         }
 
         private IEnumerator PhaseFourCoroutine()

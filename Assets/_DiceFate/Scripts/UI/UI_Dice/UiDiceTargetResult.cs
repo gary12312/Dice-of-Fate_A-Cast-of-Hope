@@ -215,6 +215,17 @@ namespace DiceFate.UI_Dice
             }
         }
 
+        public void TestMoveAndGreed()
+        {
+            mane.MovementAndGridEnable();
+            countedCreatedDice = 0;
+            diceCubes.Clear();
+            isDiceReady = false;
+
+
+        }
+
+
         public void ActiveParticalSystem(UIParticalArrey partical, int index, RectTransform rectTransform)
         {
             if (partical == null) return;
