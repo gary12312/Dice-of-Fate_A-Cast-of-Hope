@@ -7296,10 +7296,13 @@ MonoBehaviour:
     m_Bits: 128
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4096
   lootLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
+  unitLayers:
+    serializedVersion: 2
+    m_Bits: 2048
   updateInterval: 0.03
   cameraMoveSpeedX: 200
   cameraMoveSpeedY: 400

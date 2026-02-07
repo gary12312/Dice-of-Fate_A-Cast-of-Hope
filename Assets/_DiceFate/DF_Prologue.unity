@@ -10330,7 +10330,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4832610507537039587, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 7259164996299811266, guid: b6f955f5f9e6ad147b4abde0ebbdb188, type: 3}
       propertyPath: m_IsActive
@@ -11063,19 +11063,19 @@ MonoBehaviour:
   cinemachineCamera: {fileID: 1639741759}
   floorLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   movmentLayers:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 128
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 4096
   lootLayers:
     serializedVersion: 2
     m_Bits: 1024
   unitLayers:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 2048
   updateInterval: 0.03
   cameraMoveSpeedX: 1
   cameraMoveSpeedY: 2.5
@@ -12400,7 +12400,7 @@ GameObject:
   - component: {fileID: 1226823321}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14465,7 +14465,7 @@ GameObject:
   - component: {fileID: 1353775360}
   - component: {fileID: 1353775363}
   - component: {fileID: 1353775364}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Terrain_Paint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -18930,6 +18930,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1056638745}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1770251223
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1770251224}
+  - component: {fileID: 1770251225}
+  m_Layer: 0
+  m_Name: PlayerInput _Tutorilal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1770251224
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770251223}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2134762602}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1770251225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1770251223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fb68982f06ec5945bbdde348e73686f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Player.DF_PlayerInput_Tutorial
+  camera: {fileID: 1489927585}
+  cameraTarget: {fileID: 262242337}
+  cinemachineCamera: {fileID: 1639741759}
+  floorLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  movmentLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4096
+  lootLayers:
+    serializedVersion: 2
+    m_Bits: 1024
+  unitLayers:
+    serializedVersion: 2
+    m_Bits: 2048
+  updateInterval: 0.05
+  cameraMoveSpeedX: 2.1
+  cameraMoveSpeedY: 4
+  cameraRotationSpeed: 10
 --- !u!1 &1782317277
 GameObject:
   m_ObjectHideFlags: 0
@@ -19925,7 +19991,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2930146164447327979, guid: ce22c9d1b38d5e440b07e785164af074, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8371476604935792914, guid: ce22c9d1b38d5e440b07e785164af074, type: 3}
       propertyPath: m_LocalPosition.x
@@ -23614,6 +23680,7 @@ Transform:
   - {fileID: 17286265}
   - {fileID: 613230110}
   - {fileID: 1070974548}
+  - {fileID: 1770251224}
   - {fileID: 780852026}
   - {fileID: 1387518439}
   m_Father: {fileID: 0}
@@ -30382,7 +30449,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1635658941600742678, guid: f5687dd8b3a9dec4b98723c6a152c411, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 1635658941600742678, guid: f5687dd8b3a9dec4b98723c6a152c411, type: 3}
       propertyPath: m_IsActive

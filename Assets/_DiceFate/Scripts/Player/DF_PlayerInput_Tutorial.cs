@@ -12,7 +12,7 @@ using UnityEngine.InputSystem;
 
 namespace DiceFate.Player
 {
-    public class DF_PlayerInput : MonoBehaviour
+    public class DF_PlayerInput_Tutorial : MonoBehaviour
     {
         [Header("Камера")]
         [SerializeField] private new Camera camera;
@@ -61,19 +61,6 @@ namespace DiceFate.Player
 
         private bool isDragging; // Флаг, что сейчас идёт выделение
 
-        //Для отладки кликов по объектам
-        private RaycastHit hit;
-        private Collider hitCollider;
-        private Vector3 hitPoint;
-        private int objectLayer = 0;
-        private bool isUnitLayer;
-        private bool isEnemyLayer;
-        private bool isLootLayer;
-        private bool isMoveable;
-
-
-
-
         private void Awake()
         {
             Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
@@ -97,7 +84,6 @@ namespace DiceFate.Player
             MiddleClickAndHold();  // Обработка центрального клика (поворот)
             RightClickAndHold();   // Обработка правого клика (перемещение)
             LeftClick();           // Обработка правого клика
-
 
             // UpdateForHoverable();  // Уменьшение частоты Обновление FPS - для Outline
             IsMouseOnObjectOrNot(); // Без уменьшения частоты - оставить чтото одно после теста прозводительности
@@ -146,90 +132,26 @@ namespace DiceFate.Player
             }
 
             if (!Mouse.current.leftButton.wasPressedThisFrame) { return; }
-            if (EventSystem.current.IsPointerOverGameObject()) { return; }   // Проверяем, был ли клик по UI элементу
-                                                                             // 
+
+            if (EventSystem.current.IsPointerOverGameObject()) { return; }   // Проверяем, был ли клик по UI элементу                                                                             
 
             Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());   // Получение точки на экране         
 
-            if (Physics.Raycast(cameraRay, out hit, 100f))
+            if (GameStats.currentPhasePlayer == 4 || GameStats.currentPhasePlayer == 1)   // Фаза движение
             {
-                //hitPoint = hit.point;
-                //hitCollider = hit.collider;
-                objectLayer = hit.collider.gameObject.layer;
-
-                isUnitLayer = (1 << objectLayer & unitLayers) != 0;
-                isEnemyLayer = (1 << objectLayer & enemyLayers) != 0;
-                isLootLayer = (1 << objectLayer & lootLayers) != 0;
-                isMoveable = (1 << objectLayer & movmentLayers) != 0;
-
-                Debug.Log($"Кликнули ЛКМ по объекту на слое:  ({objectLayer})");
-            }
-
-
-            if (GameStats.currentPhasePlayer == 0)
-            {
-                if (isUnitLayer)
-                {
-                    ClickToSelect();
-                }
-                else if (isEnemyLayer)
-                {
-                    ClickToSelectEnemy();
-                }
-                else if (isLootLayer)
-                {
-                    ClickToLoot();
-                }
+                ClickToMove(cameraRay);
                 return;
             }
 
-            if (GameStats.currentPhasePlayer == 1 || GameStats.currentPhasePlayer == 4)
-            {
-                if (isUnitLayer)
-                {
-                    ClickToSelect();
-                }
-                else if (isEnemyLayer)
-                {
-                    ClickToAttack();
-                }
-                else if (isLootLayer)
-                {
-                    ClickToLoot();
-                }
-                else if (isMoveable)
-                {
-                    ClickToMove();
-                }
-                // else { DeselectCurrentUnit(); } // Клик в пустом месте  ???
-                return;
-            }
-
-            if (GameStats.currentPhasePlayer == 5 
-                || GameStats.currentPhasePlayer == 6 
-                || GameStats.currentPhasePlayer == 7)
-            {
-                if (isUnitLayer)
-                {
-                    ClickToSelect();
-                }
-                else if (isEnemyLayer)
-                {
-                    ClickToAttack();
-                }
-                else if (isLootLayer)
-                {
-                    ClickToLoot();
-                }
-                return;
-            }
+            ClickToSelected(cameraRay);
         }
 
-
-
-        private void ClickToSelect()
+        private void ClickToSelected(Ray cameraRay)
         {
-            if (hit.collider.TryGetComponent(out ISelectable selectable))
+            RaycastHit hit;
+
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, unitLayers)                     // Выбор своих юнитов
+            && hit.collider.TryGetComponent(out ISelectable selectable))
             {
                 if (selectedUnit != null && selectedUnit == selectable) { return; }
                 if (selectedUnit != null && selectedUnit != selectable) { DeselectCurrentUnit(); }  // Если есть уже выделенный юнит, снимаем с него выделение
@@ -237,48 +159,43 @@ namespace DiceFate.Player
                 selectable.Select();
                 Bus<OnUpdateUIAvatarEvent>.Raise(new OnUpdateUIAvatarEvent(1));
             }
-        }
 
-        private void ClickToSelectEnemy()
-        {
-            if (hit.collider.TryGetComponent(out ISelectable selectable))
-            {
-                selectable.Select();
-                Debug.Log("Выделяем и Показываем информаию о Враге");
-            }
-        }
-
-        private void ClickToAttack()
-        {
-            if (selectedUnit != null
+            else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, enemyLayers)               // Атака врага
+                && selectedUnit != null
                 && hit.collider.TryGetComponent(out IDamageable damageable))
             {
                 damageable.TakeDamage(15, selectUnitPosition);
             }
-        }
 
-        private void ClickToLoot()
-        {
-            if (hit.collider.TryGetComponent(out ILooter looter))
+            else if (Physics.Raycast(cameraRay, out hit, float.MaxValue, lootLayers)                // сбор лута
+                     && hit.collider.TryGetComponent(out ILooter looter))
             {
                 looter.LootSelection();
             }
+
+            else { DeselectCurrentUnit(); } // Клик в пустом месте 
         }
 
-        private void ClickToMove()
+
+        private void ClickToMove(Ray cameraRay)
         {
-            MonoBehaviour selectedMono = selectedUnit as MonoBehaviour; // Прямой доступ через GameObject
+            RaycastHit hit;
 
-            if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
+            if (Physics.Raycast(cameraRay, out hit, float.MaxValue, LayerMask.GetMask("Default"))) //movmentLayers //LayerMask.GetMask("Default"))
             {
-                moveable.MoveTo(hit.point);
+                MonoBehaviour selectedMono = selectedUnit as MonoBehaviour; // Прямой доступ через GameObject
 
-                Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
+                if (selectedMono != null && selectedMono.TryGetComponent(out IMoveable moveable))
+                {
+                    moveable.MoveTo(hit.point);
 
-                selectUnitPosition = hit.point;
+                    Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
+
+                    selectUnitPosition = hit.point;
+                }
             }
-
         }
+
 
 
         // Метод для снятия выделения
@@ -295,7 +212,9 @@ namespace DiceFate.Player
 
         private void LeftClickToShakeAndDropDice()
         {
-            if (selectedUnit == null) { return; }           
+            if (selectedUnit == null) { return; }
+
+            // if (GameStats.currentPhasePlayer != 3) { return; }
 
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
@@ -304,7 +223,7 @@ namespace DiceFate.Player
             else if (isDragging && Mouse.current.leftButton.isPressed)
             {
                 ShakeDiceIsMouseDown();
-                MoveToMouseDiceAndKeg();               
+                MoveToMouseDiceAndKeg();
             }
             else if (isDragging && Mouse.current.leftButton.wasReleasedThisFrame)
             {
@@ -325,21 +244,44 @@ namespace DiceFate.Player
         //---------------------------------- Функции Перемещение и вращение камеры  ----------------------------------
         private void MoveCamera()
         {
+            //mouseDelta = Mouse.current.delta.ReadValue();                     // Получаем изменение положения мыши
+            //float deltaX = -mouseDelta.x * cameraMoveSpeedX * Time.deltaTime; // сколсть по X  Инвертируем
+            //float deltaY = -mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;
+
+            //if (camera == null) return;
+
+            //// Получаем направления камеры и игнорируем вертикальную ось
+            //Vector3 moveDirection =
+            //    camera.transform.right * deltaX +
+            //    camera.transform.forward * deltaY; // Вычисляем направление движения на основе положения мыши
+            //moveDirection.y = 0;
+
+            //cameraTarget.linearVelocity = moveDirection; // Применяем движение к цели камеры
+
+            //--------------------
+
             mouseDelta = Mouse.current.delta.ReadValue();
-            float deltaX = -mouseDelta.x * cameraMoveSpeedX * Time.deltaTime;
-            float deltaY = -mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;
+            float deltaX = mouseDelta.x * cameraMoveSpeedX * Time.deltaTime;
+            float deltaY = mouseDelta.y * cameraMoveSpeedY * Time.deltaTime;
+
 
             if (cameraTarget != null)
             {
-                Vector3 moveDirection = camera.transform.right * deltaX +
-                                      camera.transform.forward * deltaY;
-                moveDirection.y = 0;
+                Vector3 moveDirection = new Vector3(-deltaX, 0, -deltaY);
 
-                if (moveDirection.magnitude > 1f)
-                    moveDirection.Normalize();
+                moveDirection = camera.transform.TransformDirection(moveDirection);
+                moveDirection.y = 0;
 
                 cameraTarget.MovePosition(cameraTarget.position + moveDirection);
             }
+
+
+
+
+
+
+
+
         }
 
         // Вращение камеры за счет вращения цели камеры ( cameraTarget )
@@ -428,7 +370,6 @@ namespace DiceFate.Player
                 if (hit.collider.CompareTag("Ground") || hit.collider.gameObject.name.Contains("Plane"))
                 {
                     pointMousePosition = hit.point;
-                    return hit.point; // Возвращаем точку попадания
                 }
             }
             return null; // Луч не попал в Plane

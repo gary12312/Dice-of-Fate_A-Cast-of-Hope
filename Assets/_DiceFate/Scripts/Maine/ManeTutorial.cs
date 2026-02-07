@@ -253,8 +253,8 @@ namespace DiceFate.Maine
             {
                 Phase(1);
                 uiManeTutorial.UiShowMasterCadrDependPrologNumber();
-                MovementAndGridEnable(); /// - добавил но не работает
-               
+
+                MovementAndGridEnable();                
             }
 
             //ShowPhaseOneUIElements();
