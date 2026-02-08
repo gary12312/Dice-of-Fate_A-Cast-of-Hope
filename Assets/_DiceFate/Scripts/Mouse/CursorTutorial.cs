@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using DiceFate.Maine;
 
 namespace DiceFate.MouseW
 {
@@ -8,7 +9,11 @@ namespace DiceFate.MouseW
     {
         [SerializeField] private Image cursor;
         [SerializeField] private GameObject pointStart;
-        [SerializeField] private GameObject pointFinish;
+        [SerializeField] private GameObject pointOne;
+        [SerializeField] private GameObject pointTwo;
+        [SerializeField] private GameObject pointThree;
+        [SerializeField] private GameObject pointFour;
+        [SerializeField] private GameObject pointFive;
         [SerializeField] private float moveDuration = 1f;
         [SerializeField] private float rotationDuration = 0.5f;
         [SerializeField] private float pauseBetweenAnimations = 0.1f;
@@ -17,25 +22,24 @@ namespace DiceFate.MouseW
                 new Keyframe(0f, 0f),
                 new Keyframe(1f, 0f)); // Кривая для плавности прыжка
 
+        [Space]
+        [SerializeField] private PrologScenario prologScenario;
+
+
         private Sequence _animationSequence;
         private Vector3 _initialRotation;
 
-        private void OnEnable()
+
+        private void Start()
         {
-            if (cursor == null || pointStart == null || pointFinish == null)
+            if (cursor == null || pointStart == null || pointOne == null)
             {
-                Debug.LogError("CursorTutorial: Не все ссылки установлены!");
+                Debug.LogError($"CursorTutorial: Не все ссылки установлены! для {this.name}");
                 return;
             }
 
             InitializeCursor();
-            StartAnimation();
-        }
-
-        private void OnDisable()
-        {
-            StopAnimation();
-        }
+        }      
 
         private void InitializeCursor()
         {
@@ -47,31 +51,22 @@ namespace DiceFate.MouseW
             cursor.transform.eulerAngles = _initialRotation;
 
             // Делаем курсор видимым
-            cursor.gameObject.SetActive(true);
+            cursor.gameObject.SetActive(false);
         }
 
-        private void StartAnimation()
+        public void AnimationCursorForPrologFour()
         {
+            StopAnimation();
+            cursor.gameObject.SetActive(true);
+
             // Создаем новую последовательность
             _animationSequence = DOTween.Sequence();
-
-
-
-            //.Append(transform.DOMove(transform.position + Vector3.up * 3, 0.5f))
-            //   .Join(transform.DORotate(Vector3.up * 180, 0.5f))
-            //   .Append(transform.DOScale(0, 0.25f).SetEase(Ease.InQuint))
-            //   .Join(transform.DORotate(Vector3.up * 720, 0.25f, RotateMode.FastBeyond360))
-            //   .Play()
-            //   .WaitForCompletion();
-
-
 
             _animationSequence.AppendInterval(0.1f);
 
             // 1. Движение из точки A в точку B
             _animationSequence
-                .Append(cursor.transform.DOMove(pointFinish.transform.position, moveDuration).SetEase(moveCurve)
-            );
+                .Append(cursor.transform.DOMove(pointOne.transform.position, moveDuration).SetEase(moveCurve));
 
             // 2. Пауза
             _animationSequence.AppendInterval(pauseBetweenAnimations);
@@ -79,17 +74,15 @@ namespace DiceFate.MouseW
             // 3. Поворот на 90 градусов по Z
             _animationSequence.Append(
                 cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration)
-                    .SetEase(moveCurve)
-            );
+                    .SetEase(moveCurve));
 
             // 4. Пауза
-           // _animationSequence.AppendInterval(pauseBetweenAnimations);
+            // _animationSequence.AppendInterval(pauseBetweenAnimations);
 
             // 5. Поворот обратно
             _animationSequence.Append(
                 cursor.transform.DORotate(_initialRotation, rotationDuration)
-                    .SetEase(moveCurve)
-            );
+                    .SetEase(moveCurve));
 
             // 6. Пауза
             _animationSequence.AppendInterval(pauseBetweenAnimations);
@@ -115,7 +108,53 @@ namespace DiceFate.MouseW
             _animationSequence.Play();
         }
 
-        private void StopAnimation()
+        public void AnimationCursorForPrologFive()
+        {
+            StopAnimation();
+            cursor.gameObject.SetActive(true);
+            cursor.transform.position = pointOne.transform.position;
+            cursor.transform.eulerAngles = _initialRotation;
+
+            _animationSequence = DOTween.Sequence();
+            // _animationSequence.AppendInterval(0.1f);
+            //_animationSequence.Append(pointTwo.transform.DOMove(pointThree.transform.position, moveDuration).SetEase(moveCurve)
+            //    .Play());
+            _animationSequence
+               .AppendInterval(0.1f)
+               .Append(cursor.transform.DOMove(pointTwo.transform.position, moveDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
+               .Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .AppendCallback(() => cursor.gameObject.SetActive(false))
+               .Play();
+        }
+
+        public void AnimationCursorForPrologSix()
+        {
+            StopAnimation();
+            cursor.gameObject.SetActive(true);
+            cursor.transform.position = pointThree.transform.position;
+            cursor.transform.eulerAngles = _initialRotation;
+
+            _animationSequence = DOTween.Sequence();
+            _animationSequence
+               .AppendInterval(0.1f)
+               .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
+               .Append(cursor.transform.DOMove(pointFour.transform.position, moveDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Append(cursor.transform.DOMove(pointFive.transform.position, moveDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
+               //.Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .AppendCallback(() => cursor.gameObject.SetActive(false))
+               .Play();
+        }
+
+        public void StopAnimation()
         {
             if (_animationSequence != null)
             {
@@ -140,14 +179,14 @@ namespace DiceFate.MouseW
         {
             StopAnimation();
             InitializeCursor();
-            StartAnimation();
+            AnimationCursorForPrologFour();
         }
 
         // Метод для изменения точек движения
         public void SetPoints(GameObject start, GameObject finish)
         {
             pointStart = start;
-            pointFinish = finish;
+            pointOne = finish;
             RestartAnimation();
         }
     }

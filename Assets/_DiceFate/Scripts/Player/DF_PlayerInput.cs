@@ -18,6 +18,7 @@ namespace DiceFate.Player
         [SerializeField] private new Camera camera;
         [SerializeField] private Rigidbody cameraTarget;
         [SerializeField] private CinemachineCamera cinemachineCamera;
+        [SerializeField] private MoveCameraTarget moveCameraTarget;
         [SerializeField] private LayerMask floorLayers;
         [SerializeField] private LayerMask movmentLayers;
         [SerializeField] private LayerMask enemyLayers;
@@ -360,7 +361,11 @@ namespace DiceFate.Player
         }
 
         //---------------------------------- События Выбор и выделение   ----------------------------------
-        private void HandelUnitSelected(UnitSelectedEvent evt) => selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+        private void HandelUnitSelected(UnitSelectedEvent evt)
+        {
+            selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+            moveCameraTarget.DOMoveTargetCameraToTarget(hit.collider.transform); // Двигать камеру к выделенному юниту
+        } 
         private void HandeleUnitDeselect(UnitDeselectedEvent evt) => selectedUnit = null;  // Сбросить текущий выделенный юнит 
         private void HandeleDeselectForUi(OnDeselectedForUiEvent args) => selectableObjectForUi = null;
         private void HandelSelectedForUi(OnSelectedForUiEvent args) => selectableObjectForUi = args.ObjectOnScene;

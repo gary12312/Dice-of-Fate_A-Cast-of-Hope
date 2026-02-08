@@ -208,6 +208,11 @@ namespace DiceFate.UI
         public void UiShowPhaseFourPlayer() => SetUiPlayerCard(true, false, false, false, true, true);
         public void UiShowPhaseFivePlayer() => SetUiPlayerCard(false, false, false, false, false, false);
 
+        public void UiBackgroundOffClicker(bool isActive)
+        {
+            iBackgroundOffClicker.SetActive(isActive);         
+        }
+
         public void UiShowMasterCadrDependPrologNumber()
         {      
 

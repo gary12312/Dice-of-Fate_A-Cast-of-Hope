@@ -11,6 +11,9 @@ namespace DiceFate.Units
     public class ControllerMovableUnitOnGrid : MonoBehaviour, IMoveable
     {
         [field: SerializeField] public bool isIMoveable { get; private set; }
+        public bool IsSelected => throw new System.NotImplementedException();
+
+
 
         [Header("Настройки перемещения")]
         public float moveDistance = 6f; // Максимальная дистанция перемещения
@@ -50,14 +53,13 @@ namespace DiceFate.Units
         private ISelectable selectedUnit; // Текущий выделенный юнит который имеет интерфейс ISelectable
 
 
-        public bool IsSelected => throw new System.NotImplementedException();
-
         private void Awake()
         {
             // Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
             Bus<OnMovmentValueEvent>.OnEvent += HandeleMovmentValue;
             Bus<OnGridEvent>.OnEvent += HandeleOnGrid;
+            Bus<OnIsActiveGridEvent>.OnEvent += HandeleActiveGrid;
         }
 
 
@@ -68,6 +70,7 @@ namespace DiceFate.Units
             Bus<UnitDeselectedEvent>.OnEvent -= HandeleUnitDeselect;
             Bus<OnMovmentValueEvent>.OnEvent -= HandeleMovmentValue;
             Bus<OnGridEvent>.OnEvent -= HandeleOnGrid;
+            Bus<OnIsActiveGridEvent>.OnEvent -= HandeleActiveGrid;
         }
 
         void Start()
@@ -138,11 +141,25 @@ namespace DiceFate.Units
 
         private void HandeleOnGrid(OnGridEvent args)
         {
-            if (gridSystem != null && unitPlayer.IsSelected) gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
+            if (gridSystem != null && unitPlayer.IsSelected)
+                gridSystem.EnablePreview(transform.position); // Включаем систему предпросмотра круговой сетки с центром в позиции фигуры
 
         }
 
-
+        private void HandeleActiveGrid(OnIsActiveGridEvent args)
+        {
+            if (gridSystem != null && unitPlayer.IsSelected)
+            {
+                if (args.isActiveGrid == true)
+                {
+                    EnaibleGrid();
+                }
+                if (args.isActiveGrid == false)
+                {
+                    DisableGrid();
+                }
+            }
+        }
 
         //-------------- IMoveable реализация --------------
 

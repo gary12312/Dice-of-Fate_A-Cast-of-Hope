@@ -1,6 +1,8 @@
+using DiceFate.MouseW;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DiceFate.UI;
 
 namespace DiceFate.Maine
 {
@@ -9,12 +11,13 @@ namespace DiceFate.Maine
         [Header("Camera Settings")]
         [SerializeField] private GameObject cameraMain;
         [SerializeField] private GameObject cameraVirtualOne;
+        [SerializeField] private GameObject cameraTarget;
         [SerializeField] public bool isTesting;
         [SerializeField] public int prologNumber = 5;  // 1- часть.
 
         [Header("Настройки движения камеры")]       // Дополнительные параметры для управления камерой
         [SerializeField] private new Camera camera;
-        [SerializeField] private Rigidbody cameraTarget;
+        [SerializeField] private Rigidbody cameraTargetRB;
         [SerializeField] private float cameraMoveSpeedX = 2.1f; // Скорость движения камеры
         [SerializeField] private float cameraMoveSpeedY = 4f; // Скорость движения камеры
         [SerializeField] private float cameraRotationSpeed = 10f; // Скорость вращения камеры
@@ -41,14 +44,26 @@ namespace DiceFate.Maine
         // 1 - Text 2
         // 2 - Text 3
 
+        [Header("Zero")]
+        [SerializeField] private ParticleSystem rainRocks;
+
         [Header("Five")]
-        [SerializeField] private GameObject cursor;
+        [SerializeField] private GameObject iBackgroundOffClicker;
+
+
 
         [Header("Six")]
         [SerializeField] private GameObject diceMove;
         [SerializeField] private GameObject diceAttack;
         [SerializeField] private GameObject diceShild;
         [SerializeField] private GameObject diceConterAtack;
+
+
+        [Space]
+        [SerializeField] private MoveCameraTarget moveCameraTarget;
+        [SerializeField] private CursorTutorial cursorTutorial;
+        [SerializeField] private UI_ManeTutorial ui_ManeTutorial;   
+
 
 
 
@@ -73,6 +88,8 @@ namespace DiceFate.Maine
             }
 
             HideMouseAndPartical();
+
+            rainRocks.Stop();
         }
 
         private void Start()
@@ -98,7 +115,8 @@ namespace DiceFate.Maine
             SetActiveAllObjectsOff(texts);
            // canvas.SetActive(false);
             canvasBattle.SetActive(false);
-            cursor.SetActive(false);            
+            iBackgroundOffClicker.SetActive(false);
+
 
             if (isTesting)
             {
@@ -114,7 +132,7 @@ namespace DiceFate.Maine
         {
             if (isTesting)
             {
-                if (cameraTarget == null) return;
+                if (cameraTargetRB == null) return;
 
                 if (Mouse.current.rightButton.isPressed)
                 {
@@ -123,7 +141,7 @@ namespace DiceFate.Maine
                 else
                 {
                     // Останавливаем камеру при отпускании кнопки
-                    cameraTarget.linearVelocity = Vector3.zero;
+                    cameraTargetRB.linearVelocity = Vector3.zero;
                 }
 
                 if (Mouse.current.rightButton.wasReleasedThisFrame)
@@ -191,7 +209,7 @@ namespace DiceFate.Maine
                 camera.transform.forward * deltaY; // Вычисляем направление движения на основе положения мыши
             moveDirection.y = 0;
 
-            cameraTarget.linearVelocity = moveDirection; // Применяем движение к цели камеры
+            cameraTargetRB.linearVelocity = moveDirection; // Применяем движение к цели камеры
         }
 
         // Вращение камеры за счет вращения цели камеры ( cameraTarget )
@@ -200,14 +218,14 @@ namespace DiceFate.Maine
             mouseDelta = Mouse.current.delta.ReadValue();                       // Получаем изменение положения мыши            
             float deltaY = mouseDelta.x * cameraRotationSpeed * Time.deltaTime; // Вращаем только по горизонтали (оси Y) на основе движения мыши по X
 
-            if (cameraTarget != null)
+            if (cameraTargetRB != null)
             {
-                Vector3 currentRotation = cameraTarget.rotation.eulerAngles;    // Получаем текущее вращение cameraTarget
+                Vector3 currentRotation = cameraTargetRB.rotation.eulerAngles;    // Получаем текущее вращение cameraTarget
 
                 float newYRotation = currentRotation.y + deltaY;                // Добавляем вращение только по оси Y
                 Quaternion newRotation = Quaternion.Euler(currentRotation.x, newYRotation, currentRotation.z);  // Создаем новое вращение, сохраняя X и Z неизменными
 
-                cameraTarget.rotation = newRotation;                            // Применяем вращение к cameraTarget
+                cameraTargetRB.rotation = newRotation;                            // Применяем вращение к cameraTarget
             }
 
             ActiveCold();
@@ -216,6 +234,10 @@ namespace DiceFate.Maine
         // --------------------------- Сценарии ----------------------------
         private IEnumerator ScenarioOne()
         {
+            yield return new WaitForSeconds(0.2f);
+            rainRocks.Play();
+
+            yield return new WaitForSeconds(1f);
             // Переключаем камеры
             cameraMain.SetActive(true);
             cameraVirtualOne.SetActive(false);
@@ -247,51 +269,96 @@ namespace DiceFate.Maine
 
         private IEnumerator ScenarioThree()
         {
+            prologNumber = 3;
             FadeTextOut();     
             HideMouse(mouse_M);
+           
+
+            moveCameraTarget.CameraTargetAnimationToOneTarget();
+
 
             // третий текст - появляется
             yield return new WaitForSeconds(0.5f);
             playerInput.SetActive(true);
-            prologNumber = 3;
             ShowObject(2);
-            FadeTextIn();
+            FadeTextIn();  // Свиток огня, я его нашол
             ShowMouse(mouse_L);
         }
 
         public void StartScenarioFour() => StartCoroutine(ScenarioFour());
         private IEnumerator ScenarioFour()
         {
+            prologNumber = 4;
             FadeTextOut();
             HideMouse(mouse_L);
-           // canvas.SetActive(true);
+            iBackgroundOffClicker.SetActive(true);
+            // canvas.SetActive(true);
 
-            // текст - появляется Нужно подойти и забрать его.
-            yield return new WaitForSeconds(0.5f);           
-            prologNumber = 4;
-            ShowObject(3);
+
+            yield return new WaitForSeconds(0.5f);          
+            ShowObject(3); // Немогу дотянуться
             FadeTextIn();
 
-            yield return new WaitForSeconds(2.5f);
-            cursor.SetActive(true);
+            yield return new WaitForSeconds(1f);
+            cursorTutorial.AnimationCursorForPrologFour();
+          
 
             yield return new WaitForSeconds(3f);
-            cursor.SetActive(false);
-            FadeTextOut();
+            cursorTutorial.StopAnimation();
+           
+
         }
 
-        public void StartScenarioFive() => StartCoroutine(ScenarioFive());       
+        public void StartScenarioFive()
+        {
+            if (prologNumber <= 4)
+            {
+                StartCoroutine(ScenarioFive());
+            }           
+        }    
+        
         private IEnumerator ScenarioFive()
         {
-            FadeTextOut();
-            cursor.SetActive(true);
             prologNumber = 5;
+            FadeTextOut();
+           // ui_ManeTutorial.UiBackgroundOffClicker(true);
+          // iBackgroundOffClicker.SetActive(true);
 
-            yield return new WaitForSeconds(4f);
-            cursor.SetActive(false);
+
+            yield return new WaitForSeconds(1f);
+            cursorTutorial.AnimationCursorForPrologFive();
+            ShowObject(4); // За шаг не пройти, мне нужен магический куб
+            FadeTextIn();
+
+
+            yield return new WaitForSeconds(3f);
+            cursorTutorial.StopAnimation();
         }
 
+        public void StartScenarioSix()
+        {
+            if (prologNumber <= 5)
+            {
+                StartCoroutine(ScenarioSix());
+            }
+        }
 
+        private IEnumerator ScenarioSix()
+        {
+            prologNumber = 6;
+            iBackgroundOffClicker.SetActive(false);
+            FadeTextOut();
+           // ui_ManeTutorial.UiBackgroundOffClicker(false);
+
+
+
+            yield return new WaitForSeconds(1f);
+            cursorTutorial.AnimationCursorForPrologSix();
+
+
+            yield return new WaitForSeconds(3f);
+            cursorTutorial.StopAnimation();
+        }
 
 
 

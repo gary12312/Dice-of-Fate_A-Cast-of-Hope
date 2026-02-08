@@ -268,6 +268,7 @@ namespace DiceFate.Maine
             //    return;
 
             Phase(2);
+            Bus<OnIsActiveGridEvent>.Raise(new OnIsActiveGridEvent(false));
             uiManeTutorial.UiShowPhaseTwoPlayer();
 
             //ShowPhaseTwoUIElements();
@@ -282,6 +283,7 @@ namespace DiceFate.Maine
 
             Phase(3);
             uiManeTutorial.UiShowPhaseThreePlayer();
+            
 
             //ShowPhaseThreeUIElements();
             ShowPhaseThreeSceneElements();

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 using DiceFate;
 using DiceFate.Dice;
