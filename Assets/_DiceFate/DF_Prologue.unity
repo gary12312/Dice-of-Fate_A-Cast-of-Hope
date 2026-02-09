@@ -3694,7 +3694,7 @@ Transform:
   m_GameObject: {fileID: 308903605}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0384, y: 0, z: 0}
+  m_LocalPosition: {x: 0.0014, y: 0.0064, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11354,11 +11354,11 @@ MonoBehaviour:
       - m_Target: {fileID: 1594720907}
         m_TargetAssemblyTypeName: DiceFate.Animation.DT_AnimationRocks, Assembly-CSharp
         m_MethodName: AnimationRocks
-        m_Mode: 1
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 3
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -14523,7 +14523,7 @@ Transform:
   m_GameObject: {fileID: 1289124662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0384, y: 0, z: 0}
+  m_LocalPosition: {x: -0.0714, y: 0.0427, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18072,21 +18072,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4039fbef6562b9f469315dd6fa3d3dc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Animation.DT_AnimationRocks
-  rocks: []
-  rockOne: {fileID: 1667472409}
-  rockTwo: {fileID: 0}
-  rockThree: {fileID: 0}
-  rockFour: {fileID: 0}
-  rockFive: {fileID: 0}
-  rockSix: {fileID: 0}
-  rockSeven: {fileID: 0}
-  points: []
-  pointOne: {fileID: 2138655772}
-  pointTwo: {fileID: 0}
-  pointThree: {fileID: 0}
-  pointFour: {fileID: 0}
-  pointFive: {fileID: 0}
-  pointSix: {fileID: 0}
+  rocks:
+  - {fileID: 1667472409}
+  - {fileID: 819021135}
+  - {fileID: 108122880}
+  - {fileID: 1129052596}
+  - {fileID: 1495455910}
+  - {fileID: 651298945}
+  points:
+  - {fileID: 2138655772}
+  - {fileID: 2140622097}
+  - {fileID: 2147262960}
+  - {fileID: 1289124663}
+  - {fileID: 308903606}
+  - {fileID: 2117060745}
   moveDuration: 0.2
   pauseBetweenAnimations: 0.1
   moveCurve:
@@ -25011,7 +25010,7 @@ Transform:
   m_GameObject: {fileID: 2117060744}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0384, y: 0, z: 0}
+  m_LocalPosition: {x: -0.0531, y: 0.0254, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25716,7 +25715,7 @@ Transform:
   m_GameObject: {fileID: 2147262959}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0372, y: -0.0061, z: -0}
+  m_LocalPosition: {x: -0.011, y: -0.015, z: -0.016}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

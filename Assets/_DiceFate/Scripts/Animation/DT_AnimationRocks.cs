@@ -1,83 +1,53 @@
 using DG.Tweening;
-using DiceFate.Maine;
-using DiceFate.UI;
-using UnityEditor.Overlays;
 using UnityEngine;
-using Архив;
+
 
 namespace DiceFate.Animation
 {
     public class DT_AnimationRocks : MonoBehaviour
     {
-
-
-        [SerializeField] private GameObject[] rocks;
-        [SerializeField] private GameObject rockOne;
-        [SerializeField] private GameObject rockTwo;
-        [SerializeField] private GameObject rockThree;
-        [SerializeField] private GameObject rockFour;
-        [SerializeField] private GameObject rockFive;
-        [SerializeField] private GameObject rockSix;
-        [SerializeField] private GameObject rockSeven;
+        [SerializeField] private GameObject[] rocks;      
         [Space]
-        [SerializeField] private Transform[] points;
-        [SerializeField] private Transform pointOne;
-        [SerializeField] private Transform pointTwo;
-        [SerializeField] private Transform pointThree;
-        [SerializeField] private Transform pointFour;
-        [SerializeField] private Transform pointFive;
-        [SerializeField] private Transform pointSix;
+        [SerializeField] private Transform[] points;    
         [Space]
-        [SerializeField] private float moveDuration = 2f;
-        //[SerializeField] private float rotationDuration = 0.5f;
+        [SerializeField] private float moveDuration = 2f;      
         [SerializeField] private float pauseBetweenAnimations = 0.1f;
         [SerializeField]
         public AnimationCurve moveCurve = new AnimationCurve(
                 new Keyframe(0f, 0f),
                 new Keyframe(1f, 0f)); // Кривая для плавности прыжка
 
-        [Space]
-        //[SerializeField] private PrologScenario prologScenario;
-
-
-        private Sequence _animationSequence;
 
         private Vector3[] _initialPosition;
-
-        private Vector3 _initialPositionRockOne;
-        private Vector3 _initialPositionRockTwo;
-        private Vector3 _initialPositionRockThree;
-        private Vector3 _initialPositionRockFour;
-        private Vector3 _initialPositionRockFive;
-        private Vector3 _initialPositionRockSix;
 
 
         private void Start()
         {
-           // ValidateScripts();
+            // ValidateScripts();
             InitializeRocks();
         }
 
         private void InitializeRocks()
         {
+            _initialPosition = new Vector3[rocks.Length]; // Инициализируем массив с нужным размером
             SaveStartPosition();
             SetRocksToBeginPoint();
-            SetActiveRocks(false);
+            SetActiveAllRocks(false);
         }
 
 
-
-
-        public void AnimationRocks()
+        public void AnimationRocks(int i)
         {
+            if (i < 0 || i >= rocks.Length) { return; }
+
             //  StopAnimation();
-            SetActiveRocks(true);
+            SetActiveRock(i, true);
 
+            Sequence _animationSequence;
             _animationSequence = DOTween.Sequence();
-
             _animationSequence
                 .AppendInterval(0.1f)
-                .Append(rockOne.transform.DOMove(_initialPositionRockOne, moveDuration).SetEase(moveCurve))
+                .Append(rocks[i].transform.DOMove(_initialPosition[i], moveDuration).SetEase(moveCurve))
                 .Play();
 
 
@@ -99,61 +69,59 @@ namespace DiceFate.Animation
 
         private void SaveStartPosition()
         {
-            _initialPositionRockOne = rockOne.transform.position;
-            //_initialPositionRockTwo = rockTwo.transform.position;
-            //_initialPositionRockThree = rockThree.transform.position;
-            //_initialPositionRockFour = rockFour.transform.position;
-            //_initialPositionRockFive = rockFive.transform.position;
-            //_initialPositionRockSix = rockSix.transform.position;
+            for (int i = 0; i < rocks.Length; i++)
+            {
+                _initialPosition[i] = rocks[i].transform.position;
+            } 
         }
 
         private void SetRocksToBeginPoint()
         {
-            rockOne.transform.position = pointOne.position;
-            //rockTwo.transform.position = pointTwo.position;
-            //rockThree.transform.position = pointThree.position;
-            //rockFour.transform.position = pointFour.position;
-            //rockFive.transform.position = pointFive.position;
-            //rockSix.transform.position = pointSix.position;
+            for (int i = 0; i < rocks.Length; i++)
+            {
+                rocks[i].transform.position = points[i].position;
+            }
         }
 
-        private void SetActiveRocks(bool isActive)
+        private void SetActiveAllRocks(bool isActive)
         {
-            rockOne.gameObject.SetActive(isActive);
-            //rockTwo.gameObject.SetActive(isActive);
-            //rockThree.gameObject.SetActive(isActive);
-            //rockFour.gameObject.SetActive(isActive);
-            //rockFive.gameObject.SetActive(isActive);
-            //rockSix.gameObject.SetActive(isActive);
+            foreach (var item in rocks)
+            {
+                item.SetActive(isActive);
+            };
         }
 
+        private void SetActiveRock(int i, bool isActive) => rocks[i].SetActive(isActive);
+     
         private void ValidateScripts()
         {
-            if (rockOne == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на rockOne!");
-            if (rockTwo == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на rockTwo!");
-            if (rockThree == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на rockThree!");
-            if (rockFour == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на rockFour!");
-            if (rockFive == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на rockFive!");
-            if (rockSix == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на rockSix!");
 
-            if (pointOne == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на pointOne!");
-            if (pointTwo == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на pointTwo!");
-            if (pointThree == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на pointThree!");
-            if (pointFour == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на pointFour!");
-            if (pointFive == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на pointFive!");
-            if (pointSix == null)
-                Debug.LogError($" для {this.name} Не установлена ссылка на pointSix!");
+
+            //if (rockOne == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockOne!");
+            //if (rockTwo == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockTwo!");
+            //if (rockThree == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockThree!");
+            //if (rockFour == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockFour!");
+            //if (rockFive == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockFive!");
+            //if (rockSix == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockSix!");
+
+            //if (pointOne == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointOne!");
+            //if (pointTwo == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointTwo!");
+            //if (pointThree == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointThree!");
+            //if (pointFour == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointFour!");
+            //if (pointFive == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointFive!");
+            //if (pointSix == null)
+            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointSix!");
         }
     }
 }
