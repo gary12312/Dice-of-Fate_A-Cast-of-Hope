@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using DiceFate.UI;
 
+
 namespace DiceFate.Maine
 {
     public class PrologScenario : MonoBehaviour

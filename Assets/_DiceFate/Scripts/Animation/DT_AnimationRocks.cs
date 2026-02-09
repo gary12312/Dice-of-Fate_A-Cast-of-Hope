@@ -1,4 +1,5 @@
-using DG.Tweening;
+п»їusing DG.Tweening;
+using System.Collections;
 using UnityEngine;
 
 
@@ -6,16 +7,19 @@ namespace DiceFate.Animation
 {
     public class DT_AnimationRocks : MonoBehaviour
     {
-        [SerializeField] private GameObject[] rocks;      
+        [SerializeField] private GameObject[] rocks;
         [Space]
-        [SerializeField] private Transform[] points;    
+        [SerializeField] private Transform[] points;
         [Space]
-        [SerializeField] private float moveDuration = 2f;      
+        [SerializeField] private float moveDuration = 2f;
         [SerializeField] private float pauseBetweenAnimations = 0.1f;
         [SerializeField]
         public AnimationCurve moveCurve = new AnimationCurve(
                 new Keyframe(0f, 0f),
-                new Keyframe(1f, 0f)); // Кривая для плавности прыжка
+                new Keyframe(1f, 0f)); // РљСЂРёРІР°СЏ РґР»СЏ РїР»Р°РІРЅРѕСЃС‚Рё РїСЂС‹Р¶РєР°
+
+       // [SerializeField] private CameraShakeAdvanced cameraShake;
+
 
 
         private Vector3[] _initialPosition;
@@ -29,14 +33,47 @@ namespace DiceFate.Animation
 
         private void InitializeRocks()
         {
-            _initialPosition = new Vector3[rocks.Length]; // Инициализируем массив с нужным размером
+            _initialPosition = new Vector3[rocks.Length]; // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РјР°СЃСЃРёРІ СЃ РЅСѓР¶РЅС‹Рј СЂР°Р·РјРµСЂРѕРј
             SaveStartPosition();
             SetRocksToBeginPoint();
             SetActiveAllRocks(false);
         }
 
+        public void StartAnimationRocks()
+        {
+            //if (rocks == null || points == null || rocks.Length == 5)
+            //{
+                StartCoroutine(AnimationRocks());
+            //}           
+        }
 
-        public void AnimationRocks(int i)
+        private IEnumerator AnimationRocks()
+        {
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+          //  cameraShake.Shake(0.7f, 0.4f);
+
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+            AnimationRock(0);
+
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+            AnimationRock(2);
+
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+            AnimationRock(1);
+
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+            AnimationRock(3);
+
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+            AnimationRock(5);
+
+            yield return new WaitForSeconds(pauseBetweenAnimations);
+            AnimationRock(4);
+        }
+
+
+
+        public void AnimationRock(int i)
         {
             if (i < 0 || i >= rocks.Length) { return; }
 
@@ -49,30 +86,14 @@ namespace DiceFate.Animation
                 .AppendInterval(0.1f)
                 .Append(rocks[i].transform.DOMove(_initialPosition[i], moveDuration).SetEase(moveCurve))
                 .Play();
-
-
-            //      _animationSequence
-            //.AppendInterval(0.1f)
-            //.Append(cursor.transform.DOMove(pointTwo.transform.position, moveDuration).SetEase(moveCurve))
-            //.AppendInterval(pauseBetweenAnimations)
-            //.Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
-            //.Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
-            //.AppendInterval(pauseBetweenAnimations)
-            //.AppendCallback(() => cursor.gameObject.SetActive(false))
-            //.Play();
-
-
-
         }
-
-
 
         private void SaveStartPosition()
         {
             for (int i = 0; i < rocks.Length; i++)
             {
                 _initialPosition[i] = rocks[i].transform.position;
-            } 
+            }
         }
 
         private void SetRocksToBeginPoint()
@@ -88,40 +109,22 @@ namespace DiceFate.Animation
             foreach (var item in rocks)
             {
                 item.SetActive(isActive);
-            };
+            }
+            ;
         }
 
         private void SetActiveRock(int i, bool isActive) => rocks[i].SetActive(isActive);
-     
+
         private void ValidateScripts()
         {
+            if (rocks == null)
+                Debug.LogError($" РґР»СЏ {this.name} РќРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅs РѕР±СЉРµРєС‚С‹ РЅР° rocks!");
 
+            if (points == null)
+                Debug.LogError($" РґР»СЏ {this.name} РќРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅs РѕР±СЉРµРєС‚С‹ РЅР° points!");
 
-            //if (rockOne == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockOne!");
-            //if (rockTwo == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockTwo!");
-            //if (rockThree == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockThree!");
-            //if (rockFour == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockFour!");
-            //if (rockFive == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockFive!");
-            //if (rockSix == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на rockSix!");
-
-            //if (pointOne == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointOne!");
-            //if (pointTwo == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointTwo!");
-            //if (pointThree == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointThree!");
-            //if (pointFour == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointFour!");
-            //if (pointFive == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointFive!");
-            //if (pointSix == null)
-            //    Debug.LogError($" для {this.name} Не установлена ссылка на pointSix!");
+            if (rocks.Length != points.Length)
+                Debug.LogError($" РґР»СЏ {this.name} РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЉРµРєС‚пїЅпїЅРІ РЅР° rocks Рё points РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РѕРґРёРЅР°РєРѕРІС‹Рј!");
         }
     }
 }

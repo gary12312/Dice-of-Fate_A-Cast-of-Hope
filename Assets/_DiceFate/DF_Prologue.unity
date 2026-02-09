@@ -3694,7 +3694,7 @@ Transform:
   m_GameObject: {fileID: 308903605}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0014, y: 0.0064, z: 0}
+  m_LocalPosition: {x: 0.0014, y: 0.0064, z: 0.026}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11353,8 +11353,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1594720907}
         m_TargetAssemblyTypeName: DiceFate.Animation.DT_AnimationRocks, Assembly-CSharp
-        m_MethodName: AnimationRocks
-        m_Mode: 3
+        m_MethodName: StartAnimationRocks
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -14523,7 +14523,7 @@ Transform:
   m_GameObject: {fileID: 1289124662}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0714, y: 0.0427, z: 0}
+  m_LocalPosition: {x: -0.0714, y: 0.0427, z: 0.025}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18086,7 +18086,7 @@ MonoBehaviour:
   - {fileID: 1289124663}
   - {fileID: 308903606}
   - {fileID: 2117060745}
-  moveDuration: 0.2
+  moveDuration: 0.1
   pauseBetweenAnimations: 0.1
   moveCurve:
     serializedVersion: 2
@@ -18651,6 +18651,7 @@ GameObject:
   - component: {fileID: 1639741759}
   - component: {fileID: 1639741762}
   - component: {fileID: 1639741763}
+  - component: {fileID: 1639741764}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -18748,6 +18749,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineHardLookAt
   LookAtOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &1639741764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639741758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76f422206f8d1db4dba02e3743613dc3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CinemachineCameraShake
 --- !u!1 &1643695374
 GameObject:
   m_ObjectHideFlags: 0
@@ -25010,7 +25023,7 @@ Transform:
   m_GameObject: {fileID: 2117060744}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0531, y: 0.0254, z: 0}
+  m_LocalPosition: {x: -0.0531, y: 0.0254, z: 0.026}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25318,7 +25331,7 @@ Transform:
   m_GameObject: {fileID: 2138655771}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.04324, y: -0.0185, z: 0.0148}
+  m_LocalPosition: {x: -0.04324, y: -0.0185, z: 0.0248}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25349,7 +25362,7 @@ Transform:
   m_GameObject: {fileID: 2140622096}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.01243, y: 0.01825, z: 0.02402}
+  m_LocalPosition: {x: -0.01243, y: 0.01825, z: 0.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -25715,7 +25728,7 @@ Transform:
   m_GameObject: {fileID: 2147262959}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.011, y: -0.015, z: -0.016}
+  m_LocalPosition: {x: -0.011, y: -0.015, z: 0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
