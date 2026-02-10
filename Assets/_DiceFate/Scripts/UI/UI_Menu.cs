@@ -38,6 +38,8 @@ public class UI_Menu : MonoBehaviour
 
     [Space]
     [SerializeField] private GameObject unClicker;
+    [SerializeField] private GameObject ImageBackgroundLoder;
+    [SerializeField] private float durationBackLoder = 0.5f;
 
     private Sequence sequenceAnimationNewGame;
     private Sequence sequenceAnimationСontinueGame;
@@ -71,6 +73,7 @@ public class UI_Menu : MonoBehaviour
         back.onClick.AddListener(Back);
 
         unClicker.SetActive(false);
+        ImageBackgroundLoder.SetActive(false);
 
         // Запускаем активацию UI элементов
         StartCoroutine(ActivationUIElements());
@@ -154,7 +157,9 @@ public class UI_Menu : MonoBehaviour
     private void NewGame()
     {
         StartCoroutine(ButtonAnimationRun("Out", () =>
-        {
+        {            
+            ImageBackgroundActive();
+
             Debug.Log("Начата новая игра!");           
         }));
     }
@@ -163,6 +168,8 @@ public class UI_Menu : MonoBehaviour
     {
         StartCoroutine(ButtonAnimationRun("Out", () =>
         {
+            ImageBackgroundActive();
+
             Debug.Log("Продолжение игры!");           
         }));
     }
@@ -323,6 +330,18 @@ public class UI_Menu : MonoBehaviour
     public void EnableReload() => isReloadEnabled = true;                     // Включает  возможность перезагрузки сцены
     public void DisableReload() => isReloadEnabled = false;                   // Отключает возможность перезагрузки сцены
 
+
+    //-------------------------------- Доплнительные методы --------------------------------
+    private void ImageBackgroundActive()
+    {
+        ImageBackgroundLoder.SetActive(true);
+
+        UIImageLoading uiImage = ImageBackgroundLoder.GetComponent<UIImageLoading>();
+
+        uiImage.DOFateImageLoadToOne(durationBackLoder);
+    }
+
+
     private void ValidateScriptsAndObject()
     {
         if (newGame == null)
@@ -339,6 +358,8 @@ public class UI_Menu : MonoBehaviour
             Debug.LogError($"Для {this.name} не установлена ссылка на canvasGroupFirst!");
         if (settings == null)
             Debug.LogError($"Для {this.name} не установлена ссылка на settings!");
+        if (ImageBackgroundLoder == null)
+            Debug.LogError($"Для {this.name} не установлена ссылка на ImageBackgroundLoder!");
         if (settingsCanvasGroup == null && settings.GetComponent<CanvasGroup>() == null)
             Debug.LogWarning($"Для {this.name} не установлена ссылка на settingsCanvasGroup! Пытаемся получить компонент автоматически.");  
     }

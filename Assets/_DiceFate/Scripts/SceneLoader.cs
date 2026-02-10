@@ -15,8 +15,6 @@ namespace DiceFate
         [SerializeField] private string gameScene = "GameScene";
         [SerializeField] private string settingsScene = "Settings";
 
-        [SerializeField] private GameObject ImageScreenLoad;
-        [SerializeField] private float durationScreenloder = 0.5f;
 
         private void Awake()
         {
@@ -45,7 +43,7 @@ namespace DiceFate
 
         public void OpenSettings()
         {
-            ImageLoder();
+            
             SceneManager.LoadScene(settingsScene);
         }
 
@@ -63,13 +61,6 @@ namespace DiceFate
             SceneManager.LoadScene(sceneName);
         }
 
-        //--------------------------------
-        private void ImageLoder()
-        {
-            UIImageLoading uiImage = ImageScreenLoad.GetComponent<UIImageLoading>();
-
-            uiImage.DOFateImageLoadToOne(durationScreenloder);
-        }
 
     }
 }
