@@ -10,7 +10,8 @@ using DiceFate.Maine;
 namespace DiceFate.UI
 {
     public class UI_ManeTutorial : MonoBehaviour
-    {
+    {       
+
         [Header("Фаза 1 настройки")]
 
 

@@ -17,17 +17,13 @@ namespace DiceFate.Animation
         public AnimationCurve moveCurve = new AnimationCurve(
                 new Keyframe(0f, 0f),
                 new Keyframe(1f, 0f)); // Кривая для плавности прыжка
-
-       // [SerializeField] private CameraShakeAdvanced cameraShake;
-
-
+            
 
         private Vector3[] _initialPosition;
 
-
         private void Start()
         {
-            // ValidateScripts();
+            ValidateScripts();
             InitializeRocks();
         }
 
@@ -39,19 +35,11 @@ namespace DiceFate.Animation
             SetActiveAllRocks(false);
         }
 
-        public void StartAnimationRocks()
-        {
-            //if (rocks == null || points == null || rocks.Length == 5)
-            //{
-                StartCoroutine(AnimationRocks());
-            //}           
-        }
+        public void StartAnimationRocks() => StartCoroutine(AnimationRocks());  
+    
 
         private IEnumerator AnimationRocks()
-        {
-            yield return new WaitForSeconds(pauseBetweenAnimations);
-          //  cameraShake.Shake(0.7f, 0.4f);
-
+        {        
             yield return new WaitForSeconds(pauseBetweenAnimations);
             AnimationRock(0);
 
@@ -70,8 +58,6 @@ namespace DiceFate.Animation
             yield return new WaitForSeconds(pauseBetweenAnimations);
             AnimationRock(4);
         }
-
-
 
         public void AnimationRock(int i)
         {

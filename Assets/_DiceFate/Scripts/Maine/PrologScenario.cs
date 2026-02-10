@@ -1,8 +1,11 @@
+using DiceFate.Animation;
 using DiceFate.MouseW;
+using DiceFate.UI;
 using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using DiceFate.UI;
+using UnityEngine.UI;
 
 
 namespace DiceFate.Maine
@@ -46,7 +49,11 @@ namespace DiceFate.Maine
         // 2 - Text 3
 
         [Header("Zero")]
+        [SerializeField] private GameObject Screenloder;
+        [SerializeField] private float durationScreenloder = 0.5f;
         [SerializeField] private ParticleSystem rainRocks;
+        [SerializeField] private DT_AnimationRocks animationRocks;
+        [SerializeField] private CinemachineImpulseSource impulseSource;
 
         [Header("Five")]
         [SerializeField] private GameObject iBackgroundOffClicker;
@@ -63,11 +70,10 @@ namespace DiceFate.Maine
         [Space]
         [SerializeField] private MoveCameraTarget moveCameraTarget;
         [SerializeField] private CursorTutorial cursorTutorial;
-        [SerializeField] private UI_ManeTutorial ui_ManeTutorial;   
+        [SerializeField] private UI_ManeTutorial ui_ManeTutorial;
 
-
-
-
+        [Space]
+       
 
         private CanvasGroup currentCanvasGroup;
         private Vector2 mouseDelta;            // Изменение положения мыши
@@ -77,8 +83,10 @@ namespace DiceFate.Maine
 
         private void Awake()
         {
+            
             if (isTesting)
             {
+                Screenloder.SetActive(true);
                 cameraMain.SetActive(false);
                 cameraVirtualOne.SetActive(true);
             }
@@ -235,10 +243,16 @@ namespace DiceFate.Maine
         // --------------------------- Сценарии ----------------------------
         private IEnumerator ScenarioOne()
         {
-            yield return new WaitForSeconds(0.2f);
-            rainRocks.Play();
+            ImageLoder();
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.3f);
+            CameraShakeCinemachine();
+
+            yield return new WaitForSeconds(0.1f);
+            rainRocks.Play();
+            animationRocks.StartAnimationRocks();
+
+            yield return new WaitForSeconds(0.3f);
             // Переключаем камеры
             cameraMain.SetActive(true);
             cameraVirtualOne.SetActive(false);
@@ -478,9 +492,18 @@ namespace DiceFate.Maine
             isColdActive = true;
         }
 
+        // -------------------------- Тряска камеры ---------------------------
+        public void CameraShakeCinemachine()
+        {
+            CameraShakeManadger.instance.CameraShake(impulseSource);
+        }
 
+        private void ImageLoder()
+        {
+            UIImageLoading uiImage = Screenloder.GetComponent<UIImageLoading>();
 
-
+            uiImage.DOFateImageLoadToZero(durationScreenloder);      
+        }
 
     }
 }

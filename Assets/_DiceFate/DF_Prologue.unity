@@ -5685,7 +5685,7 @@ MonoBehaviour:
   cameraMain: {fileID: 1639741758}
   cameraVirtualOne: {fileID: 559822745}
   cameraTarget: {fileID: 262242334}
-  isTesting: 0
+  isTesting: 1
   prologNumber: 5
   camera: {fileID: 1489927585}
   cameraTargetRB: {fileID: 262242337}
@@ -5710,7 +5710,11 @@ MonoBehaviour:
   - {fileID: 981381740}
   - {fileID: 1183202587}
   - {fileID: 1495432494}
+  Screenloder: {fileID: 734314090}
+  durationScreenloder: 0.5
   rainRocks: {fileID: 1670411570}
+  animationRocks: {fileID: 1594720907}
+  impulseSource: {fileID: 1677062501}
   iBackgroundOffClicker: {fileID: 1610687615}
   diceMove: {fileID: 0}
   diceAttack: {fileID: 0}
@@ -5975,6 +5979,7 @@ GameObject:
   - component: {fileID: 559822749}
   - component: {fileID: 559822748}
   - component: {fileID: 559822747}
+  - component: {fileID: 559822750}
   m_Layer: 0
   m_Name: Virt_One_CinemachineCamera
   m_TagString: Untagged
@@ -6072,6 +6077,30 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
+--- !u!114 &559822750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559822745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00b2d199b96b516448144ab30fb26aed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseListener
+  ApplyAfter: 2
+  ChannelMask: 1
+  Gain: 1
+  Use2DDistance: 0
+  UseCameraSpace: 1
+  SignalCombinationMode: 0
+  ReactionSettings:
+    m_SecondaryNoise: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    Duration: 1
+    m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1 &564534314
 GameObject:
   m_ObjectHideFlags: 0
@@ -8257,6 +8286,95 @@ Transform:
   - {fileID: 1065701943}
   m_Father: {fileID: 1548288805}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &734314090
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 734314091}
+  - component: {fileID: 734314094}
+  - component: {fileID: 734314093}
+  - component: {fileID: 734314092}
+  m_Layer: 5
+  m_Name: I_Loading
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &734314091
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734314090}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1748171584}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &734314092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734314090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af78c20197d85ca4ead4d7d62a641f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIImageLoading
+  image: {fileID: 734314093}
+--- !u!114 &734314093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734314090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &734314094
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 734314090}
+  m_CullTransparentMesh: 1
 --- !u!1 &734850030
 GameObject:
   m_ObjectHideFlags: 0
@@ -11187,9 +11305,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u0427\u0442\u043E\u0431\u044B \u0434\u043E\u0439\u0442\u0438, \u043C\u043D\u0435
-    \u043D\u0443\u0436\u0435\u043D \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u0438\u0439
-    \u043A\u0443\u0431."
+  m_text: "\u041D\u0443\u0436\u0435\u043D \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+    \u043A\u0443\u0431, \u0447\u0442\u043E\u0431\u044B \u043F\u0440\u043E\u0439\u0442\u0438
+    \u0431\u043E\u043B\u044C\u0448\u0435."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 581b79c35025e2347aa43efc3f5ccbe8, type: 2}
   m_sharedMaterial: {fileID: 1720957209839289220, guid: 581b79c35025e2347aa43efc3f5ccbe8, type: 2}
@@ -11359,6 +11477,18 @@ MonoBehaviour:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 524100007}
+        m_TargetAssemblyTypeName: DiceFate.Maine.PrologScenario, Assembly-CSharp
+        m_MethodName: CameraShakeCinemachine
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -16793,7 +16923,7 @@ MonoBehaviour:
     DefaultMode: 2
   DefaultBlend:
     Style: 7
-    Time: 4
+    Time: 3
     CustomCurve:
       serializedVersion: 2
       m_Curve:
@@ -18758,9 +18888,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1639741758}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 76f422206f8d1db4dba02e3743613dc3, type: 3}
+  m_Script: {fileID: 11500000, guid: 00b2d199b96b516448144ab30fb26aed, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CinemachineCameraShake
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseListener
+  ApplyAfter: 2
+  ChannelMask: 1
+  Gain: 1
+  Use2DDistance: 0
+  UseCameraSpace: 1
+  SignalCombinationMode: 0
+  ReactionSettings:
+    m_SecondaryNoise: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    Duration: 1
+    m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1 &1643695374
 GameObject:
   m_ObjectHideFlags: 0
@@ -19393,6 +19535,307 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   prologScenario: {fileID: 524100007}
+--- !u!1 &1677062498
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1677062499}
+  - component: {fileID: 1677062500}
+  - component: {fileID: 1677062501}
+  - component: {fileID: 1677062502}
+  m_Layer: 0
+  m_Name: CameraShakeManadger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1677062499
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677062498}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2134762602}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1677062500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677062498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7b0e83e32fc451479e1f48157af9b2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraShakeManadger
+  globalShekeForce: 0.2
+--- !u!114 &1677062501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677062498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
+  ImpulseDefinition:
+    ImpulseChannel: 1
+    ImpulseShape: 0
+    CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 3.974554
+        outSlope: 3.974554
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.049615968
+        value: 0.19720134
+        inSlope: -0.11514616
+        outSlope: -0.11514616
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.09726401
+        value: -0.0031513423
+        inSlope: -0.14547643
+        outSlope: -0.14547643
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.1499198
+        value: 0.3962819
+        inSlope: -0.06203615
+        outSlope: -0.06203615
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.19994175
+        value: -0.0040475577
+        inSlope: -0.037769705
+        outSlope: -0.037769705
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.66534346
+      - serializedVersion: 3
+        time: 0.24929999
+        value: 0.988399
+        inSlope: -0.05531638
+        outSlope: -0.05531638
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 1
+      - serializedVersion: 3
+        time: 0.29634857
+        value: -0.0008599609
+        inSlope: 0.025384406
+        outSlope: 0.025384406
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7428861
+      - serializedVersion: 3
+        time: 0.34972823
+        value: 0.6936713
+        inSlope: -0.09087314
+        outSlope: -0.09087314
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.7611674
+      - serializedVersion: 3
+        time: 0.3981429
+        value: 0.0016026646
+        inSlope: -0.09185052
+        outSlope: -0.09185052
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.70844287
+      - serializedVersion: 3
+        time: 0.44821367
+        value: 0.99791265
+        inSlope: 0.01945243
+        outSlope: 0.01945243
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.94032365
+      - serializedVersion: 3
+        time: 0.5036178
+        value: 0.00047543645
+        inSlope: -0.039229393
+        outSlope: -0.039229393
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 1
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5511335
+        value: 0.70216274
+        inSlope: -0.063470915
+        outSlope: -0.063470915
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.26197714
+      - serializedVersion: 3
+        time: 0.5994191
+        value: 0.00021851063
+        inSlope: 0.012774037
+        outSlope: 0.012774037
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.666819
+      - serializedVersion: 3
+        time: 0.6514715
+        value: 0.9990581
+        inSlope: 0.04094842
+        outSlope: 0.04094842
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.77664596
+      - serializedVersion: 3
+        time: 0.69861555
+        value: -0.0040193796
+        inSlope: 0.06452553
+        outSlope: 0.06452553
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.8429691
+      - serializedVersion: 3
+        time: 0.74919134
+        value: 0.69553566
+        inSlope: 1.1672857
+        outSlope: 1.1672857
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.79863554
+        value: -0.0073943734
+        inSlope: -0.037452806
+        outSlope: -0.037452806
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.83235705
+      - serializedVersion: 3
+        time: 0.8498074
+        value: 0.3996235
+        inSlope: -0.2088302
+        outSlope: -0.2088302
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.89932156
+        value: -0.0046716034
+        inSlope: 0.6778097
+        outSlope: 0.6778097
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.9524237
+        value: 0.19233733
+        inSlope: -1.0980781
+        outSlope: -1.0980781
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.0000007748604
+        inSlope: -4.042696
+        outSlope: -4.042696
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ImpulseDuration: 1.5
+    ImpulseType: 0
+    DissipationRate: 0.25
+    RawSignal: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    RepeatMode: 0
+    Randomize: 1
+    TimeEnvelope:
+      AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      AttackTime: 0
+      SustainTime: 0.2
+      DecayTime: 0.7
+      ScaleWithImpact: 1
+      HoldForever: 0
+    ImpactRadius: 100
+    DirectionMode: 0
+    DissipationMode: 2
+    DissipationDistance: 100
+    PropagationSpeed: 343
+  DefaultVelocity: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1677062502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677062498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f300ebe33d135f40affd2ccacd9bcf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtunCinemachineShackeTast
 --- !u!1 &1677558014
 GameObject:
   m_ObjectHideFlags: 0
@@ -20244,6 +20687,7 @@ RectTransform:
   - {fileID: 52618877}
   - {fileID: 1673595034}
   - {fileID: 994827394}
+  - {fileID: 734314091}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -25203,6 +25647,7 @@ Transform:
   - {fileID: 780852026}
   - {fileID: 1387518439}
   - {fileID: 1594720906}
+  - {fileID: 1677062499}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2134762603
