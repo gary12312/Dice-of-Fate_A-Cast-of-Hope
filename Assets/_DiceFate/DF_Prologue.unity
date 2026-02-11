@@ -12354,13 +12354,13 @@ MonoBehaviour:
   moveCameraTarget: {fileID: 192188288}
   floorLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   movmentLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   enemyLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4096
   lootLayers:
     serializedVersion: 2
     m_Bits: 1024
@@ -14595,7 +14595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65f68e44d7b1079409ed0f158009254d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Maine.ManeTutorial
-  numberDiceToDrop: 3
+  numberDiceToDrop: 1
   unitMasterCard: {fileID: 945594408}
   prologScenario: {fileID: 524100007}
   dice: {fileID: 2129825221}

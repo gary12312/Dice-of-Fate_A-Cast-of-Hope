@@ -23,6 +23,7 @@ namespace DiceFate
 
         // Прогрессия игрока
         public static int numberDiceToDrop = 1;
+      //  public static int numberDiceToDropForTutorial = 1;
 
         // Значения последних брошенных кубиков игрока на поле
         public static int diceMovement;

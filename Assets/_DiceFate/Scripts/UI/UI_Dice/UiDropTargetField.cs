@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using System.Linq;
 using DiceFate;
-using System.Collections;
 using TMPro;
 
 public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
@@ -62,11 +60,12 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
             }
         }
 
-        numberDiceToDrop = GameStats.numberDiceToDrop;
+       
     }
 
     private void OnEnable()
     {
+        numberDiceToDrop = GameStats.numberDiceToDrop;
         isThisobjectActive = true;
         textNumberDiceToDrop.text = numberDiceToDrop.ToString();
 
