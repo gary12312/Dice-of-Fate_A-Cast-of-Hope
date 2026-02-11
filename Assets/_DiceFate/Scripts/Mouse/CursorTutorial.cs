@@ -27,6 +27,7 @@ namespace DiceFate.MouseW
 
 
         private Sequence _animationSequence;
+        private Sequence _animationSequenceSix;
         private Vector3 _initialRotation;
 
 
@@ -39,7 +40,7 @@ namespace DiceFate.MouseW
             }
 
             InitializeCursor();
-        }      
+        }
 
         private void InitializeCursor()
         {
@@ -148,11 +149,48 @@ namespace DiceFate.MouseW
                .Append(cursor.transform.DOMove(pointFive.transform.position, moveDuration).SetEase(moveCurve))
                .AppendInterval(pauseBetweenAnimations)
                .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
-               //.Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+               .Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
                .AppendInterval(pauseBetweenAnimations)
                .AppendCallback(() => cursor.gameObject.SetActive(false))
                .Play();
         }
+
+        public void AnimationCursorForPrologSixPartOne()
+        {
+            StopAnimation();
+            cursor.gameObject.SetActive(true);
+            cursor.transform.position = pointThree.transform.position;
+            cursor.transform.eulerAngles = _initialRotation;
+
+            _animationSequence = DOTween.Sequence();
+            _animationSequence
+               .AppendInterval(0.1f)
+               .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
+               .Append(cursor.transform.DOMove(pointFour.transform.position, moveDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Append(cursor.transform.DOMove(pointFive.transform.position, moveDuration).SetEase(moveCurve))
+               .AppendInterval(pauseBetweenAnimations)
+               .Play();
+        }
+        public void AnimationCursorForPrologSixPartTwo()
+        {
+            StopAnimation();
+            cursor.gameObject.SetActive(true);
+            cursor.transform.position = pointThree.transform.position;
+            cursor.transform.eulerAngles = _initialRotation;
+
+            _animationSequence = DOTween.Sequence();
+            _animationSequence
+            .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
+            .Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+            .AppendInterval(pauseBetweenAnimations)
+            .AppendCallback(() => cursor.gameObject.SetActive(false))
+            .Play();
+        }
+
+
 
         public void StopAnimation()
         {

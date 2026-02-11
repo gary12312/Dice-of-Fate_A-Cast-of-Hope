@@ -25,7 +25,8 @@ namespace DiceFate.Maine
         [SerializeField] private Button dice;
 
         [Header("Фаза 2 настройки")]
-        [SerializeField] private Button keg;
+        [SerializeField] private Button buttonKeg;
+        [SerializeField] private Button buttonBackToPhaseOne;
         [SerializeField] private GameObject diceGroup;
 
         [Header("Фаза 3 настройки")]
@@ -81,7 +82,9 @@ namespace DiceFate.Maine
 
             buttonReturne.onClick.AddListener(ClickButtoneToReturne); // подписывается на щелчок
             dice.onClick.AddListener(PhaseTwoSelectedUnit); // подписывается на щелчок
-            keg.onClick.AddListener(PhaseThreeSelectedUnit); // подписывается на щелчок
+            buttonKeg.onClick.AddListener(PhaseThreeSelectedUnit); // подписывается на щелчок
+            buttonBackToPhaseOne.onClick.AddListener(BackToPhaseOne);
+
         }
 
         private void OnDestroy()
@@ -97,7 +100,8 @@ namespace DiceFate.Maine
 
             buttonReturne.onClick.RemoveListener(ClickButtoneToReturne);
             dice.onClick.RemoveListener(PhaseTwoSelectedUnit);
-            keg.onClick.RemoveListener(PhaseThreeSelectedUnit);
+            buttonKeg.onClick.RemoveListener(PhaseThreeSelectedUnit);
+            buttonBackToPhaseOne.onClick.RemoveListener(BackToPhaseOne);
         }
 
 
@@ -273,6 +277,12 @@ namespace DiceFate.Maine
 
             //ShowPhaseTwoUIElements();
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
+        }
+
+        public void BackToPhaseOne()
+        {
+            uiManeTutorial.HideAllUIElements();
+            PhaseOneSelectedUnit();
         }
 
         //-------------- 3 Фаза Бросить кости выбранные кости --------------

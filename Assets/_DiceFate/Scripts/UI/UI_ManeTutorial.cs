@@ -10,7 +10,7 @@ using DiceFate.Maine;
 namespace DiceFate.UI
 {
     public class UI_ManeTutorial : MonoBehaviour
-    {       
+    {
 
         [Header("Фаза 1 настройки")]
 
@@ -18,13 +18,15 @@ namespace DiceFate.UI
         [Header("Player Card")]
         [SerializeField] private GameObject unitMasterCard;    // Фаза 1       
         [SerializeField] private GameObject inactiveElement;
+        [SerializeField] private GameObject inactiveElementMove;
+        [SerializeField] private GameObject inactiveElementAttack;
         [SerializeField] private GameObject activeElement;
         [SerializeField] private GameObject textDiceValue;
         [Space]
-        [SerializeField] private TextMeshProUGUI textUnitMovement;
-        [SerializeField] private TextMeshProUGUI textUnitAttack;
-        [SerializeField] private TextMeshProUGUI textUnitShield;
-        [SerializeField] private TextMeshProUGUI textUnitCounterattack;
+        //[SerializeField] private TextMeshProUGUI textUnitMovement;
+        //[SerializeField] private TextMeshProUGUI textUnitAttack;
+        //[SerializeField] private TextMeshProUGUI textUnitShield;
+        //[SerializeField] private TextMeshProUGUI textUnitCounterattack;
         [Space]
         [SerializeField] private Button startDice;             // Фаза 1
 
@@ -34,11 +36,16 @@ namespace DiceFate.UI
         [SerializeField] private GameObject diceOnTable;       // Фаза 2
         [SerializeField] private GameObject iBackgroundOffClicker;       // Фаза 2
 
+
         [Header("Text on TextDiceValue")]
         [SerializeField] private TextMeshProUGUI textDiceMovement;
         [SerializeField] private TextMeshProUGUI textDiceAttack;
         [SerializeField] private TextMeshProUGUI textDiceShield;
         [SerializeField] private TextMeshProUGUI textDiceCounterattack;
+        [Space]
+        [SerializeField] private Image diceAttack;
+        [SerializeField] private Image diceShield;
+        [SerializeField] private Image diceCounterattack;
 
 
 
@@ -64,7 +71,11 @@ namespace DiceFate.UI
         [SerializeField] private PrologScenario prologScenario;
 
         private Color colorTextDefault;
+        private Color defoultColorDiceAttack;
+        private Color defoultColorDiceShield;
+        private Color defoultColorDiceCounterattack;       
         private Color colorAlfaZero = new Color(1f, 1f, 1f, 0f);
+
 
 
 
@@ -86,7 +97,10 @@ namespace DiceFate.UI
 
         private void Start()
         {
-            colorTextDefault = textUnitMovement.color;
+            //colorTextDefault = textUnitMovement.color;
+            defoultColorDiceAttack = diceAttack.color;
+            defoultColorDiceShield = diceShield.color;
+            defoultColorDiceCounterattack = diceCounterattack.color;
 
             ValidateScriptsAndObject();
 
@@ -194,12 +208,24 @@ namespace DiceFate.UI
         public void UiShowPhaseOnePlayer()
         {
             uiDiceTargetResult.UpdateTextUiDisplay();
-            SetUiPlayerCard(true, false, true, true, false, true);
+            SetUiPlayerCard(true, false, true, true, true, true);
+
+
         }
         public void UiShowPhaseTwoPlayer()
         {
             iBackgroundOffClicker.SetActive(true);
             SetUiPlayerCard(true, true, false, false, true, true);
+           
+            switch (prologScenario.prologNumber)
+            {
+                case 6:
+                    diceAttack.color = colorAlfaZero;
+                    diceShield.color = colorAlfaZero;
+                    diceCounterattack.color = colorAlfaZero;
+                    break;
+            }
+
         }
         public void UiShowPhaseThreePlayer()
         {
@@ -211,36 +237,36 @@ namespace DiceFate.UI
 
         public void UiBackgroundOffClicker(bool isActive)
         {
-            iBackgroundOffClicker.SetActive(isActive);         
+            iBackgroundOffClicker.SetActive(isActive);
         }
 
         public void UiShowMasterCadrDependPrologNumber()
-        {      
+        {
 
             switch (prologScenario.prologNumber)
-            {        
+            {
                 case 5: // только движение 
                     iShowMasterCadrPrologFive();
+                    inactiveElementMove.SetActive(false);
+                    inactiveElementAttack.SetActive(true);
                     break;
 
-                //case 3: // Фаза броска кубиков                   
-                //    //LeftClickToShakeAndDropDice();
-                //    break;
-
                 default:
+                    inactiveElementMove.SetActive(false);
+                    inactiveElementAttack.SetActive(false);
                     break;
             }
             uiDiceTargetResult.UpdateTextUiDisplay();
-            SetUiPlayerCard(true, false, true, true, false, true);
+            SetUiPlayerCard(true, false, true, true, true, true);
         }
         private void iShowMasterCadrPrologFive()
         {
             uiDiceTargetResult.UpdateTextUiDisplay();
-            SetUiPlayerCard(true, false, true, true, false, true);
-           
-            textUnitAttack.color = colorAlfaZero;
-            textUnitShield.color = colorAlfaZero;
-            textUnitCounterattack.color = colorAlfaZero;
+            SetUiPlayerCard(true, false, true, true, true, true);
+
+            //textUnitAttack.color = colorAlfaZero;
+            //textUnitShield.color = colorAlfaZero;
+            //textUnitCounterattack.color = colorAlfaZero;
 
         }
 

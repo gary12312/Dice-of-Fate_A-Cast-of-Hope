@@ -52,6 +52,7 @@ namespace DiceFate.UI_Dice
         [SerializeField] private float durationBeforeAnimation = 1.5f;
 
         private bool isDiceReady = false;
+        private bool isDiceMoveblRunGridEnable = false;
         private Sequence _sequenceAnimation;
         private int countedCreatedDice = 0;
 
@@ -89,6 +90,7 @@ namespace DiceFate.UI_Dice
         private void HandelDropDice(OnDropEvent evt)
         {
             isDiceReady = true;
+            isDiceMoveblRunGridEnable = false;
             ResetPlayerDiceResultsToGameStats();
         }
 
@@ -103,7 +105,7 @@ namespace DiceFate.UI_Dice
             diceCubes.Add(dice);
 
             // Создаём UI-элемент для этого кубика           
-            CreateUiResultInPointForDice(dice);        
+            CreateUiResultInPointForDice(dice);
         }
 
 
@@ -173,6 +175,9 @@ namespace DiceFate.UI_Dice
             if (rectTransform == null) { return; }
 
             SaveResultDiceToGameStats(dice.diceType.ToString(), currentValue);
+            UpdateUnitValueGameStats(dice.diceType.ToString());
+
+            ReadyAndGoNextPhaseToMane(); // Показываем на поле           
 
             StartCoroutine(AnimateResultDice(particals, rectTransform, targetPoint, dice.diceType.ToString(), uiInstance));
         }
@@ -194,14 +199,17 @@ namespace DiceFate.UI_Dice
         {
             ActiveParticalSystem(partical, secondPS, targetPoint);
 
-            UpdateUnitValueGameStats(diceType);
+            //UpdateUnitValueGameStats(diceType); - Если все работает почистить
             UpdateTextUiDisplay();
 
             Destroy(uiInstance);
 
             countedCreatedDice++;
 
-            ReadyAndGoNextPhase();
+            // ReadyAndGoNextPhase(); - Если все работает почистить
+
+            ReadyAndGo();
+
         }
 
         private void ReadyAndGoNextPhase()
@@ -214,6 +222,29 @@ namespace DiceFate.UI_Dice
                 isDiceReady = false;
             }
         }
+
+        private void ReadyAndGo()
+        {
+            if (countedCreatedDice >= diceCubes.Count)
+            {
+                countedCreatedDice = 0;
+                diceCubes.Clear();
+                isDiceReady = false;
+            }
+        }
+        private void ReadyAndGoNextPhaseToMane()
+        {
+            bool hasMovementDice = diceCubes.Exists(dice => dice.diceType == DiceCube.DiceType.Movement);
+
+            if (hasMovementDice && isDiceMoveblRunGridEnable == false)
+            {
+                mane.MovementAndGridEnable();
+                isDiceMoveblRunGridEnable = true;
+                Debug.Log($"Значение 11111111111111111111111111111111111111111111111111111111 ");
+            }
+        }
+
+
 
         public void TestMoveAndGreed()
         {
