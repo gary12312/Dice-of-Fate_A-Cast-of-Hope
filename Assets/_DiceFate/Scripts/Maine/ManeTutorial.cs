@@ -1,15 +1,14 @@
-using System.Collections.Generic;
-using Unity.Cinemachine;
-using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
 using DiceFate;
 using DiceFate.Dice;
+using DiceFate.EventBus;
+using DiceFate.Events;
+using DiceFate.MouseW;
 using DiceFate.UI;
 using DiceFate.Units;
-using DiceFate.Events;
-using DiceFate.EventBus;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace DiceFate.Maine
 {
@@ -55,6 +54,7 @@ namespace DiceFate.Maine
         [Header("Доп. настройки")]
         [SerializeField] private Button buttonReturne;
         [SerializeField] private PhaseNumberText PhaseNumberText;
+        [SerializeField] private CursorTutorial cursorTutorial;
 
 
 
@@ -282,6 +282,7 @@ namespace DiceFate.Maine
         public void BackToPhaseOne()
         {
             uiManeTutorial.HideAllUIElements();
+            cursorTutorial.StopAnimation();
             PhaseOneSelectedUnit();
         }
 
@@ -292,8 +293,11 @@ namespace DiceFate.Maine
             //    return;
 
             Phase(3);
+            cursorTutorial.StopAnimation();
             uiManeTutorial.UiShowPhaseThreePlayer();
-            
+            prologScenario.StartScenarioSeven();
+
+
 
             //ShowPhaseThreeUIElements();
             ShowPhaseThreeSceneElements();
@@ -452,16 +456,11 @@ namespace DiceFate.Maine
             uiManeTutorial.UiShowPhaseFourPlayer();
             uiManeTutorial.UiClearAllDiceOnField(); // Очистить список кубиков на платке
             uiManeTutorial.TestingListToDiceTargetResult();
-
-
+            prologScenario.StartScenarioEight();
 
             //Получаем значение кубиков на столе            
             // StartCoroutine(PhaseFourCoroutine());
-
             // uiDropTargetField.ResetAllDiceAndClearField();
-
-
-
 
             Debug.Log($"Фаза = {GameStats.currentPhasePlayer}");
         }
@@ -491,9 +490,6 @@ namespace DiceFate.Maine
             //yield return new WaitForSeconds(1f);
             //uiMane.UiDisableResultDisplay();
 
-
-
-
             //Bus<OnGridEvent>.Raise(new OnGridEvent(1)); // Сообщаем что можновключить сетку для движения
             //GameStats.isPlayerMoveble = true;
 
@@ -504,10 +500,7 @@ namespace DiceFate.Maine
             // Получаем количество кубиков движения из GameStats
             int movementDiceCount = GameStats.diceMovement;
             Bus<OnMovmentValueEvent>.Raise(new OnMovmentValueEvent(movementDiceCount));
-
         }
-
-
 
 
         //-------------- 5 Фаза (перемещение фигурки)  --------------

@@ -177,9 +177,6 @@ namespace DiceFate.UI
         }
 
 
-
-
-
         // ------------------------ UI управление ---------------------------------
 
         private void SetUiPlayerCard(

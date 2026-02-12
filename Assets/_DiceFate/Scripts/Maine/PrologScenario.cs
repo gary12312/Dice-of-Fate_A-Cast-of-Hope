@@ -32,6 +32,7 @@ namespace DiceFate.Maine
         [Header("Mouse")]
         [SerializeField] private GameObject mouse_L;
         [SerializeField] private ParticleSystem psMouse_L;
+        [SerializeField] private GameObject mouse_L_Shake;
         [SerializeField] private GameObject mouse_M;
         [SerializeField] private ParticleSystem psMouse_M;
         [SerializeField] private GameObject mouse_R;
@@ -185,6 +186,7 @@ namespace DiceFate.Maine
             mouse_M.SetActive(false);
             mouse_R.SetActive(false);
             mouse_L.SetActive(false);
+            mouse_L_Shake.SetActive(false);
         }
 
         public void ShowMouse(GameObject gameObject)
@@ -260,7 +262,7 @@ namespace DiceFate.Maine
             yield return new WaitForSeconds(1.5f);
 
             // Первый текст 
-            ShowObject(0);
+            ShowObjectWithText(0);
             FadeTextIn();
 
             yield return new WaitForSeconds(1f);      
@@ -276,7 +278,7 @@ namespace DiceFate.Maine
 
             // Второй текст 
             yield return new WaitForSeconds(0.5f);
-            ShowObject(1);
+            ShowObjectWithText(1);
             FadeTextIn();
             prologNumber = 2;
             ShowMouse(mouse_M);
@@ -295,7 +297,7 @@ namespace DiceFate.Maine
             // третий текст - появляется
             yield return new WaitForSeconds(0.5f);
             playerInput.SetActive(true);
-            ShowObject(2);
+            ShowObjectWithText(2);
             FadeTextIn();  // Свиток огня, я его нашол
             ShowMouse(mouse_L);
         }
@@ -311,7 +313,7 @@ namespace DiceFate.Maine
 
 
             yield return new WaitForSeconds(0.5f);          
-            ShowObject(3); // Немогу дотянуться
+            ShowObjectWithText(3); // Немогу дотянуться
             FadeTextIn();
 
             yield return new WaitForSeconds(1f);
@@ -342,7 +344,7 @@ namespace DiceFate.Maine
 
             yield return new WaitForSeconds(1f);
             cursorTutorial.AnimationCursorForPrologFive();
-            ShowObject(4); // За шаг не пройти, мне нужен магический куб
+            ShowObjectWithText(4); // За шаг не пройти, мне нужен магический куб
             FadeTextIn();
 
 
@@ -362,8 +364,8 @@ namespace DiceFate.Maine
         {
             prologNumber = 6;
             iBackgroundOffClicker.SetActive(false);
-            FadeTextOut();
-           // ui_ManeTutorial.UiBackgroundOffClicker(false);
+            FadeTextOut();          
+            // ui_ManeTutorial.UiBackgroundOffClicker(false);
 
 
 
@@ -375,11 +377,72 @@ namespace DiceFate.Maine
             cursorTutorial.StopAnimation();
         }
 
+        public void StartScenarioSeven()
+        {
+            if (prologNumber <= 6)
+            {
+                StartCoroutine(ScenarioSeven());
+            }
+        }
+
+        private IEnumerator ScenarioSeven()
+        {
+            prologNumber = 7;
+
+            yield return new WaitForSeconds(0.5f);
+            ShowObjectWithText(5); // Пора проверить удачу.
+            ShowMouse(mouse_L_Shake);
+            FadeTextIn();
+        }
+
+        public void StartScenarioEight()
+        {
+            if (prologNumber <= 7)
+            {
+                StartCoroutine(ScenarioEight());
+            }
+        }
+
+        private IEnumerator ScenarioEight()
+        {
+            prologNumber = 8;
+            FadeTextOut();
+            HideMouse(mouse_L_Shake);
+
+            yield return new WaitForSeconds(2f);
+            ShowObjectWithText(6); // Забрать            
+            FadeTextIn();
+
+            //yield return new WaitForSeconds(0.5f);
+        }
+
+        public void StartScenarioNine()
+        {
+            if (prologNumber <= 8)
+            {
+                StartCoroutine(ScenarioNine());
+            }
+        }
+
+        private IEnumerator ScenarioNine()
+        {
+            prologNumber = 9;
+            FadeTextOut();
+           
+
+            yield return new WaitForSeconds(0.5f);
+            //ShowObjectWithText(6); // Забрать            
+            //FadeTextIn();
+
+            //yield return new WaitForSeconds(0.5f);
+        }
+
+
 
 
 
         // --------------------------- Работа с текстами ----------------------------
-        public void ShowObject(int index)
+        public void ShowObjectWithText(int index)
         {
             // Выключить все тексты
             SetActiveAllObjectsOff(texts);

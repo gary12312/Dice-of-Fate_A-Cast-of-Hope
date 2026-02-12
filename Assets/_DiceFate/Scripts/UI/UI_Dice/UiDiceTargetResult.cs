@@ -212,16 +212,16 @@ namespace DiceFate.UI_Dice
 
         }
 
-        private void ReadyAndGoNextPhase()
-        {
-            if (countedCreatedDice >= diceCubes.Count)
-            {
-                mane.MovementAndGridEnable();
-                countedCreatedDice = 0;
-                diceCubes.Clear();
-                isDiceReady = false;
-            }
-        }
+        //private void ReadyAndGoNextPhase()
+        //{
+        //    if (countedCreatedDice >= diceCubes.Count)
+        //    {
+        //        mane.MovementAndGridEnable();
+        //        countedCreatedDice = 0;
+        //        diceCubes.Clear();
+        //        isDiceReady = false;
+        //    }
+        //}
 
         private void ReadyAndGo()
         {
@@ -239,11 +239,9 @@ namespace DiceFate.UI_Dice
             if (hasMovementDice && isDiceMoveblRunGridEnable == false)
             {
                 mane.MovementAndGridEnable();
-                isDiceMoveblRunGridEnable = true;
-                Debug.Log($"Значение 11111111111111111111111111111111111111111111111111111111 ");
+                isDiceMoveblRunGridEnable = true;                
             }
         }
-
 
 
         public void TestMoveAndGreed()
@@ -252,8 +250,6 @@ namespace DiceFate.UI_Dice
             countedCreatedDice = 0;
             diceCubes.Clear();
             isDiceReady = false;
-
-
         }
 
 
