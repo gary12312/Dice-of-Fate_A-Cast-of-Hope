@@ -18,9 +18,10 @@ namespace DiceFate.Units
         [SerializeField] public string unitType;
 
         [field: SerializeField] public GameObject avatarPrefab; // Префаб аватара для UI
+        [field: SerializeField] public GameObject vfxLevelUP; // VFX Level UP
         [field: SerializeField] public bool IsHover { get; private set; }   // IHover
 
-       // private string unit;          // player, enemy, other
+        // private string unit;          // player, enemy, other
         private string nameUnit;
         private int distanceToAttack; // Расстояние атаки юнита
         private int move;
@@ -61,8 +62,9 @@ namespace DiceFate.Units
         private void InitializationStart()
         {
             detectorZone.SetActive(false);            // 1. отключть Decal        
-            Outline?.DisableOutline();                // 2. отключить Обводку       
-                                                      //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
+            Outline?.DisableOutline();                // 2. отключить Обводку
+            VFXLevelUpSetActive(false);
+            //  Outline?.ChangeColorOutline(Color.green); // 3. Назначить цвет для обводки при выделении / цвет для обводки при наведении это цвет настроенный по умолчанию/
             MaxHealth = UnitSO.Health;                // 4. Назначить Здоровье
             CurrentHealth = MaxHealth;
 
@@ -73,7 +75,7 @@ namespace DiceFate.Units
             attack = UnitSO.Attack;
             shild = UnitSO.Shild;
             conterAttack = UnitSO.ConterAttack;
-        
+
         }
 
 
@@ -180,7 +182,7 @@ namespace DiceFate.Units
 
         //-------------- Основные методы --------------
 
-        public void Die() => Destroy(gameObject);       
+        public void Die() => Destroy(gameObject);
 
         private void RecValueInGameStaticForUIMane()
         {
@@ -195,7 +197,7 @@ namespace DiceFate.Units
 
 
         //-------------- IHover реализация --------------
-        
+
         public void OnEnterHover()
         {
             if (IsSelected == false) { Outline?.EnableOutline(); }
@@ -239,6 +241,23 @@ namespace DiceFate.Units
         }
 
 
+        public void VFXLevelUpStart(float delay) => StartCoroutine(VfxLevelUp(delay));     
+        private IEnumerator VfxLevelUp(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            VFXLevelUpSetActive(true);
+
+            yield return new WaitForSeconds(3f);
+            VFXLevelUpSetActive(false);
+        }
+
+        private void VFXLevelUpSetActive(bool isActive)
+        {
+            if (vfxLevelUP !=null) 
+            {
+                vfxLevelUP.SetActive(isActive);
+            }
+        }
 
     }
 }

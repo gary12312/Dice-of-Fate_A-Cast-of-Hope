@@ -206,24 +206,24 @@ namespace DiceFate.Player
                 return;
             }
 
-            if (GameStats.currentPhasePlayer == 5 
-                || GameStats.currentPhasePlayer == 6 
-                || GameStats.currentPhasePlayer == 7)
-            {
-                if (isUnitLayer)
-                {
-                    ClickToSelect();
-                }
-                else if (isEnemyLayer)
-                {
-                    ClickToAttack();
-                }
-                else if (isLootLayer)
-                {
-                    ClickToLoot();
-                }
-                return;
-            }
+            //if (GameStats.currentPhasePlayer == 5 
+            //    || GameStats.currentPhasePlayer == 6 
+            //    || GameStats.currentPhasePlayer == 7)
+            //{
+            //    if (isUnitLayer)
+            //    {
+            //        ClickToSelect();
+            //    }
+            //    else if (isEnemyLayer)
+            //    {
+            //        ClickToAttack();
+            //    }
+            //    else if (isLootLayer)
+            //    {
+            //        ClickToLoot();
+            //    }
+            //    return;
+            //}
         }
 
 
@@ -263,7 +263,17 @@ namespace DiceFate.Player
             if (hit.collider.TryGetComponent(out ILooter looter))
             {
                 looter.LootSelection();
+
+
+                // Проверяем, является ли selectedUnit MonoBehaviour и получаем UnitPlayer
+                UnitPlayer unitPlayer = (selectedUnit as MonoBehaviour)?.GetComponent<UnitPlayer>();
+                unitPlayer?.VFXLevelUpStart(0.5f);
+
+
             }
+
+           
+
         }
 
         private void ClickToMove()
@@ -274,7 +284,7 @@ namespace DiceFate.Player
             {
                 moveable.MoveTo(hit.point);
 
-                Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события 5 в майне
+                Bus<OnMoveEvent>.Raise(new OnMoveEvent(1)); //  события в майне Подготовка к движению
 
                 selectUnitPosition = hit.point;
             }

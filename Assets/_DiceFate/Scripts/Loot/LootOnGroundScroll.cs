@@ -8,7 +8,7 @@ namespace DiceFate.Loot
 {
     public class LootOnGroundScroll : MonoBehaviour, ILooter, IHover
     {
-      //  [field: SerializeField] public bool IsSelected { get; private set; }   // ISelectable
+        //  [field: SerializeField] public bool IsSelected { get; private set; }   // ISelectable
         [field: SerializeField] public bool IsHover { get; private set; }   // IHover
 
         [Header("Настройки лута")]
@@ -33,7 +33,12 @@ namespace DiceFate.Loot
         public AnimationCurve bounceCurve =
             new AnimationCurve(
                 new Keyframe(0f, 0f),
-                new Keyframe(1f, 0f)); // Кривая для плавности прыжка
+                new Keyframe(1f, 0f)); // Кривая для плавности
+        [SerializeField]
+        public AnimationCurve selectedCurve =
+            new AnimationCurve(
+                new Keyframe(0f, 0f),
+                new Keyframe(1f, 0f)); // Кривая для плавности при выделении
 
 
         private bool _isCanTake = false;
@@ -61,7 +66,7 @@ namespace DiceFate.Loot
             //if (IsSelected == false)
             //{
             //}
-                Outline?.EnableOutline();
+            Outline?.EnableOutline();
             IsHover = true;
         }
 
@@ -70,7 +75,7 @@ namespace DiceFate.Loot
             //if (IsSelected == false)
             //{
             //}
-                Outline?.DisableOutline();
+            Outline?.DisableOutline();
             IsHover = false;
         }
 
@@ -98,7 +103,7 @@ namespace DiceFate.Loot
                 ShowCannotPickupFeedback();
             }
         }
-        
+
         //-------------- Метод обнаружения объектов --------------
         private bool FindUnitsAround()
         {
@@ -194,14 +199,40 @@ namespace DiceFate.Loot
             _isCanTake = false;
 
             // Анимация исчезновения
-            transform
-                .DOScale(0, 0.5f)
-                .SetEase(Ease.InBack)
-                .OnComplete(() =>
-                {
-                    OnPickupComplete(nearestTarget);
-                })
+            //transform
+            //    .DOScale(0, 0.5f)
+            //    .SetEase(Ease.InBack)
+            //    .OnComplete(() =>
+            //    {
+            //        OnPickupComplete(nearestTarget);
+            //    })
+            //    .Play();
+
+            Vector3 unitTarget = new Vector3(nearestTarget.transform.position.x,
+                                             nearestTarget.transform.position.y + 1,
+                                             nearestTarget.transform.position.z);
+
+            DOTween.Sequence()
+                .Append(transform.DOMoveY(1f, 0.5f)).SetEase(selectedCurve)
+               // .AppendInterval(0.1f)
+                .Append(transform.DOMove(unitTarget, 0.5f))
+                .Join(transform.DOScale(0, 0.5f))
+                .OnComplete(() => OnPickupComplete(nearestTarget))
                 .Play();
+
+
+
+
+
+
+            //transform
+            //    .DOMoveY(2f, 0.5f)          
+            //    .OnComplete(() =>
+            //    {
+            //        OnPickupComplete(nearestTarget);
+            //    })
+            //    .Play();
+
 
             Debug.Log($"Свиток {gameObject.name} взят");
 
@@ -209,8 +240,8 @@ namespace DiceFate.Loot
             if (particleSystemSparkles != null)
                 particleSystemSparkles.Stop();
 
-            if (particleSystemHit != null)
-                particleSystemHit.gameObject.SetActive(true);
+            //if (particleSystemHit != null)
+            //    particleSystemHit.gameObject.SetActive(true); // Пока отключить
 
             // Убираем обводку
             Outline?.DisableOutline();
@@ -262,7 +293,7 @@ namespace DiceFate.Loot
                 Outline?.ResetColorOutline();
                 Outline?.DisableOutline();
                 _currentFeedbackTween = null;
-               
+
 
             });
             bounceSequence.Play();
@@ -380,6 +411,6 @@ namespace DiceFate.Loot
             }
         }
 
-      
+
     }
 }

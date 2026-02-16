@@ -412,6 +412,7 @@ namespace DiceFate.Maine
             yield return new WaitForSeconds(2f);
             ShowObjectWithText(6); // Забрать            
             FadeTextIn();
+            GameStats.numberDiceToDrop = 0;
 
             //yield return new WaitForSeconds(0.5f);
         }

@@ -29,6 +29,7 @@ namespace DiceFate.UI
         //[SerializeField] private TextMeshProUGUI textUnitCounterattack;
         [Space]
         [SerializeField] private Button startDice;             // Фаза 1
+        [SerializeField] private ParticleSystem psStartDice;
 
         [Header("Фаза 2 настройки")]
         [SerializeField] private TextMeshProUGUI numberDiceToDtop;
@@ -201,14 +202,30 @@ namespace DiceFate.UI
         {
             iBackgroundOffClicker.SetActive(false);
             SetUiPlayerCard(false, false, false, false, false, false);
+
+            psStartDice.Stop(); // Для Туториал        
         }
         public void UiShowPhaseOnePlayer()
         {
+
+            switch (prologScenario.prologNumber)
+            {
+                case 5: // только движение 
+                    iShowMasterCadrPrologFive();
+                    inactiveElementMove.SetActive(false);
+                    inactiveElementAttack.SetActive(true);
+                    psStartDice.gameObject.SetActive(true);
+                    break;
+
+                default:
+                    inactiveElementMove.SetActive(false);
+                    inactiveElementAttack.SetActive(false);
+                    break;
+            }
             uiDiceTargetResult.UpdateTextUiDisplay();
-            SetUiPlayerCard(true, false, true, true, true, true);
-
-
+            SetUiPlayerCard(true, false, true, true, true, true); 
         }
+
         public void UiShowPhaseTwoPlayer()
         {
             iBackgroundOffClicker.SetActive(true);
@@ -220,6 +237,7 @@ namespace DiceFate.UI
                     diceAttack.color = colorAlfaZero;
                     diceShield.color = colorAlfaZero;
                     diceCounterattack.color = colorAlfaZero;
+                    psStartDice.Stop();
                     break;
             }
 
@@ -237,25 +255,28 @@ namespace DiceFate.UI
             iBackgroundOffClicker.SetActive(isActive);
         }
 
-        public void UiShowMasterCadrDependPrologNumber()
-        {
+        //public void UiShowMasterCadrDependPrologNumber()
+        //{
 
-            switch (prologScenario.prologNumber)
-            {
-                case 5: // только движение 
-                    iShowMasterCadrPrologFive();
-                    inactiveElementMove.SetActive(false);
-                    inactiveElementAttack.SetActive(true);
-                    break;
+        //    switch (prologScenario.prologNumber)
+        //    {
+        //        case 5: // только движение 
+        //            iShowMasterCadrPrologFive();
+        //            inactiveElementMove.SetActive(false);
+        //            inactiveElementAttack.SetActive(true);
+        //            psStartDice.gameObject.SetActive(true);
+        //            break;
 
-                default:
-                    inactiveElementMove.SetActive(false);
-                    inactiveElementAttack.SetActive(false);
-                    break;
-            }
-            uiDiceTargetResult.UpdateTextUiDisplay();
-            SetUiPlayerCard(true, false, true, true, true, true);
-        }
+        //        default:
+        //            inactiveElementMove.SetActive(false);
+        //            inactiveElementAttack.SetActive(false);
+        //            break;
+        //    }
+        //    uiDiceTargetResult.UpdateTextUiDisplay();
+        //    SetUiPlayerCard(true, false, true, true, true, true);               
+        //}
+
+
         private void iShowMasterCadrPrologFive()
         {
             uiDiceTargetResult.UpdateTextUiDisplay();

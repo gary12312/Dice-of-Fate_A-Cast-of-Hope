@@ -73,6 +73,11 @@ public class UiDropTargetField : MonoBehaviour, IDropHandler, IPointerEnterHandl
         if (diceAttack != null) diceAttack.SetActive(true);
         if (diceShield != null) diceShield.SetActive(true);
         if (diceConterAttack != null) diceConterAttack.SetActive(true);
+
+        if (numberDiceToDrop == 0)
+        {
+            NumberDiceToDropToActivation();
+        }
     }
 
     private void OnDisable()
