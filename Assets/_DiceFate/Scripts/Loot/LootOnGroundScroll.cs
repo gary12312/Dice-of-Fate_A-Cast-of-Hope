@@ -92,6 +92,7 @@ namespace DiceFate.Loot
             if (FindUnitsAround())
             {
                 Debug.Log("Запуск1");
+                prologScenario.StartScenarioNine();
 
                 _isCanTake = true;
                 TakeScroll();

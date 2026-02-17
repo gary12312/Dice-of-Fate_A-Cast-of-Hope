@@ -73,8 +73,9 @@ namespace DiceFate.Maine
         [SerializeField] private CursorTutorial cursorTutorial;
         [SerializeField] private UI_ManeTutorial ui_ManeTutorial;
 
-        [Space]
-       
+        [Header("Nine")]
+        [SerializeField] private GameObject buttonEmakimono;
+
 
         private CanvasGroup currentCanvasGroup;
         private Vector2 mouseDelta;            // Изменение положения мыши
@@ -89,11 +90,13 @@ namespace DiceFate.Maine
             {
                 Screenloder.SetActive(true);
                 cameraMain.SetActive(false);
+                buttonEmakimono.SetActive(false);
                 cameraVirtualOne.SetActive(true);
             }
             else
             {
                 cameraMain.SetActive(true);
+                buttonEmakimono.SetActive(true);
                 cameraVirtualOne.SetActive(false);
             }
 
@@ -417,7 +420,7 @@ namespace DiceFate.Maine
             //yield return new WaitForSeconds(0.5f);
         }
 
-        public void StartScenarioNine()
+        public void StartScenarioNine()  // При подборе лута
         {
             if (prologNumber <= 8)
             {
@@ -429,7 +432,10 @@ namespace DiceFate.Maine
         {
             prologNumber = 9;
             FadeTextOut();
-           
+
+            yield return new WaitForSeconds(1f);
+            buttonEmakimono.SetActive(true);
+
 
             yield return new WaitForSeconds(0.5f);
             //ShowObjectWithText(6); // Забрать            
