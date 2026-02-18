@@ -1,4 +1,5 @@
 using DiceFate.Animation;
+using DiceFate.Loot;
 using DiceFate.MouseW;
 using DiceFate.UI;
 using System.Collections;
@@ -6,6 +7,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
 
 
 namespace DiceFate.Maine
@@ -55,6 +57,9 @@ namespace DiceFate.Maine
         [SerializeField] private ParticleSystem rainRocks;
         [SerializeField] private DT_AnimationRocks animationRocks;
         [SerializeField] private CinemachineImpulseSource impulseSource;
+       
+        [Header("Four")]
+        [SerializeField] private GameObject uiButtonUnit;
 
         [Header("Five")]
         [SerializeField] private GameObject iBackgroundOffClicker;
@@ -75,29 +80,32 @@ namespace DiceFate.Maine
 
         [Header("Nine")]
         [SerializeField] private GameObject buttonEmakimono;
+        [SerializeField] private GameObject rockAnim;
 
 
         private CanvasGroup currentCanvasGroup;
         private Vector2 mouseDelta;            // Изменение положения мыши
-     
+
         private bool isColdActive = false;
 
 
         private void Awake()
         {
-            
+
             if (isTesting)
             {
                 Screenloder.SetActive(true);
                 cameraMain.SetActive(false);
                 buttonEmakimono.SetActive(false);
                 cameraVirtualOne.SetActive(true);
+                uiButtonUnit.SetActive(false);
             }
             else
             {
                 cameraMain.SetActive(true);
                 buttonEmakimono.SetActive(true);
                 cameraVirtualOne.SetActive(false);
+                uiButtonUnit.SetActive(true);
             }
 
             HideMouseAndPartical();
@@ -126,7 +134,7 @@ namespace DiceFate.Maine
         private void PrologOneBegin()
         {
             SetActiveAllObjectsOff(texts);
-           // canvas.SetActive(false);
+            // canvas.SetActive(false);
             canvasBattle.SetActive(false);
             iBackgroundOffClicker.SetActive(false);
 
@@ -268,7 +276,7 @@ namespace DiceFate.Maine
             ShowObjectWithText(0);
             FadeTextIn();
 
-            yield return new WaitForSeconds(1f);      
+            yield return new WaitForSeconds(1f);
             ShowMouse(mouse_R);
             prologNumber = 1;
         }
@@ -276,7 +284,7 @@ namespace DiceFate.Maine
         private IEnumerator ScenarioTwo()
         {
             FadeTextOut();
-           // psMouse_M.gameObject.SetActive(true);      
+            // psMouse_M.gameObject.SetActive(true);      
             HideMouse(mouse_R);
 
             // Второй текст 
@@ -290,9 +298,9 @@ namespace DiceFate.Maine
         private IEnumerator ScenarioThree()
         {
             prologNumber = 3;
-            FadeTextOut();     
+            FadeTextOut();
             HideMouse(mouse_M);
-           
+
 
             moveCameraTarget.CameraTargetAnimationToOneTarget();
 
@@ -312,20 +320,22 @@ namespace DiceFate.Maine
             FadeTextOut();
             HideMouse(mouse_L);
             iBackgroundOffClicker.SetActive(true);
+            uiButtonUnit.SetActive(true);
+            
             // canvas.SetActive(true);
 
 
-            yield return new WaitForSeconds(0.5f);          
+            yield return new WaitForSeconds(0.5f);
             ShowObjectWithText(3); // Немогу дотянуться
             FadeTextIn();
 
             yield return new WaitForSeconds(1f);
             cursorTutorial.AnimationCursorForPrologFour();
-          
+
 
             yield return new WaitForSeconds(3f);
             cursorTutorial.StopAnimation();
-           
+
 
         }
 
@@ -334,15 +344,15 @@ namespace DiceFate.Maine
             if (prologNumber <= 4)
             {
                 StartCoroutine(ScenarioFive());
-            }           
-        }    
-        
+            }
+        }
+
         private IEnumerator ScenarioFive()
         {
             prologNumber = 5;
             FadeTextOut();
-           // ui_ManeTutorial.UiBackgroundOffClicker(true);
-          // iBackgroundOffClicker.SetActive(true);
+            // ui_ManeTutorial.UiBackgroundOffClicker(true);
+            // iBackgroundOffClicker.SetActive(true);
 
 
             yield return new WaitForSeconds(1f);
@@ -367,7 +377,7 @@ namespace DiceFate.Maine
         {
             prologNumber = 6;
             iBackgroundOffClicker.SetActive(false);
-            FadeTextOut();          
+            FadeTextOut();
             // ui_ManeTutorial.UiBackgroundOffClicker(false);
 
 
@@ -436,12 +446,24 @@ namespace DiceFate.Maine
             yield return new WaitForSeconds(1f);
             buttonEmakimono.SetActive(true);
 
+            if (rockAnim != null)
+            {
+                RockOnGround rockOnGround = rockAnim.GetComponent<RockOnGround>();
+                rockOnGround.ActivateRock();
+            }
+
+            //prologScenario = GetComponent<PrologScenario>();
 
             yield return new WaitForSeconds(0.5f);
-            //ShowObjectWithText(6); // Забрать            
-            //FadeTextIn();
+            ShowObjectWithText(7); // Камень мешает            
+            FadeTextIn();
 
-            //yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
+            cursorTutorial.AnimationCursorForPrologNine();
+
+
+            yield return new WaitForSeconds(4.5f);
+            cursorTutorial.StopAnimation();
         }
 
 
@@ -572,7 +594,7 @@ namespace DiceFate.Maine
         {
             UIImageLoading uiImage = Screenloder.GetComponent<UIImageLoading>();
 
-            uiImage.DOFateImageLoadToZero(durationScreenloder);      
+            uiImage.DOFateImageLoadToZero(durationScreenloder);
         }
 
     }

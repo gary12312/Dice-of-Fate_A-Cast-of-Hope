@@ -14,6 +14,7 @@ namespace DiceFate.MouseW
         [SerializeField] private GameObject pointThree;
         [SerializeField] private GameObject pointFour;
         [SerializeField] private GameObject pointFive;
+        [SerializeField] private GameObject pointSix;
         [SerializeField] private float moveDuration = 1f;
         [SerializeField] private float rotationDuration = 0.5f;
         [SerializeField] private float pauseBetweenAnimations = 0.1f;
@@ -188,6 +189,24 @@ namespace DiceFate.MouseW
             .AppendInterval(pauseBetweenAnimations)
             .AppendCallback(() => cursor.gameObject.SetActive(false))
             .Play();
+        }
+        
+        public void AnimationCursorForPrologNine()
+        {
+            StopAnimation();
+            cursor.gameObject.SetActive(true);
+            cursor.transform.position = pointStart.transform.position;
+            cursor.transform.eulerAngles = _initialRotation;
+
+
+            _animationSequence = DOTween.Sequence();
+            _animationSequence
+                .Append(cursor.transform.DOMove(pointSix.transform.position, moveDuration).SetEase(moveCurve))
+                .Append(cursor.transform.DORotate(_initialRotation + new Vector3(0, 0, 45), rotationDuration).SetEase(moveCurve))
+                .Append(cursor.transform.DORotate(_initialRotation, rotationDuration).SetEase(moveCurve))
+                .AppendInterval(pauseBetweenAnimations)
+                .AppendCallback(() => cursor.gameObject.SetActive(false))
+                .Play();
         }
 
 
