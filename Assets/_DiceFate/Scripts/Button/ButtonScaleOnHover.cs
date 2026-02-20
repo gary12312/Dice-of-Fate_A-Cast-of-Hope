@@ -20,9 +20,12 @@ namespace DiceFate.Buttons
         [SerializeField] private Color colorFerst;
         [SerializeField] private Color colorSecond;
         [SerializeField] private bool isChangeFerstColor;
+        [SerializeField] private GameObject oldGreed;
+        [SerializeField] private bool isChangeOldGreed;
         [Space]
         [SerializeField] private Image imageBorder;
         [SerializeField] private Image imageVizual;
+        [SerializeField] private Image imageEmaki;
         [SerializeField] private Image imageBorderText;
         [SerializeField] private Image imageMove;
         [SerializeField] private Image imageAttack;
@@ -80,12 +83,14 @@ namespace DiceFate.Buttons
             targetScale = originalScale * hoverScale;
             SetColorToImageAndText(colorSecond);
 
+            if (isChangeOldGreed) oldGreed.SetActive(false);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             targetScale = originalScale;
-            
+            if (isChangeOldGreed) oldGreed.SetActive(true);
+
             if (!isChangeFerstColor)
             {
                 originalColor = imageBorder.color;
@@ -103,6 +108,7 @@ namespace DiceFate.Buttons
         {
             imageMove.color = color;
             imageShild.color = color;
+            imageEmaki.color = color;
             imageVizual.color = color;
             imageBorder.color = color;
             imageAttack.color = color;
@@ -123,6 +129,7 @@ namespace DiceFate.Buttons
         {
             if (imageMove == null) Debug.LogError($" для {this.name} Не установлена ссылка на imageMove!");
             if (imageShild == null) Debug.LogError($" для {this.name} Не установлена ссылка на imageShild!");
+            if (imageEmaki == null) Debug.LogError($" для {this.name} Не установлена ссылка на imageEmaki!");
             if (imageBorder == null) Debug.LogError($" для {this.name} Не установлена ссылка на imageBorder!");
             if (imageVizual == null) Debug.LogError($" для {this.name} Не установлена ссылка на imageVizual!");
             if (imageAttack == null) Debug.LogError($" для {this.name} Не установлена ссылка на imageAttack!");
@@ -135,6 +142,8 @@ namespace DiceFate.Buttons
             if (textShild == null) Debug.LogError($" для {this.name} Не установлена ссылка на textShild!");
             if (textConterAttac == null) Debug.LogError($" для {this.name} Не установлена ссылка на textConterAttac!");
             if (textDescription == null) Debug.LogError($" для {this.name} Не установлена ссылка на textDescription!");
+
+            if (oldGreed == null) Debug.LogError($" для {this.name} Не установлена ссылка на oldGreed!");
         }
 
     }
