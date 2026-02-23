@@ -43,21 +43,21 @@ namespace DiceFate.Buttons
 
         private Vector3 originalScale;
         private Vector3 targetScale;
-        private Color originalColor;
+        //private Color originalColor;
 
         private void Awake()
         {
             originalScale = transform.localScale;
             targetScale = originalScale;
 
-            if (!isChangeFerstColor)
-            {
-                originalColor = imageBorder.color;
-            }
-            else
-            {
+            //if (!isChangeFerstColor)
+            //{
+            //    originalColor = imageBorder.color;
+            //}
+            //else
+            //{
                 SetColorToImageAndText(colorFerst);
-            }
+            //}
 
 
         }
@@ -91,14 +91,14 @@ namespace DiceFate.Buttons
             targetScale = originalScale;
             if (isChangeOldGreed) oldGreed.SetActive(true);
 
-            if (!isChangeFerstColor)
-            {
-                originalColor = imageBorder.color;
-            }
-            else
-            {
+            //if (!isChangeFerstColor)
+            //{
+            //    originalColor = imageBorder.color;
+            //}
+            //else
+            //{
                 SetColorToImageAndText(colorFerst);
-            }
+            //}
         }
 
         public void OnPointerDown(PointerEventData eventData) => targetScale = originalScale * clickScale;
@@ -145,6 +145,14 @@ namespace DiceFate.Buttons
 
             if (oldGreed == null) Debug.LogError($" для {this.name} Не установлена ссылка на oldGreed!");
         }
+
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            SetColorToImageAndText(colorFerst);   // Вызывается при изменении значения в инспекторе
+        }
+#endif
 
     }
 }

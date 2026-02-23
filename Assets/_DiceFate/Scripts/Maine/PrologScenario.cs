@@ -44,8 +44,7 @@ namespace DiceFate.Maine
         [SerializeField] private GameObject canvas;
         [SerializeField] private GameObject canvasBattle;
         [SerializeField] private GameObject CanvasScenario;
-        [SerializeField] private GameObject playerInput;
-        [SerializeField] private GameObject cold;
+        [SerializeField] private GameObject playerInput;       
         [SerializeField] private GameObject[] texts;
         // 0 - Text 1
         // 1 - Text 2
@@ -57,7 +56,12 @@ namespace DiceFate.Maine
         [SerializeField] private ParticleSystem rainRocks;
         [SerializeField] private DT_AnimationRocks animationRocks;
         [SerializeField] private CinemachineImpulseSource impulseSource;
-       
+
+        [Header("Three")]
+        [SerializeField] private GameObject scroll;
+        [SerializeField] private GameObject psSkyRays;
+
+
         [Header("Four")]
         [SerializeField] private GameObject uiButtonUnit;
 
@@ -80,7 +84,8 @@ namespace DiceFate.Maine
 
         [Header("Nine")]
         [SerializeField] private GameObject buttonEmakimono;
-        [SerializeField] private GameObject rockAnim;
+        [SerializeField] private GameObject rockEventFire;
+        [SerializeField] private GameObject rockEventIce;
 
 
         private CanvasGroup currentCanvasGroup;
@@ -99,6 +104,7 @@ namespace DiceFate.Maine
                 buttonEmakimono.SetActive(false);
                 cameraVirtualOne.SetActive(true);
                 uiButtonUnit.SetActive(false);
+
             }
             else
             {
@@ -106,6 +112,7 @@ namespace DiceFate.Maine
                 buttonEmakimono.SetActive(true);
                 cameraVirtualOne.SetActive(false);
                 uiButtonUnit.SetActive(true);
+
             }
 
             HideMouseAndPartical();
@@ -115,7 +122,7 @@ namespace DiceFate.Maine
 
         private void Start()
         {
-            PrologOneBegin();
+            PrologOneBegin();          
         }
 
         private void Update()
@@ -141,10 +148,21 @@ namespace DiceFate.Maine
 
             if (isTesting)
             {
-                cold.SetActive(false);
+                scroll.SetActive(false);
+                psSkyRays.SetActive(false);
                 playerInput.SetActive(false);
                 StartCoroutine(ScenarioOne());
             }
+
+           
+            // ???????????????
+            if (!isTesting)
+            {
+                StoneActivate(rockEventIce);
+                DelayWaitForSeconds(0.5f);
+                StoneActivate(rockEventFire);
+            }
+
         }
 
 
@@ -250,7 +268,7 @@ namespace DiceFate.Maine
                 cameraTargetRB.rotation = newRotation;                            // Применяем вращение к cameraTarget
             }
 
-            ActiveCold();
+            ActiveScroll();
         }
 
         // --------------------------- Сценарии ----------------------------
@@ -304,6 +322,10 @@ namespace DiceFate.Maine
 
             moveCameraTarget.CameraTargetAnimationToOneTarget();
 
+            StoneActivate(rockEventFire);
+            StoneActivate(rockEventIce);
+
+
 
             // третий текст - появляется
             yield return new WaitForSeconds(0.5f);
@@ -311,6 +333,17 @@ namespace DiceFate.Maine
             ShowObjectWithText(2);
             FadeTextIn();  // Свиток огня, я его нашол
             ShowMouse(mouse_L);
+        }
+        private void StoneActivate(GameObject rockEvent)
+        {
+            if (rockEvent != null)
+            {
+                RockOnGround rockOnGround = rockEvent.GetComponent<RockOnGround>();
+                if (rockOnGround != null)
+                {
+                    rockOnGround.ActivateRock();
+                }
+            }
         }
 
         public void StartScenarioFour() => StartCoroutine(ScenarioFour());
@@ -321,7 +354,7 @@ namespace DiceFate.Maine
             HideMouse(mouse_L);
             iBackgroundOffClicker.SetActive(true);
             uiButtonUnit.SetActive(true);
-            
+
             // canvas.SetActive(true);
 
 
@@ -446,17 +479,14 @@ namespace DiceFate.Maine
             yield return new WaitForSeconds(1f);
             buttonEmakimono.SetActive(true);
 
-            if (rockAnim != null)
-            {
-                RockOnGround rockOnGround = rockAnim.GetComponent<RockOnGround>();
-                rockOnGround.ActivateRock();
-            }
+
 
             //prologScenario = GetComponent<PrologScenario>();
 
             yield return new WaitForSeconds(0.5f);
             ShowObjectWithText(7); // Камень мешает            
             FadeTextIn();
+            psSkyRays.SetActive(false);
 
             yield return new WaitForSeconds(1f);
             cursorTutorial.AnimationCursorForPrologNine();
@@ -574,12 +604,14 @@ namespace DiceFate.Maine
 
         // --------------------------- 
 
-        private void ActiveCold()
+        private void ActiveScroll()
         {
             if (!isColdActive)
             {
-                cold.SetActive(true);
-            }
+                scroll.SetActive(true);
+                psSkyRays.SetActive(true);
+            }        
+          
 
             isColdActive = true;
         }
@@ -597,5 +629,11 @@ namespace DiceFate.Maine
             uiImage.DOFateImageLoadToZero(durationScreenloder);
         }
 
+        // ---------------------------- Дополнительные функции ----------------------------
+
+        private IEnumerator DelayWaitForSeconds(float value)
+        {
+            yield return new WaitForSeconds(value);
+        }
     }
 }

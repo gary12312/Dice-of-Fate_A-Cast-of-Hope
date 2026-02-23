@@ -270,10 +270,7 @@ namespace DiceFate.Player
                 unitPlayer?.VFXLevelUpStart(0.5f);
 
 
-            }
-
-           
-
+            }         
         }
 
         private void ClickToMove()

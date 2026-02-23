@@ -1580,21 +1580,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb7e2b6742b88bc458bfb69e69ace5ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DiceFate.Tooltip.TooptipCard
+  duration: 0.5
+  targetPosition: {x: -200, y: 0, z: 0}
+  moveCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   color: {r: 1, g: 0, b: 0, a: 1}
-  imageCard: {fileID: 293454335163830366}
-  imageVizual: {fileID: 7780958802466641137}
-  imageBorderText: {fileID: 3690280472201116163}
-  imageMove: {fileID: 8032544583829923650}
-  imageAttack: {fileID: 2473100285707880025}
-  imageShild: {fileID: 5585798966469134814}
-  imageConterAttac: {fileID: 4658826574794800740}
-  textName: {fileID: 3465422586159074806}
-  textLevel: {fileID: 7639135976790614299}
-  textDescription: {fileID: 6067612979089878419}
-  textMove: {fileID: 785624628605489990}
-  textAttack: {fileID: 4090419968578184569}
-  textShild: {fileID: 49117363600881478}
-  textConterAttac: {fileID: 723510340746419601}
+  _images:
+  - {fileID: 7780958802466641137}
+  - {fileID: 3690280472201116163}
+  - {fileID: 8032544583829923650}
+  - {fileID: 2473100285707880025}
+  - {fileID: 5585798966469134814}
+  - {fileID: 4658826574794800740}
+  - {fileID: 293454335163830366}
+  _textMeshProUGUIs:
+  - {fileID: 3465422586159074806}
+  - {fileID: 7639135976790614299}
+  - {fileID: 6067612979089878419}
+  - {fileID: 785624628605489990}
+  - {fileID: 4090419968578184569}
+  - {fileID: 49117363600881478}
+  - {fileID: 723510340746419601}
 --- !u!1 &9102757395628751901
 GameObject:
   m_ObjectHideFlags: 0

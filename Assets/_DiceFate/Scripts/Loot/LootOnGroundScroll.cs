@@ -2,6 +2,9 @@ using UnityEngine;
 using DiceFate.Units;
 using DiceFate.Maine;
 using DG.Tweening;
+using DiceFate.EventBus;
+using DiceFate.Events;
+using DiceFate.UI;
 
 
 namespace DiceFate.Loot
@@ -12,10 +15,11 @@ namespace DiceFate.Loot
         [field: SerializeField] public bool IsHover { get; private set; }   // IHover
 
         [Header("Настройки лута")]
+        [SerializeField] private string nameRock;
         [SerializeField] private ObjectOutline Outline; //обводка
         [SerializeField] private PrologScenario prologScenario;
         [Space]
-        [SerializeField] private ParticleSystem particleSystemSparkles;
+        [SerializeField] private ParticleSystem particleSystemSparkles;   
         [SerializeField] private ParticleSystem particleSystemHit;
 
 
@@ -25,7 +29,7 @@ namespace DiceFate.Loot
         [SerializeField] private LayerMask detectionLayer = ~0; // Слой для поиска (по умолчанию все)
         [SerializeField] private bool showGizmos = true;        // Показывать радиус в редакторе
 
-        [Header("Настройки анимации отказа")]
+        [Header("Настройки анимации")]
         [SerializeField] private float bounceHeight = 0.5f; // Высота подпрыгивания
         [SerializeField] private float bounceDuration = 0.5f; // Длительность анимации
         [SerializeField] private int bounceCount = 2; // Количество подпрыгиваний
@@ -40,8 +44,10 @@ namespace DiceFate.Loot
                 new Keyframe(0f, 0f),
                 new Keyframe(1f, 0f)); // Кривая для плавности при выделении
 
+        [Header("Доп")]
+        [SerializeField] private UI_ManeTutorial UI_ManeTutorial;
 
-        private bool _isCanTake = false;
+       private bool _isCanTake = false;
         private Tween _currentFeedbackTween;
         private Vector3 startPosition;
 
@@ -68,6 +74,7 @@ namespace DiceFate.Loot
             //}
             Outline?.EnableOutline();
             IsHover = true;
+            Bus<OnTooltipHoverEvent>.Raise(new OnTooltipHoverEvent(nameRock));
         }
 
         public void OnExitHover()
@@ -77,6 +84,7 @@ namespace DiceFate.Loot
             //}
             Outline?.DisableOutline();
             IsHover = false;
+            Bus<OnTooltipHoverExitEvent>.Raise(new OnTooltipHoverExitEvent(nameRock));
         }
 
         //-------------- Управление обводкой юнита --------------
@@ -189,12 +197,12 @@ namespace DiceFate.Loot
                 return;
             }
 
-            // Получаем ближайшую цель для дополнительной информации
-            GameObject nearestTarget = GetNearestTarget();
-            if (nearestTarget != null)
-            {
-                Debug.Log($"Взятие {gameObject.name} игроком {nearestTarget.name}");
-            }
+            //// Получаем ближайшую цель для дополнительной информации
+            //GameObject nearestTarget = GetNearestTarget();
+            //if (nearestTarget != null)
+            //{
+            //    Debug.Log($"Взятие {gameObject.name} игроком {nearestTarget.name}");
+            //}
 
             // Отключаем возможность повторного взятия
             _isCanTake = false;
@@ -209,22 +217,19 @@ namespace DiceFate.Loot
             //    })
             //    .Play();
 
-            Vector3 unitTarget = new Vector3(nearestTarget.transform.position.x,
-                                             nearestTarget.transform.position.y + 1,
-                                             nearestTarget.transform.position.z);
+            //Vector3 unitTarget = new Vector3(nearestTarget.transform.position.x,
+            //                                 nearestTarget.transform.position.y + 1,
+            //                                 nearestTarget.transform.position.z);
 
             DOTween.Sequence()
                 .Append(transform.DOMoveY(1f, 0.5f)).SetEase(selectedCurve)
-               // .AppendInterval(0.1f)
-                .Append(transform.DOMove(unitTarget, 0.5f))
-                .Join(transform.DOScale(0, 0.5f))
-                .OnComplete(() => OnPickupComplete(nearestTarget))
+                .OnComplete(() => OpenSelectMagicFromUiMain())
                 .Play();
 
-
-
-
-
+                //.Append(transform.DOMove(unitTarget, 0.5f))
+                //.Join(transform.DOScale(0, 0.5f))
+                //.OnComplete(() => OnPickupComplete(nearestTarget))
+                //.Play();
 
             //transform
             //    .DOMoveY(2f, 0.5f)          
@@ -240,6 +245,7 @@ namespace DiceFate.Loot
             // Останавливаем частицы
             if (particleSystemSparkles != null)
                 particleSystemSparkles.Stop();
+         
 
             //if (particleSystemHit != null)
             //    particleSystemHit.gameObject.SetActive(true); // Пока отключить
@@ -247,6 +253,38 @@ namespace DiceFate.Loot
             // Убираем обводку
             Outline?.DisableOutline();
         }
+
+        private void OpenSelectMagicFromUiMain()
+        {
+            if (UI_ManeTutorial != null)
+            {
+                UI_ManeTutorial.MagicSelectedEnable();
+            }
+        }
+
+
+        public void MoveToUnitAndDeactivate()
+        {
+            // Получаем ближайшую цель для дополнительной информации
+            GameObject nearestTarget = GetNearestTarget();
+            if (nearestTarget != null)
+            {
+                Debug.Log($"Взятие {gameObject.name} игроком {nearestTarget.name}");
+            }
+
+            Vector3 unitTarget = new Vector3(nearestTarget.transform.position.x,
+                                         nearestTarget.transform.position.y + 1,
+                                         nearestTarget.transform.position.z);
+
+            DOTween.Sequence()
+                .Append(transform.DOMove(unitTarget, 0.5f))
+                .Join(transform.DOScale(0, 0.5f))
+                .OnComplete(() => OnPickupComplete(nearestTarget))
+                .Play();
+        }    
+
+
+
 
         private void OnPickupComplete(GameObject picker)
         {
@@ -318,7 +356,7 @@ namespace DiceFate.Loot
                 Debug.LogError($"Установить targetTag для {gameObject.name}");
 
             if (particleSystemSparkles == null)
-                Debug.LogWarning($"particleSystemSparkles не установлен для {gameObject.name}");
+                Debug.LogWarning($"particleSystemSparkles не установлен для {gameObject.name}");      
 
             if (particleSystemHit == null)
                 Debug.LogWarning($"particleSystemHit не установлен для {gameObject.name}");
@@ -346,6 +384,7 @@ namespace DiceFate.Loot
             {
                 particleSystemSparkles.Play();
             }
+        
 
             if (particleSystemHit != null)
             {

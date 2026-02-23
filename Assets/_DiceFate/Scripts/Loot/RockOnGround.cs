@@ -1,6 +1,7 @@
 using DiceFate.Units;
 using UnityEngine;
-using UnityEngine.UIElements;
+using DiceFate.EventBus;
+using DiceFate.Events;
 
 
 namespace DiceFate.Loot
@@ -11,6 +12,7 @@ namespace DiceFate.Loot
         [field: SerializeField] public bool IsHover { get; private set; }   // IHover
 
         [SerializeField] private GameObject particle;
+        [SerializeField] private string nameRock;
 
         //[SerializeField] private LootTwinAnimation lootTwinAnimation;
         [SerializeField] private ObjectOutline Outline; //обводка
@@ -34,9 +36,9 @@ namespace DiceFate.Loot
 
 
         public void ActivateRock()
-        { 
-            isActivate = true;        
-            particle.SetActive(true);        
+        {
+            isActivate = true;
+            particle.SetActive(true);
         }
 
 
@@ -49,6 +51,8 @@ namespace DiceFate.Loot
             {
                 if (IsSelected == false) { Outline?.EnableOutline(); }
                 IsHover = true;
+
+                Bus<OnTooltipHoverEvent>.Raise(new OnTooltipHoverEvent(nameRock));
             }
         }
         public void OnExitHover()
@@ -56,8 +60,10 @@ namespace DiceFate.Loot
             if (isActivate)
             {
                 if (IsSelected == false) { Outline?.DisableOutline(); }
-            IsHover = false;
-                }
+                IsHover = false;
+
+                Bus<OnTooltipHoverExitEvent>.Raise(new OnTooltipHoverExitEvent(nameRock));
+            }
         }
         //-------------- Управление обводкой юнита --------------
         public void OutlineOnSelected()

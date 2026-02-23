@@ -1,11 +1,13 @@
+using DiceFate.EventBus;
+using DiceFate.Events;
+using DiceFate.Maine;
+using DiceFate.UI_Dice;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using DiceFate.Events;
-using DiceFate.EventBus;
-using DiceFate.UI_Dice;
-using System;
-using DiceFate.Maine;
+using DiceFate.Loot;
+using DiceFate.Tooltip;
+
 
 namespace DiceFate.UI
 {
@@ -66,6 +68,22 @@ namespace DiceFate.UI
         [SerializeField] private TextMeshProUGUI testNameEnemy;
         [SerializeField] private TextMeshProUGUI testPhase;
 
+        [Header("Магия")]
+        [SerializeField] private GameObject magikCardFire;
+        [SerializeField] private GameObject magikCardIce;
+        [SerializeField] private GameObject emakimonoPanel;
+        [SerializeField] private Button     buttonEmakimono;
+        [SerializeField] private Button     buttonEmakimonoExit;
+
+        [Header("Tooltip")]
+        [SerializeField] private GameObject cardInfoGolem;
+        [SerializeField] private GameObject cardInfoStoneFire;
+        [SerializeField] private GameObject cardInfoStoneIce;
+        [SerializeField] private GameObject cardInfoScroll;
+        
+
+
+
 
         [Header("Доп")]
         [SerializeField] private UI_Mane_Battle uI_Mane_Battle;
@@ -74,7 +92,7 @@ namespace DiceFate.UI
         private Color colorTextDefault;
         private Color defoultColorDiceAttack;
         private Color defoultColorDiceShield;
-        private Color defoultColorDiceCounterattack;       
+        private Color defoultColorDiceCounterattack;
         private Color colorAlfaZero = new Color(1f, 1f, 1f, 0f);
 
 
@@ -87,12 +105,16 @@ namespace DiceFate.UI
 
             Bus<UnitSelectedEvent>.OnEvent += HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandeleUnitDeselect;
+            Bus<OnTooltipHoverEvent>.OnEvent += OnTooltipHover;
+            Bus<OnTooltipHoverExitEvent>.OnEvent += OnTooltipHoverExit;
         }
 
         private void OnDestroy()
         {
             Bus<UnitSelectedEvent>.OnEvent -= HandelUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandeleUnitDeselect;
+            Bus<OnTooltipHoverEvent>.OnEvent -= OnTooltipHover;
+            Bus<OnTooltipHoverExitEvent>.OnEvent += OnTooltipHoverExit;
         }
 
 
@@ -103,12 +125,17 @@ namespace DiceFate.UI
             defoultColorDiceShield = diceShield.color;
             defoultColorDiceCounterattack = diceCounterattack.color;
 
-            ValidateScriptsAndObject();
+            emakimonoPanel.SetActive(false);
+            MagicSetActive(false);
 
+            buttonEmakimono.onClick.AddListener(ClickButtoneEmakimonoToOpenMagicSelect);
+            buttonEmakimonoExit.onClick.AddListener(ClickButtoneEmakimonoExit); 
+
+            ValidateScriptsAndObject();
             HideAllUIElements(); // Начальное состояние: всё скрыто
         }
 
-
+     
 
         private void UpdateAvatarBattleFotUI()  // Запустить через событие
         {
@@ -166,16 +193,11 @@ namespace DiceFate.UI
         }
 
         //---------------------------------- События  ----------------------------------
-        private void HandelUnitSelected(UnitSelectedEvent evt)
-        {
-            //selectedUnit = evt.Unit; // Обновить текущий выделенный юнит
+        private void HandelUnitSelected(UnitSelectedEvent evt) => EnableUISelectedEnemyOrOherUnit();
+        private void HandeleUnitDeselect(UnitDeselectedEvent args) => DisableUISelectedEnemyOrOherUnit();
+        private void OnTooltipHover(OnTooltipHoverEvent evt) => TooltipInfoEnable(evt.NameTool);
+        private void OnTooltipHoverExit(OnTooltipHoverExitEvent evt) => TooltipInfoDesable(evt.NameTool);
 
-            EnableUISelectedEnemyOrOherUnit();
-        }
-        private void HandeleUnitDeselect(UnitDeselectedEvent args)
-        {
-            DisableUISelectedEnemyOrOherUnit();
-        }
 
 
         // ------------------------ UI управление ---------------------------------
@@ -223,14 +245,14 @@ namespace DiceFate.UI
                     break;
             }
             uiDiceTargetResult.UpdateTextUiDisplay();
-            SetUiPlayerCard(true, false, true, true, true, true); 
+            SetUiPlayerCard(true, false, true, true, true, true);
         }
 
         public void UiShowPhaseTwoPlayer()
         {
             iBackgroundOffClicker.SetActive(true);
             SetUiPlayerCard(true, true, false, false, true, true);
-           
+
             switch (prologScenario.prologNumber)
             {
                 case 6:
@@ -349,9 +371,108 @@ namespace DiceFate.UI
         public void UiDisplayClearAll() => uiDiceTargetResult.ClearAll();
         public void UiClearAllDiceOnField() => uiDropTargetField.ResetAllDiceAndClearField(); // Очистить список кубиков на платке
 
+        //-------------------------- Magic  ----------------------------------
+
+        private void ClickButtoneEmakimonoToOpenMagicSelect()
+        {
+            HideAllUIElements();
+            iBackgroundOffClicker?.SetActive(true);
+            emakimonoPanel?.SetActive(true);
+        }
+
+        private void ClickButtoneEmakimonoExit()
+        {
+            //HideAllUIElements();
+            iBackgroundOffClicker?.SetActive(false);
+            emakimonoPanel?.SetActive(false);
+        }
+
+        public void MagicSelectedEnable()
+        {
+            HideAllUIElements();
+            iBackgroundOffClicker?.SetActive(true);
+            MagicSetActive(true);
+        }
+        public void MagicSelectedExit()
+        {
+           
+            iBackgroundOffClicker?.SetActive(false);
+            MagicSetActive(false);
+        }
+
+
+        private void MagicSetActive(bool isActive)
+        {
+            magikCardFire.SetActive(isActive);
+            magikCardIce.SetActive(isActive);
+        }
 
 
 
+
+
+        //-------------------------- Tooltip  ----------------------------------
+
+        private void TooltipInfoEnable(string name)
+        {
+            switch (name)
+            {
+                case "Golem":
+                    cardInfoGolem.SetActive(true);
+                    break;
+                case "RockEventFire":
+                    cardInfoStoneFire.SetActive(true);
+                    break;
+                case "RockEventIсe":
+                    cardInfoStoneIce.SetActive(true);
+                    break;
+                case "Scroll":
+                    cardInfoScroll.SetActive(true);
+                    break;
+            }
+        }
+
+
+        private void TooltipInfoDesable(string name)
+        {
+            switch (name)
+            {
+                case "Golem":
+                    StoneActivate(cardInfoGolem);
+                    break;
+                case "RockEventFire":
+                    StoneActivate(cardInfoStoneFire);
+                    break;
+                case "RockEventIсe":
+                    StoneActivate(cardInfoStoneIce);                   
+                    break;
+                case "Scroll":
+                    StoneActivate(cardInfoScroll);
+                    break;
+                default:
+                    TooltipInfoDisable();
+                    break;
+            }
+        }
+
+        private void StoneActivate(GameObject tooltipInfo)
+        {
+            if (tooltipInfo != null)
+            {
+                TooltipCard tooltipCard = tooltipInfo.GetComponent<TooltipCard>();
+                if (tooltipCard != null)
+                {
+                    tooltipCard.MoveTooltipOnDisable();
+                }
+            }
+        }
+
+        private void TooltipInfoDisable()
+        {
+            cardInfoGolem.SetActive(false);
+            cardInfoStoneFire.SetActive(false);
+            cardInfoStoneIce.SetActive(false);
+        }
 
         // ------------------------ Проверки ---------------------------------
         private void ValidateScriptsAndObject()
